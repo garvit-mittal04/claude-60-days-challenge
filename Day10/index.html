@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Garvit Mittal · Business Analytics & AI Builder</title>
+<meta name="description" content="Garvit Mittal — MS Business Analytics & AI student at UT Dallas. Building data products that turn analytics into decisions. Python · SQL · Power BI · ML." />
+<meta name="keywords" content="Garvit Mittal, Business Analytics, AI, Machine Learning, UT Dallas, Data Analyst, Python, SQL, Power BI, FP&A, Forecasting" />
+<meta name="author" content="Garvit Mittal" />
+<meta property="og:title" content="Garvit Mittal · Business Analytics & AI Builder" />
+<meta property="og:description" content="MS Business Analytics & AI student at UT Dallas. I build data products that turn analytics into decisions." />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://garvitmittal.com" />
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232563eb'/%3E%3Ctext x='32' y='44' font-size='34' font-weight='800' fill='white' text-anchor='middle' font-family='Inter,sans-serif'%3EGM%3C/text%3E%3C/svg%3E" />
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Inter','system-ui','sans-serif'] },
+        colors: {
+          brand: { 50:'#eff6ff', 100:'#dbeafe', 400:'#60a5fa', 500:'#3b82f6', 600:'#2563eb', 700:'#1d4ed8', 800:'#1e40af', 900:'#1e3a8a' },
+          accent:{ 50:'#fff7ed', 100:'#ffedd5', 400:'#fb923c', 500:'#f97316', 600:'#ea580c', 700:'#c2410c' }
+        },
+        animation: {
+          'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
+          'float': 'float 6s ease-in-out infinite',
+          'glow': 'glow 3s ease-in-out infinite',
+        },
+        keyframes: {
+          fadeInUp: { '0%': {opacity:'0',transform:'translateY(20px)'}, '100%': {opacity:'1',transform:'translateY(0)'} },
+          float: { '0%,100%': {transform:'translateY(0)'}, '50%': {transform:'translateY(-10px)'} },
+          glow: { '0%,100%': {boxShadow:'0 0 20px rgba(37,99,235,0.4)'}, '50%': {boxShadow:'0 0 40px rgba(249,115,22,0.5)'} }
+        }
+      }
+    }
+  }
+</script>
+<style>
+  html,body{font-family:'Inter',system-ui,sans-serif;}
+  .gradient-text{background:linear-gradient(135deg,#2563eb,#f97316);-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .gradient-bg{background:linear-gradient(135deg,#2563eb,#f97316);}
+  .gradient-border{position:relative;}
+  .gradient-border::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:2px;background:linear-gradient(135deg,#2563eb,#f97316);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;}
+  .reveal{opacity:0;transform:translateY(30px);transition:opacity 0.7s ease,transform 0.7s ease;}
+  .reveal.visible{opacity:1;transform:translateY(0);}
+  .skill-bar{height:8px;border-radius:999px;background:rgba(148,163,184,0.2);overflow:hidden;}
+  .skill-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,#2563eb,#f97316);width:0;transition:width 1.2s cubic-bezier(0.4,0,0.2,1);}
+  .nav-link.active{color:#f97316;}
+  .nav-link.active::after{transform:scaleX(1);}
+  .nav-link{position:relative;}
+  .nav-link::after{content:"";position:absolute;left:0;bottom:-4px;height:2px;width:100%;background:linear-gradient(90deg,#2563eb,#f97316);transform:scaleX(0);transition:transform 0.3s;transform-origin:left;}
+  .nav-link:hover::after{transform:scaleX(1);}
+  .typing-cursor::after{content:"|";color:#f97316;animation:blink 1s infinite;}
+  @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+  .grain{position:relative;}
+  .grain::before{content:"";position:absolute;inset:0;background-image:radial-gradient(circle at 10% 20%,rgba(37,99,235,0.15),transparent 40%),radial-gradient(circle at 90% 80%,rgba(249,115,22,0.12),transparent 40%);pointer-events:none;z-index:0;}
+  .card-hover{transition:transform 0.3s ease,box-shadow 0.3s ease,border-color 0.3s ease;}
+  .card-hover:hover{transform:translateY(-6px);box-shadow:0 20px 40px -10px rgba(37,99,235,0.25);}
+  /* Dark/light surfaces */
+  .dark body{background:#070914;}
+</style>
+</head>
+<body class="bg-white dark:bg-[#070914] text-slate-900 dark:text-slate-100 antialiased transition-colors duration-300">
+
+<!-- NAV -->
+<nav id="nav" class="fixed top-0 inset-x-0 z-50 backdrop-blur-lg bg-white/70 dark:bg-[#070914]/70 border-b border-slate-200/60 dark:border-slate-800/60 transition-all">
+  <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <a href="#hero" class="font-extrabold text-lg gradient-text">Garvit Mittal</a>
+    <div class="hidden md:flex items-center gap-7 text-sm font-medium text-slate-600 dark:text-slate-400">
+      <a href="#about"     class="nav-link hover:text-slate-900 dark:hover:text-white transition">About</a>
+      <a href="#skills"    class="nav-link hover:text-slate-900 dark:hover:text-white transition">Skills</a>
+      <a href="#projects"  class="nav-link hover:text-slate-900 dark:hover:text-white transition">Projects</a>
+      <a href="#experience"class="nav-link hover:text-slate-900 dark:hover:text-white transition">Experience</a>
+      <a href="#contact"   class="nav-link hover:text-slate-900 dark:hover:text-white transition">Contact</a>
+    </div>
+    <div class="flex items-center gap-3">
+      <button id="themeToggle" aria-label="Toggle theme" class="p-2 rounded-lg border border-slate-300 dark:border-slate-700 hover:border-brand-600 dark:hover:border-accent-500 transition">
+        <svg id="sunIcon" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364-6.364l-1.414 1.414M6.05 17.95l-1.414 1.414m12.728 0l-1.414-1.414M6.05 6.05L4.636 4.636M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        <svg id="moonIcon" class="w-5 h-5 dark:hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+      </button>
+      <a href="#contact" class="hidden sm:inline-block px-4 py-2 rounded-lg text-sm font-semibold text-white gradient-bg hover:opacity-90 transition">Let's talk</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero" class="grain relative min-h-screen flex items-center pt-28 pb-16 px-6 overflow-hidden">
+  <div class="absolute inset-0 -z-10">
+    <div class="absolute top-20 left-10 w-72 h-72 bg-brand-600/30 rounded-full filter blur-3xl animate-float"></div>
+    <div class="absolute bottom-20 right-10 w-80 h-80 bg-accent-500/25 rounded-full filter blur-3xl animate-float" style="animation-delay:-3s"></div>
+  </div>
+  <div class="max-w-6xl mx-auto w-full grid md:grid-cols-2 gap-12 items-center relative z-10">
+    <div class="reveal">
+      <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.05] tracking-tight mb-5">
+        Hi, I'm <span class="gradient-text">Garvit</span>.
+      </h1>
+      <p class="text-xl md:text-2xl font-medium text-slate-700 dark:text-slate-300 mb-3 h-8">
+        <span id="typed" class="typing-cursor"></span>
+      </p>
+      <p class="text-base md:text-lg text-slate-600 dark:text-slate-400 leading-relaxed mb-8 max-w-xl">
+        MS Business Analytics & AI student at UT Dallas. I build data products that turn analytics into decisions — forecasting models, ML pipelines, executive dashboards, AI agents.
+      </p>
+      <div class="flex flex-wrap items-center gap-3 mb-8">
+        <a href="#projects" class="px-6 py-3 rounded-xl text-sm font-semibold text-white gradient-bg hover:opacity-90 transition shadow-lg shadow-brand-600/30">View My Work →</a>
+        <a href="#contact"  class="px-6 py-3 rounded-xl text-sm font-semibold border border-slate-300 dark:border-slate-700 hover:border-brand-600 dark:hover:border-accent-500 transition">Get in touch</a>
+      </div>
+      <div class="flex items-center gap-4 text-slate-500 dark:text-slate-400">
+        <a href="https://linkedin.com/in/garvit-mittal04" target="_blank" rel="noopener" aria-label="LinkedIn" class="hover:text-brand-600 dark:hover:text-brand-400 transition">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+        </a>
+        <a href="https://github.com/garvit-mittal04" target="_blank" rel="noopener" aria-label="GitHub" class="hover:text-brand-600 dark:hover:text-brand-400 transition">
+          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        </a>
+        <a href="mailto:garvitm534@gmail.com" aria-label="Email" class="hover:text-brand-600 dark:hover:text-brand-400 transition">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l9 6 9-6M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        </a>
+        <span class="text-sm">·</span>
+        <span class="text-sm">📍 Dallas, TX</span>
+      </div>
+    </div>
+    <div class="reveal flex justify-center md:justify-end">
+      <div class="relative">
+        <div class="absolute -inset-3 gradient-bg rounded-3xl blur-2xl opacity-40 animate-glow"></div>
+        <div class="relative w-72 h-72 md:w-80 md:h-80 rounded-3xl overflow-hidden border-4 border-white/10 dark:border-white/5 shadow-2xl">
+          <img src="profile.jpg" alt="Garvit Mittal" class="w-full h-full object-cover" onerror="this.outerHTML='<div class=\'w-full h-full flex items-center justify-center gradient-bg text-white text-7xl font-black\'>GM</div>'"/>
+        </div>
+        <div class="absolute -bottom-4 -right-4 bg-white dark:bg-slate-900 px-4 py-2 rounded-xl shadow-xl border border-slate-200 dark:border-slate-800 text-sm font-semibold">
+          <span class="gradient-text">🚀 60-Day Claude Challenge</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="py-24 px-6 bg-slate-50 dark:bg-[#0c1227]">
+  <div class="max-w-5xl mx-auto">
+    <div class="reveal">
+      <p class="text-sm font-semibold uppercase tracking-widest text-accent-500 mb-3">About me</p>
+      <h2 class="text-3xl md:text-4xl font-extrabold mb-6">Analytics first. AI second. <span class="gradient-text">Outcomes always.</span></h2>
+      <div class="grid md:grid-cols-2 gap-10 mt-10">
+        <div class="space-y-4 text-slate-700 dark:text-slate-300 text-base leading-relaxed">
+          <p>I'm pursuing my MS in Business Analytics & AI at UT Dallas, with a Bachelor's in Finance from Christ University, Bangalore. I've spent the last year shipping data products across finance, retail, and operations — from SKU-level pricing analysis at JityAI to a 5-table SQL schema and Random Forest models for warehouse decisioning.</p>
+          <p>My favorite work sits at the intersection of <strong class="text-brand-600 dark:text-brand-400">structured analytics</strong> and <strong class="text-accent-500">applied AI</strong>: forecasting that drives real staffing decisions, LLM-powered variance commentary that replaces 5 days of manual FP&A work, dashboards that executives actually open.</p>
+          <p>Currently learning in public via the #60DayClaudeChallenge — building a new AI-powered application every day.</p>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 card-hover">
+            <div class="text-3xl font-extrabold gradient-text">53K+</div>
+            <div class="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">Supply chain records modeled</div>
+          </div>
+          <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 card-hover">
+            <div class="text-3xl font-extrabold gradient-text">91.7%</div>
+            <div class="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">Risk classifier accuracy</div>
+          </div>
+          <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 card-hover">
+            <div class="text-3xl font-extrabold gradient-text">$840K</div>
+            <div class="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">Projected annual savings</div>
+          </div>
+          <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 card-hover">
+            <div class="text-3xl font-extrabold gradient-text">10/60</div>
+            <div class="text-xs text-slate-500 dark:text-slate-400 mt-1 font-medium">Days into Claude challenge</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills" class="py-24 px-6">
+  <div class="max-w-6xl mx-auto">
+    <div class="reveal mb-12">
+      <p class="text-sm font-semibold uppercase tracking-widest text-accent-500 mb-3">Skills</p>
+      <h2 class="text-3xl md:text-4xl font-extrabold">The toolkit I ship with.</h2>
+    </div>
+    <div class="grid md:grid-cols-2 gap-8 mb-12">
+      <div class="reveal">
+        <h3 class="text-lg font-bold mb-5 flex items-center gap-2"><span class="w-1.5 h-6 gradient-bg rounded-full"></span>Query & Programming</h3>
+        <div class="space-y-4">
+          <div><div class="flex justify-between text-sm mb-2"><span class="font-medium">SQL · Joins, CTEs, Window Functions</span><span class="text-slate-500 font-semibold">95%</span></div><div class="skill-bar"><div class="skill-fill" data-w="95"></div></div></div>
+          <div><div class="flex justify-between text-sm mb-2"><span class="font-medium">Python · Pandas, NumPy, Scikit-learn</span><span class="text-slate-500 font-semibold">90%</span></div><div class="skill-bar"><div class="skill-fill" data-w="90"></div></div></div>
+          <div><div class="flex justify-between text-sm mb-2"><span class="font-medium">R · Statistical validation</span><span class="text-slate-500 font-semibold">75%</span></div><div class="skill-bar"><div class="skill-fill" data-w="75"></div></div></div>
+        </div>
+      </div>
+      <div class="reveal">
+        <h3 class="text-lg font-bold mb-5 flex items-center gap-2"><span class="w-1.5 h-6 gradient-bg rounded-full"></span>BI & Visualization</h3>
+        <div class="space-y-4">
+          <div><div class="flex justify-between text-sm mb-2"><span class="font-medium">Power BI · DAX</span><span class="text-slate-500 font-semibold">92%</span></div><div class="skill-bar"><div class="skill-fill" data-w="92"></div></div></div>
+          <div><div class="flex justify-between text-sm mb-2"><span class="font-medium">Tableau Desktop Specialist</span><span class="text-slate-500 font-semibold">88%</span></div><div class="skill-bar"><div class="skill-fill" data-w="88"></div></div></div>
+          <div><div class="flex justify-between text-sm mb-2"><span class="font-medium">Excel · Power Query, VBA, Power Automate</span><span class="text-slate-500 font-semibold">95%</span></div><div class="skill-bar"><div class="skill-fill" data-w="95"></div></div></div>
+        </div>
+      </div>
+      <div class="reveal">
+        <h3 class="text-lg font-bold mb-5 flex items-center gap-2"><span class="w-1.5 h-6 gradient-bg rounded-full"></span>Analytics Methods</h3>
+        <div class="space-y-4">
+          <div><div class="flex justify-between text-sm mb-2"><span class="font-medium">Forecasting & Regression Modeling</span><span class="text-slate-500 font-semibold">90%</span></div><div class="skill-bar"><div class="skill-fill" data-w="90"></div></div></div>
+          <div><div class="flex justify-between text-sm mb-2"><span class="font-medium">Pricing & SKU Analysis</span><span class="text-slate-500 font-semibold">93%</span></div><div class="skill-bar"><div class="skill-fill" data-w="93"></div></div></div>
+          <div><div class="flex justify-between text-sm mb-2"><span class="font-medium">A/B Testing & Variance Analysis</span><span class="text-slate-500 font-semibold">85%</span></div><div class="skill-bar"><div class="skill-fill" data-w="85"></div></div></div>
+        </div>
+      </div>
+      <div class="reveal">
+        <h3 class="text-lg font-bold mb-5 flex items-center gap-2"><span class="w-1.5 h-6 gradient-bg rounded-full"></span>AI & ML Stack</h3>
+        <div class="space-y-4">
+          <div><div class="flex justify-between text-sm mb-2"><span class="font-medium">Scikit-learn · Random Forest, XGBoost</span><span class="text-slate-500 font-semibold">88%</span></div><div class="skill-bar"><div class="skill-fill" data-w="88"></div></div></div>
+          <div><div class="flex justify-between text-sm mb-2"><span class="font-medium">SHAP · Model Explainability</span><span class="text-slate-500 font-semibold">82%</span></div><div class="skill-bar"><div class="skill-fill" data-w="82"></div></div></div>
+          <div><div class="flex justify-between text-sm mb-2"><span class="font-medium">LLM Integration · Claude, Groq API</span><span class="text-slate-500 font-semibold">85%</span></div><div class="skill-bar"><div class="skill-fill" data-w="85"></div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="reveal">
+      <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-4">Tech tags</h3>
+      <div class="flex flex-wrap gap-2">
+        <span class="px-3 py-1.5 rounded-full text-xs font-semibold bg-brand-600/10 text-brand-700 dark:text-brand-400 border border-brand-600/30">Python</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-semibold bg-brand-600/10 text-brand-700 dark:text-brand-400 border border-brand-600/30">SQL / MySQL</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-semibold bg-brand-600/10 text-brand-700 dark:text-brand-400 border border-brand-600/30">R</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-semibold bg-accent-500/10 text-accent-700 dark:text-accent-500 border border-accent-500/30">Power BI</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-semibold bg-accent-500/10 text-accent-700 dark:text-accent-500 border border-accent-500/30">Tableau</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-semibold bg-accent-500/10 text-accent-700 dark:text-accent-500 border border-accent-500/30">Excel · VBA</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-semibold bg-brand-600/10 text-brand-700 dark:text-brand-400 border border-brand-600/30">Streamlit</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-semibold bg-brand-600/10 text-brand-700 dark:text-brand-400 border border-brand-600/30">Scikit-learn</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-semibold bg-brand-600/10 text-brand-700 dark:text-brand-400 border border-brand-600/30">XGBoost</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-semibold bg-brand-600/10 text-brand-700 dark:text-brand-400 border border-brand-600/30">Facebook Prophet</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-semibold bg-brand-600/10 text-brand-700 dark:text-brand-400 border border-brand-600/30">SHAP</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-semibold bg-accent-500/10 text-accent-700 dark:text-accent-500 border border-accent-500/30">Claude API</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-semibold bg-accent-500/10 text-accent-700 dark:text-accent-500 border border-accent-500/30">Groq API</span>
+        <span class="px-3 py-1.5 rounded-full text-xs font-semibold bg-accent-500/10 text-accent-700 dark:text-accent-500 border border-accent-500/30">Power Automate</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects" class="py-24 px-6 bg-slate-50 dark:bg-[#0c1227]">
+  <div class="max-w-6xl mx-auto">
+    <div class="reveal mb-12">
+      <p class="text-sm font-semibold uppercase tracking-widest text-accent-500 mb-3">Featured Projects</p>
+      <h2 class="text-3xl md:text-4xl font-extrabold">Where analytics meets <span class="gradient-text">decisions.</span></h2>
+    </div>
+    <div class="grid lg:grid-cols-3 gap-6">
+
+      <article class="reveal card-hover group p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-12 h-12 rounded-xl gradient-bg flex items-center justify-center text-white text-xl font-bold">📦</div>
+          <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-green-500/15 text-green-600 dark:text-green-400 border border-green-500/30">Live App</span>
+        </div>
+        <h3 class="text-xl font-bold mb-2">ML-Powered Warehouse Decision System</h3>
+        <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-4 flex-1">End-to-end ML system on 53K supply chain records. Random Forest throughput predictor (R²=0.934), risk classifier (91.7% accuracy), interactive Streamlit app with 5 decision tabs, $840K projected annual savings.</p>
+        <div class="flex flex-wrap gap-1.5 mb-4">
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-600/10 text-brand-700 dark:text-brand-400">Python</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-600/10 text-brand-700 dark:text-brand-400">scikit-learn</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-600/10 text-brand-700 dark:text-brand-400">Streamlit</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-600/10 text-brand-700 dark:text-brand-400">SHAP</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-600/10 text-brand-700 dark:text-brand-400">MySQL</span>
+        </div>
+        <div class="flex gap-2 mt-auto">
+          <a href="https://warehouse-garvit.streamlit.app" target="_blank" rel="noopener" class="flex-1 text-center text-xs font-semibold py-2 rounded-lg gradient-bg text-white hover:opacity-90 transition">Live Demo →</a>
+          <a href="https://github.com/garvit-mittal04/warehouse-decision-system" target="_blank" rel="noopener" class="flex-1 text-center text-xs font-semibold py-2 rounded-lg border border-slate-300 dark:border-slate-700 hover:border-brand-600 transition">GitHub</a>
+        </div>
+      </article>
+
+      <article class="reveal card-hover group p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-12 h-12 rounded-xl gradient-bg flex items-center justify-center text-white text-xl font-bold">💼</div>
+          <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-green-500/15 text-green-600 dark:text-green-400 border border-green-500/30">Live App</span>
+        </div>
+        <h3 class="text-xl font-bold mb-2">FP&A AI Analyst Agent</h3>
+        <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-4 flex-1">Automated FP&A pipeline that replaces 2–5 days of manual variance analysis with a sub-2-minute workflow. SQLite variance engine (CTEs + window functions), Isolation Forest anomaly detection, Groq LLM board-ready commentary, 15-test automated suite.</p>
+        <div class="flex flex-wrap gap-1.5 mb-4">
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-600/10 text-brand-700 dark:text-brand-400">Python</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-600/10 text-brand-700 dark:text-brand-400">SQLite</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-600/10 text-brand-700 dark:text-brand-400">Streamlit</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-accent-500/10 text-accent-700 dark:text-accent-500">Groq LLM</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-600/10 text-brand-700 dark:text-brand-400">Isolation Forest</span>
+        </div>
+        <div class="flex gap-2 mt-auto">
+          <a href="https://github.com/garvit-mittal04/fpa-ai-agent" target="_blank" rel="noopener" class="flex-1 text-center text-xs font-semibold py-2 rounded-lg gradient-bg text-white hover:opacity-90 transition">View Code →</a>
+          <a href="https://github.com/garvit-mittal04/fpa-ai-agent" target="_blank" rel="noopener" class="flex-1 text-center text-xs font-semibold py-2 rounded-lg border border-slate-300 dark:border-slate-700 hover:border-brand-600 transition">GitHub</a>
+        </div>
+      </article>
+
+      <article class="reveal card-hover group p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col">
+        <div class="flex items-center justify-between mb-4">
+          <div class="w-12 h-12 rounded-xl gradient-bg flex items-center justify-center text-white text-xl font-bold">🚀</div>
+          <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-accent-500/15 text-accent-700 dark:text-accent-500 border border-accent-500/30">In Progress</span>
+        </div>
+        <h3 class="text-xl font-bold mb-2">60-Day Claude Challenge</h3>
+        <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed mb-4 flex-1">Building a new AI-powered application every day for 60 days. Includes a Personal Environmental Health Analyzer, NutriScope nutrition analyzer (MVP + Pro), prompt engineering experiments, and learnings shipped publicly on LinkedIn + GitHub.</p>
+        <div class="flex flex-wrap gap-1.5 mb-4">
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-accent-500/10 text-accent-700 dark:text-accent-500">Claude</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-600/10 text-brand-700 dark:text-brand-400">HTML/JS</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-600/10 text-brand-700 dark:text-brand-400">Chart.js</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-brand-600/10 text-brand-700 dark:text-brand-400">Tailwind</span>
+          <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-accent-500/10 text-accent-700 dark:text-accent-500">Prompt Eng</span>
+        </div>
+        <div class="flex gap-2 mt-auto">
+          <a href="https://github.com/garvit-mittal04/claude-60-days-challenge" target="_blank" rel="noopener" class="flex-1 text-center text-xs font-semibold py-2 rounded-lg gradient-bg text-white hover:opacity-90 transition">Explore →</a>
+          <a href="https://linkedin.com/in/garvit-mittal04" target="_blank" rel="noopener" class="flex-1 text-center text-xs font-semibold py-2 rounded-lg border border-slate-300 dark:border-slate-700 hover:border-brand-600 transition">LinkedIn</a>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience" class="py-24 px-6">
+  <div class="max-w-5xl mx-auto">
+    <div class="reveal mb-12">
+      <p class="text-sm font-semibold uppercase tracking-widest text-accent-500 mb-3">Experience</p>
+      <h2 class="text-3xl md:text-4xl font-extrabold">Where I've shipped.</h2>
+    </div>
+    <div class="space-y-6">
+      <div class="reveal p-6 rounded-2xl bg-white dark:bg-slate-900 border-2 border-brand-600/40 dark:border-accent-500/40 card-hover relative">
+        <span class="absolute -top-3 left-6 px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-widest text-white gradient-bg">Current</span>
+        <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
+          <div>
+            <h3 class="text-lg font-bold">Operations Analyst Intern</h3>
+            <p class="text-sm text-brand-600 dark:text-brand-400 font-semibold">The Chicago School</p>
+          </div>
+          <span class="text-xs font-semibold px-3 py-1 rounded-full bg-green-500/15 text-green-600 dark:text-green-400 border border-green-500/30">Jun 2026 – Present</span>
+        </div>
+        <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+          <li>• Partnering with departments across the university — under the Director of Operations — to analyze business processes, surface efficiency gaps, and propose technology-enabled solutions</li>
+          <li>• Building automated workflows in <strong class="text-accent-500">Microsoft Power Automate</strong> to standardize recurring operational tasks across SharePoint, Microsoft Lists, and Teams</li>
+          <li>• Documenting current-state processes and recommending <strong class="text-accent-500">Power BI</strong> + <strong class="text-accent-500">Power Apps</strong> interventions to improve cross-functional reporting and decision flow</li>
+          <li>• Monitoring impact of implemented solutions and training staff on new tools and automated workflows</li>
+        </ul>
+      </div>
+
+      <div class="reveal p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 card-hover">
+        <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
+          <div>
+            <h3 class="text-lg font-bold">Business Analyst</h3>
+            <p class="text-sm text-brand-600 dark:text-brand-400 font-semibold">JityAI</p>
+          </div>
+          <span class="text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">Jan 2025 – Aug 2025</span>
+        </div>
+        <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+          <li>• SKU-level pricing and demand analysis for retail clients — structured reporting and forecasting for product setup and inventory allocation</li>
+          <li>• Built regression + time-series models in Python that lifted forecast accuracy by <strong class="text-accent-500">15–20%</strong></li>
+          <li>• Built Power BI + Tableau dashboards that became the cross-functional review hub for pricing and sales velocity</li>
+        </ul>
+      </div>
+
+      <div class="reveal p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 card-hover">
+        <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
+          <div>
+            <h3 class="text-lg font-bold">Operations & Business Analyst</h3>
+            <p class="text-sm text-brand-600 dark:text-brand-400 font-semibold">Harsiddhi Foods Pvt. Ltd., India</p>
+          </div>
+          <span class="text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">Apr 2025 – Jul 2025</span>
+        </div>
+        <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+          <li>• Analyzed <strong class="text-accent-500">20,000+</strong> procurement, production, and export records to surface supplier pricing gaps and cost variances</li>
+          <li>• Built regression-based forecasting model on 12 months of data — <strong class="text-accent-500">15%</strong> planning accuracy lift</li>
+          <li>• Automated vendor payment + AR reconciliation in Excel Power Query + VBA — <strong class="text-accent-500">25%</strong> faster monthly close</li>
+        </ul>
+      </div>
+
+      <div class="reveal p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 card-hover">
+        <div class="flex flex-wrap items-start justify-between gap-3 mb-3">
+          <div>
+            <h3 class="text-lg font-bold">Accounts & Audit Trainee</h3>
+            <p class="text-sm text-brand-600 dark:text-brand-400 font-semibold">Dipankar Gupta & Co., India</p>
+          </div>
+          <span class="text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">May 2024 – Jun 2024</span>
+        </div>
+        <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+          <li>• Reconciled financial records across client portfolios; built data-validation checklists adopted across the team</li>
+          <li>• Performed compliance + data-quality audits on <strong class="text-accent-500">30+</strong> client document sets</li>
+          <li>• Built automated Excel templates that cut recurring report prep by <strong class="text-accent-500">20%</strong></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EDUCATION + CERTIFICATIONS -->
+<section class="py-24 px-6 bg-slate-50 dark:bg-[#0c1227]">
+  <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-10">
+    <div class="reveal">
+      <p class="text-sm font-semibold uppercase tracking-widest text-accent-500 mb-3">Education</p>
+      <h2 class="text-2xl md:text-3xl font-extrabold mb-8">Foundations.</h2>
+      <div class="space-y-4">
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 card-hover">
+          <div class="flex items-start justify-between gap-3 mb-2">
+            <h3 class="font-bold">MS, Business Analytics & Artificial Intelligence</h3>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-accent-500/15 text-accent-700 dark:text-accent-500 whitespace-nowrap">May 2027</span>
+          </div>
+          <p class="text-sm text-brand-600 dark:text-brand-400 font-semibold mb-1">The University of Texas at Dallas</p>
+          <p class="text-sm text-slate-500 dark:text-slate-400">GPA: 3.44 / 4.0 · Data Analytics, Advanced Statistics, A/B Testing, Applied Econometrics, Operations Management</p>
+        </div>
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 card-hover">
+          <div class="flex items-start justify-between gap-3 mb-2">
+            <h3 class="font-bold">BS, Business Administration (Hons.) — Finance</h3>
+            <span class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 whitespace-nowrap">May 2025</span>
+          </div>
+          <p class="text-sm text-brand-600 dark:text-brand-400 font-semibold mb-1">Christ University, Bangalore</p>
+          <p class="text-sm text-slate-500 dark:text-slate-400">Finance concentration, business foundation for analytics career.</p>
+        </div>
+      </div>
+    </div>
+    <div class="reveal">
+      <p class="text-sm font-semibold uppercase tracking-widest text-accent-500 mb-3">Certifications & Achievements</p>
+      <h2 class="text-2xl md:text-3xl font-extrabold mb-8">Continuous learning.</h2>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 card-hover">
+          <div class="text-2xl mb-2">🎓</div>
+          <h4 class="text-sm font-bold leading-tight">Data Science & Business Analytics</h4>
+          <p class="text-xs text-slate-500 mt-1">University of Maryland</p>
+        </div>
+        <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 card-hover">
+          <div class="text-2xl mb-2">📊</div>
+          <h4 class="text-sm font-bold leading-tight">Tableau Desktop Specialist</h4>
+          <p class="text-xs text-slate-500 mt-1">Tableau (Salesforce)</p>
+        </div>
+        <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 card-hover">
+          <div class="text-2xl mb-2">⚡</div>
+          <h4 class="text-sm font-bold leading-tight">Power BI Certification</h4>
+          <p class="text-xs text-slate-500 mt-1">Udemy</p>
+        </div>
+        <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 card-hover">
+          <div class="text-2xl mb-2">🌱</div>
+          <h4 class="text-sm font-bold leading-tight">Economics & Sustainability</h4>
+          <p class="text-xs text-slate-500 mt-1">Wayland Baptist University</p>
+        </div>
+        <div class="p-4 col-span-2 rounded-xl gradient-bg text-white card-hover">
+          <div class="flex items-center gap-3">
+            <div class="text-3xl">🔥</div>
+            <div>
+              <h4 class="text-sm font-bold">60-Day Claude Challenge</h4>
+              <p class="text-xs opacity-90">Building & shipping a new AI app every single day. Currently on Day 10.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="py-24 px-6">
+  <div class="max-w-4xl mx-auto">
+    <div class="reveal text-center mb-12">
+      <p class="text-sm font-semibold uppercase tracking-widest text-accent-500 mb-3">Contact</p>
+      <h2 class="text-3xl md:text-4xl font-extrabold mb-4">Let's build something <span class="gradient-text">useful.</span></h2>
+      <p class="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">Open to roles and collaborations in data analytics, BI, FP&A, and AI-powered product work. Reach out below or on LinkedIn.</p>
+    </div>
+    <div class="grid md:grid-cols-2 gap-8">
+      <div class="reveal space-y-3">
+        <a href="mailto:garvitm534@gmail.com" class="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 card-hover">
+          <div class="w-12 h-12 rounded-xl gradient-bg flex items-center justify-center text-white">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l9 6 9-6M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">Email</div>
+            <div class="font-semibold truncate">garvitm534@gmail.com</div>
+          </div>
+        </a>
+        <a href="https://linkedin.com/in/garvit-mittal04" target="_blank" rel="noopener" class="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 card-hover">
+          <div class="w-12 h-12 rounded-xl gradient-bg flex items-center justify-center text-white">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">LinkedIn</div>
+            <div class="font-semibold truncate">linkedin.com/in/garvit-mittal04</div>
+          </div>
+        </a>
+        <a href="https://github.com/garvit-mittal04" target="_blank" rel="noopener" class="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 card-hover">
+          <div class="w-12 h-12 rounded-xl gradient-bg flex items-center justify-center text-white">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">GitHub</div>
+            <div class="font-semibold truncate">github.com/garvit-mittal04</div>
+          </div>
+        </a>
+        <div class="flex items-center gap-4 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
+          <div class="w-12 h-12 rounded-xl gradient-bg flex items-center justify-center text-white">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.244-4.243a8 8 0 1111.314 0zM15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          </div>
+          <div class="flex-1">
+            <div class="text-xs text-slate-500 dark:text-slate-400 font-semibold uppercase tracking-wider">Location</div>
+            <div class="font-semibold">Dallas, TX · USA</div>
+          </div>
+        </div>
+      </div>
+      <form id="contactForm" class="reveal p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-4">
+        <div>
+          <label for="name" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Name</label>
+          <input id="name" name="name" type="text" required class="w-full px-4 py-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-brand-600 focus:ring-2 focus:ring-brand-600/20 outline-none transition" placeholder="Your name" />
+        </div>
+        <div>
+          <label for="email" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Email</label>
+          <input id="email" name="email" type="email" required class="w-full px-4 py-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-brand-600 focus:ring-2 focus:ring-brand-600/20 outline-none transition" placeholder="you@company.com" />
+        </div>
+        <div>
+          <label for="msg" class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">Message</label>
+          <textarea id="msg" name="message" rows="4" required class="w-full px-4 py-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:border-brand-600 focus:ring-2 focus:ring-brand-600/20 outline-none transition resize-none" placeholder="What are you building?"></textarea>
+        </div>
+        <button type="submit" class="w-full py-3 rounded-lg text-sm font-bold text-white gradient-bg hover:opacity-90 transition shadow-lg shadow-brand-600/30">Send Message →</button>
+        <p id="formStatus" class="text-xs text-center text-slate-500 dark:text-slate-400"></p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="py-10 px-6 border-t border-slate-200 dark:border-slate-800">
+  <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-slate-500 dark:text-slate-400">
+    <div>© 2026 Garvit Mittal · Built with Claude · Day 10 of #60DayClaudeChallenge</div>
+    <div class="flex items-center gap-4">
+      <a href="https://linkedin.com/in/garvit-mittal04" target="_blank" rel="noopener" class="hover:text-brand-600 dark:hover:text-brand-400 transition">LinkedIn</a>
+      <a href="https://github.com/garvit-mittal04" target="_blank" rel="noopener" class="hover:text-brand-600 dark:hover:text-brand-400 transition">GitHub</a>
+      <a href="mailto:garvitm534@gmail.com" class="hover:text-brand-600 dark:hover:text-brand-400 transition">Email</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// THEME TOGGLE
+const root = document.documentElement;
+const tBtn = document.getElementById('themeToggle');
+const saved = localStorage.getItem('theme');
+if(saved === 'light') root.classList.remove('dark');
+tBtn.addEventListener('click', () => {
+  root.classList.toggle('dark');
+  localStorage.setItem('theme', root.classList.contains('dark') ? 'dark' : 'light');
+});
+
+// TYPING ANIMATION
+const phrases = [
+  "Operations Analyst @ The Chicago School",
+  "Business Analytics & AI · UT Dallas",
+  "AI Builder",
+  "Data Storyteller",
+  "Process Automation · Power Platform"
+];
+const typed = document.getElementById('typed');
+let pi=0, ci=0, deleting=false;
+function tick(){
+  const cur = phrases[pi];
+  typed.textContent = cur.slice(0, ci);
+  if(!deleting && ci < cur.length){ ci++; setTimeout(tick, 70); }
+  else if(deleting && ci > 0){ ci--; setTimeout(tick, 35); }
+  else if(!deleting && ci === cur.length){ deleting = true; setTimeout(tick, 1600); }
+  else { deleting = false; pi = (pi+1) % phrases.length; setTimeout(tick, 300); }
+}
+tick();
+
+// REVEAL ON SCROLL
+const reveals = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('visible');
+      // Skill bars
+      e.target.querySelectorAll('.skill-fill').forEach(f=>{f.style.width = f.dataset.w + '%';});
+      io.unobserve(e.target);
+    }
+  });
+}, {threshold: 0.15});
+reveals.forEach(r => io.observe(r));
+
+// ACTIVE NAV HIGHLIGHTING
+const navLinks = document.querySelectorAll('.nav-link');
+const sections = ['about','skills','projects','experience','contact'].map(id=>document.getElementById(id));
+function updateActive(){
+  const y = window.scrollY + 100;
+  let current = '';
+  sections.forEach(s=>{
+    if(s && s.offsetTop <= y) current = s.id;
+  });
+  navLinks.forEach(l=>{
+    l.classList.toggle('active', l.getAttribute('href') === '#'+current);
+  });
+}
+window.addEventListener('scroll', updateActive);
+updateActive();
+
+// NAV SHADOW ON SCROLL
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  if(window.scrollY > 20) nav.classList.add('shadow-lg');
+  else nav.classList.remove('shadow-lg');
+});
+
+// CONTACT FORM (mailto fallback)
+document.getElementById('contactForm').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const name = document.getElementById('name').value;
+  const email = document.getElementById('email').value;
+  const msg = document.getElementById('msg').value;
+  const subject = encodeURIComponent(`Portfolio contact from ${name}`);
+  const body = encodeURIComponent(`From: ${name} (${email})\n\n${msg}`);
+  window.location.href = `mailto:garvitm534@gmail.com?subject=${subject}&body=${body}`;
+  document.getElementById('formStatus').textContent = 'Opening your email client...';
+});
+</script>
+</body>
+</html>
