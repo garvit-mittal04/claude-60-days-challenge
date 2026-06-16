@@ -49,7 +49,7 @@ All SVG. No external CDN. Dark navy `#0a0f1e` background with glassmorphism. Col
 
 E85 is **20% cheaper at the pump** than regular gasoline ($2.80 vs $3.50 per gallon), but **4.3% more expensive per mile driven** ($0.139 vs $0.133).
 
-**Why?** E85 averages 22 mpg vs regular gas at 28 mpg — you burn 27% more fuel per mile, completely offsetting the cheaper pump price. The **break-even E85 price is $2.20/gallon** — current pump is $2.80, meaning E85 is still $0.60/gal over its breakeven economically.
+**Why?** E85 averages 22 mpg vs regular gas at 28 mpg — you burn 27% more fuel per mile, completely offsetting the cheaper pump price. The **break-even E85 price is $2.75/gallon** — current pump is $2.80, meaning E85 is still $0.05/gal over its breakeven economically.
 
 **The trap:** Buyers compare pump prices, not cost per mile. Without this dashboard, an E85 driver would feel like they're saving 20% while actually spending more.
 
