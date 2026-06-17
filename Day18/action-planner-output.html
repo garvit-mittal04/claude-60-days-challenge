@@ -1,0 +1,253 @@
+<style>
+  :root{
+    --bg:#0d1117; --surface:#161b22; --elevated:#1c2128; --border:rgba(255,255,255,0.08);
+    --text:#e6edf3; --muted:#7d8590; --subtle:#484f58;
+    --accent:#58a6ff; --success:#3fb950; --warning:#d29922; --danger:#f85149; --conflict:#ff7b72; --question:#bc8cff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,'SF Pro Display','Segoe UI',Roboto,sans-serif;}
+  html,body{background:var(--bg);color:var(--text);min-height:100vh;padding:24px;line-height:1.5;}
+  .wrap{max-width:1200px;margin:0 auto;}
+
+  .top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;padding-bottom:18px;border-bottom:1px solid var(--border);margin-bottom:24px;}
+  .top h1{font-size:24px;font-weight:700;letter-spacing:-0.3px;margin-bottom:6px;}
+  .top .meta{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--muted);}
+  .top .meta .item{display:inline-flex;align-items:center;gap:6px;}
+  .top .mode{padding:6px 12px;border-radius:6px;background:rgba(88,166,255,0.12);color:var(--accent);font-size:12px;font-weight:600;letter-spacing:0.5px;border:1px solid rgba(88,166,255,0.3);}
+
+  .section{margin-bottom:28px;}
+  .section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;}
+  .section-head h2{font-size:14px;font-weight:700;letter-spacing:1.2px;color:var(--muted);text-transform:uppercase;}
+  .section-head .count{font-size:11px;background:var(--elevated);color:var(--muted);padding:2px 8px;border-radius:999px;font-weight:600;}
+
+  /* Summary */
+  .summary-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 22px;}
+  .summary-card p{font-size:15px;color:var(--text);}
+
+  /* Key Takeaways grid */
+  .takeaways{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;}
+  .takeaway{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;transition:border-color 0.15s,transform 0.15s;}
+  .takeaway:hover{border-color:var(--accent);transform:translateY(-2px);}
+  .takeaway .label{font-size:10px;letter-spacing:1.5px;color:var(--muted);font-weight:700;margin-bottom:6px;}
+  .takeaway .val{font-size:15px;font-weight:600;color:var(--text);}
+
+  /* Action items table */
+  .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  thead{background:var(--elevated);}
+  thead th{text-align:left;padding:12px 16px;font-size:11px;font-weight:700;letter-spacing:1px;color:var(--muted);text-transform:uppercase;border-bottom:1px solid var(--border);}
+  tbody td{padding:14px 16px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:rgba(255,255,255,0.02);}
+  td.task{font-weight:500;}
+  td .owner{display:inline-flex;align-items:center;gap:6px;}
+  td .owner-avatar{width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  td .owner-avatar.s{background:#f85149;}
+  td .owner-avatar.m{background:#d29922;}
+  td .owner-avatar.p{background:#bc8cff;}
+  td .owner-avatar.t{background:#3fb950;}
+
+  /* Status Badges */
+  .badge{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:600;}
+  .badge.high{background:rgba(248,81,73,0.12);color:#ff8c83;border:1px solid rgba(248,81,73,0.25);}
+  .badge.med{background:rgba(210,153,34,0.12);color:#f0bc40;border:1px solid rgba(210,153,34,0.25);}
+  .badge.low{background:rgba(63,185,80,0.12);color:#5dde6e;border:1px solid rgba(63,185,80,0.25);}
+  .badge.pending{background:rgba(125,133,144,0.12);color:#a3acb6;border:1px solid rgba(125,133,144,0.25);}
+  .badge.done{background:rgba(63,185,80,0.12);color:#5dde6e;border:1px solid rgba(63,185,80,0.25);}
+
+  /* Questions / Risks / Conflicts cards */
+  .card-list{display:flex;flex-direction:column;gap:10px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;display:flex;gap:12px;align-items:flex-start;}
+  .card .icon{font-size:18px;flex-shrink:0;line-height:1;}
+  .card .body{flex:1;}
+  .card .title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px;}
+  .card .desc{font-size:13px;color:var(--muted);line-height:1.55;}
+  .card.q{border-left:3px solid var(--question);}
+  .card.r{border-left:3px solid var(--warning);}
+  .card.c{border-left:3px solid var(--conflict);background:rgba(248,81,73,0.04);}
+
+  /* Notes */
+  .notes-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 20px;}
+  .notes-card ul{list-style:none;}
+  .notes-card li{padding:6px 0;color:var(--muted);font-size:13px;display:flex;gap:8px;align-items:flex-start;}
+  .notes-card li::before{content:"·";color:var(--subtle);font-weight:700;}
+
+  @media (max-width:640px){
+    body{padding:16px;}
+    .top{flex-direction:column;align-items:flex-start;}
+    .top h1{font-size:20px;}
+    thead{display:none;}
+    tbody tr{display:block;padding:12px 0;border-bottom:1px solid var(--border);}
+    tbody td{display:flex;justify-content:space-between;padding:6px 16px;border:none;}
+    tbody td::before{content:attr(data-label);font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+  }
+</style>
+
+<div class="wrap">
+
+  <div class="top">
+    <div>
+      <h1>MS Capstone Project Kickoff — June 16, 2026</h1>
+      <div class="meta">
+        <span class="item">👥 4 attendees</span>
+        <span class="item">📅 Topic confirm: Jul 5</span>
+        <span class="item">🚀 Final: Dec 10</span>
+        <span class="item">⏱ 19 days to next milestone</span>
+      </div>
+    </div>
+    <span class="mode">📥 FULL BREAKDOWN MODE</span>
+  </div>
+
+  <!-- 1. SUMMARY -->
+  <div class="section">
+    <div class="section-head"><h2>Summary</h2></div>
+    <div class="summary-card">
+      <p>Kickoff meeting for the AI-Powered Customer Churn Prediction MS capstone project. Three students (Garvit, Sarah, Marcus) and Prof. Anderson aligned on dataset, role split, and milestone dates. Decisions on dataset scope and IRB approval remain open. Marcus's August travel window overlaps with prototype deadline — flagged as primary timeline risk.</p>
+    </div>
+  </div>
+
+  <!-- 2. KEY TAKEAWAYS -->
+  <div class="section">
+    <div class="section-head"><h2>Key Takeaways</h2><span class="count">6</span></div>
+    <div class="takeaways">
+      <div class="takeaway"><div class="label">PROJECT TOPIC</div><div class="val">AI-Powered Customer Churn Prediction</div></div>
+      <div class="takeaway"><div class="label">PRIMARY DATASET</div><div class="val">Telco churn (7,000+ rows)</div></div>
+      <div class="takeaway"><div class="label">ROLE — GARVIT</div><div class="val">ML modeling (XGBoost, NN)</div></div>
+      <div class="takeaway"><div class="label">ROLE — SARAH</div><div class="val">Data prep + EDA</div></div>
+      <div class="takeaway"><div class="label">ROLE — MARCUS</div><div class="val">Dashboard / visualization</div></div>
+      <div class="takeaway"><div class="label">BUDGET</div><div class="val">$200 (tools + compute)</div></div>
+    </div>
+  </div>
+
+  <!-- 3. ACTION ITEMS -->
+  <div class="section">
+    <div class="section-head"><h2>Action Items</h2><span class="count">6</span></div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th style="width:38%">Task</th><th>Owner</th><th>Deadline</th><th>Status</th><th>Priority</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="task" data-label="Task">Set up GitHub repository for the project</td>
+            <td data-label="Owner"><span class="owner"><span class="owner-avatar s">SC</span> Sarah Chen</span></td>
+            <td data-label="Deadline">Jun 20, 2026</td>
+            <td data-label="Status"><span class="badge pending">⏳ Pending</span></td>
+            <td data-label="Priority"><span class="badge high">🔴 High</span></td>
+          </tr>
+          <tr>
+            <td class="task" data-label="Task">Email IRB office about HR dataset approval requirement</td>
+            <td data-label="Owner"><span class="owner"><span class="owner-avatar s">SC</span> Sarah Chen</span></td>
+            <td data-label="Deadline">Jun 17, 2026</td>
+            <td data-label="Status"><span class="badge pending">⏳ Pending</span></td>
+            <td data-label="Priority"><span class="badge high">🔴 High</span></td>
+          </tr>
+          <tr>
+            <td class="task" data-label="Task">Learn TensorFlow Probability for uncertainty quantification</td>
+            <td data-label="Owner"><span class="owner"><span class="owner-avatar p">GM</span> Garvit Mittal</span></td>
+            <td data-label="Deadline">Jul 31, 2026</td>
+            <td data-label="Status"><span class="badge pending">⏳ Pending</span></td>
+            <td data-label="Priority"><span class="badge med">🟠 Medium</span></td>
+          </tr>
+          <tr>
+            <td class="task" data-label="Task">Create initial dashboard mockup in Figma</td>
+            <td data-label="Owner"><span class="owner"><span class="owner-avatar m">MR</span> Marcus Rodriguez</span></td>
+            <td data-label="Deadline">Jul 1, 2026</td>
+            <td data-label="Status"><span class="badge pending">⏳ Pending</span></td>
+            <td data-label="Priority"><span class="badge med">🟠 Medium</span></td>
+          </tr>
+          <tr>
+            <td class="task" data-label="Task">EDA on telco data and share findings</td>
+            <td data-label="Owner"><span class="owner"><span class="owner-avatar s">SC</span> Sarah Chen</span></td>
+            <td data-label="Deadline">Jul 1, 2026</td>
+            <td data-label="Status"><span class="badge pending">⏳ Pending</span></td>
+            <td data-label="Priority"><span class="badge high">🔴 High</span></td>
+          </tr>
+          <tr>
+            <td class="task" data-label="Task">Topic review meeting with Prof. Anderson</td>
+            <td data-label="Owner"><span class="owner"><span class="owner-avatar t">ALL</span> Full team</span></td>
+            <td data-label="Deadline">Jul 8, 2026</td>
+            <td data-label="Status"><span class="badge pending">⏳ Pending</span></td>
+            <td data-label="Priority"><span class="badge high">🔴 High</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 4. OPEN QUESTIONS -->
+  <div class="section">
+    <div class="section-head"><h2>Open Questions</h2><span class="count">3</span></div>
+    <div class="card-list">
+      <div class="card q">
+        <span class="icon">❓</span>
+        <div class="body">
+          <div class="title">Should the scope be Telco only, or both Telco + IBM HR Analytics?</div>
+          <div class="desc">Sarah proposed telco-only. Marcus pushed for HR data alongside for robustness. Did not get resolved in kickoff. Decision needed before Jul 5 topic confirmation.</div>
+        </div>
+      </div>
+      <div class="card q">
+        <span class="icon">❓</span>
+        <div class="body">
+          <div class="title">Does HR dataset usage require IRB approval?</div>
+          <div class="desc">Prof. Anderson was unsure. Sarah will email IRB office tomorrow.</div>
+        </div>
+      </div>
+      <div class="card q">
+        <span class="icon">❓</span>
+        <div class="body">
+          <div class="title">Should the team publish a paper from this project?</div>
+          <div class="desc">Optional per Prof. Anderson but encouraged. Would add 4–6 weeks after December. No decision yet.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. RISKS / BLOCKERS -->
+  <div class="section">
+    <div class="section-head"><h2>Risks & Blockers</h2><span class="count">2</span></div>
+    <div class="card-list">
+      <div class="card r">
+        <span class="icon">⚠️</span>
+        <div class="body">
+          <div class="title">Marcus traveling Aug 1 – Aug 21 (Mexico)</div>
+          <div class="desc">Overlaps with the Aug 15 prototype demo deadline. Visualization work may be delayed. Owner: Marcus Rodriguez. Mitigation not yet defined.</div>
+        </div>
+      </div>
+      <div class="card r">
+        <span class="icon">⚠️</span>
+        <div class="body">
+          <div class="title">Budget may be insufficient for large neural-net training</div>
+          <div class="desc">$200 allocated. Likely OK with sklearn + XGBoost; neural-net experiments may exceed budget. Sarah's GPU access (via her job) could mitigate — pending her manager's approval.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. CONFLICTS -->
+  <div class="section">
+    <div class="section-head"><h2>Conflicts</h2><span class="count">1</span></div>
+    <div class="card-list">
+      <div class="card c">
+        <span class="icon">🚨</span>
+        <div class="body">
+          <div class="title">Dataset count conflict — Prof. Anderson vs Marcus</div>
+          <div class="desc">Prof. Anderson set a maximum of 3 datasets for the project. Marcus wants 5+ for model robustness. Must be resolved before the Jul 5 topic submission.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. ADDITIONAL NOTES -->
+  <div class="section">
+    <div class="section-head"><h2>Additional Notes</h2></div>
+    <div class="notes-card">
+      <ul>
+        <li>Weekly team sync agreed for every Wednesday at 6:00 PM, starting Jun 24, 2026.</li>
+        <li>Sarah's manager at her current job may want a presentation of the findings at the end — potential job opportunity for Garvit. No commitment made.</li>
+        <li>Sarah has GPU access through her workplace and may secure it for the team. Pending manager approval.</li>
+        <li>Prof. Anderson highlighted that uncertainty quantification (TensorFlow Probability) would impress the panel — Garvit committed to learning it by end of July.</li>
+      </ul>
+    </div>
+  </div>
+
+</div>

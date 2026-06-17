@@ -1,0 +1,40 @@
+MS Capstone Project Kickoff Meeting
+Date: June 16, 2026
+Attendees: Garvit Mittal, Sarah Chen, Marcus Rodriguez, Prof. Anderson
+
+ok so we finally had the kickoff today and lots of stuff came up... let me dump everything before i forget
+
+topic — AI-Powered Customer Churn Prediction. sarah suggested telco churn dataset has like 7000+ rows pretty clean. marcus wants to also bring in IBM HR analytics data for comparison says it'll make our model more robust. i'm not sure yet
+
+prof anderson said we need to submit final topic confirmation by july 5. that's like 19 days from now
+
+open question: should we focus on telco only or do both telco AND HR? this didnt get resolved
+
+we split roles — garvit (me) will own ML modeling so xgboost, random forest, maybe some neural net stuff. sarah handles data prep + EDA. marcus on dashboard/visualization layer
+
+deadlines —
+- topic confirmation: july 5
+- prototype demo: aug 15
+- final presentation: dec 10
+
+marcus is traveling aug 1 to aug 21 (family thing in mexico). this is a problem because thats right when we need viz done. risk!
+
+sarah mentioned her job has GPU access she can probably use for training, would speed up xgboost grid search a lot. she'll check with her manager.
+
+CONFLICT — prof said max 3 datasets total for the project. marcus wants 5+ for robustness. need to resolve this before topic submission
+
+open question: do we need IRB approval for using HR data? prof wasnt sure. sarah will email the IRB office tomorrow
+
+status — kicked off but no actual work started. weekly meetings agreed every wednesday 6pm starting next week (june 24)
+
+budget — prof allocated $200 for tools/compute. i think we'll need more if we use big neural nets but might be ok with sklearn + xgboost
+
+action — sarah will set up github repo by end of week (june 20)
+action — garvit (me) needs to learn TensorFlow Probability for uncertainty quantification, prof said this would impress the panel. by end of july
+action — marcus to create initial dashboard mockup in figma by july 1
+action — sarah to do EDA on telco data and share findings by july 1
+action — group meeting with prof anderson scheduled for july 8 to review topic submission
+
+oh and one more thing — sarah's manager at her job might want us to present findings to them too at the end. could be a job opportunity for me actually. didnt commit to anything yet
+
+also we need to figure out — do we want to publish a paper from this? prof said optional but encouraged. would need extra 4-6 weeks after december
