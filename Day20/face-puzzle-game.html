@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Face Puzzle — Day 20 · #60DayClaudeChallenge</title>
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --bg-2: #12121a;
+    --panel: #1a1a25;
+    --panel-2: #232336;
+    --line: #2b2b40;
+    --text: #f5f5f7;
+    --text-dim: #9999b3;
+    --accent: #7c5cff;
+    --accent-2: #00d4ff;
+    --good: #2dd4a8;
+    --bad: #ff5577;
+    --gold: #ffd166;
+    --shadow: 0 20px 60px rgba(0,0,0,.45);
+    --radius: 16px;
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; padding: 0; height: 100%; background: radial-gradient(1200px 800px at 20% -10%, rgba(124,92,255,.18), transparent 60%),
+                              radial-gradient(1000px 700px at 100% 100%, rgba(0,212,255,.12), transparent 60%),
+                              var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Inter, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  .app { min-height: 100%; display: flex; flex-direction: column; align-items: center; padding: 24px 16px 64px; }
+  header { width: 100%; max-width: 980px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+  .brand {
+    font-weight: 800; letter-spacing: 4px; font-size: 12px; color: var(--text-dim);
+  }
+  .brand b { color: var(--accent); letter-spacing: 4px; }
+  .pill {
+    font-size: 11px; letter-spacing: 2px; font-weight: 700;
+    padding: 6px 12px; border-radius: 999px;
+    background: rgba(124,92,255,.12); color: #c8b8ff; border: 1px solid rgba(124,92,255,.35);
+  }
+  h1 {
+    font-size: clamp(28px, 4.4vw, 44px); margin: 6px 0 4px; text-align: center;
+    font-weight: 800; letter-spacing: -.5px;
+    background: linear-gradient(90deg, #fff, #b8a8ff 60%, #88e0ff);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .sub { color: var(--text-dim); text-align: center; margin: 0 0 22px; font-size: 14px; }
+  .card {
+    width: 100%; max-width: 980px;
+    background: linear-gradient(180deg, var(--panel), var(--bg-2));
+    border: 1px solid var(--line); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 22px; margin-bottom: 18px;
+  }
+  .row { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; justify-content: center; }
+  button.btn {
+    appearance: none; border: 1px solid var(--line);
+    background: linear-gradient(180deg, #2a2a3f, #1c1c2c);
+    color: var(--text); font-weight: 700; letter-spacing: .3px;
+    padding: 12px 18px; border-radius: 12px; cursor: pointer;
+    font-size: 14px; transition: transform .08s ease, border-color .12s, box-shadow .12s;
+  }
+  button.btn:hover { border-color: var(--accent); box-shadow: 0 6px 18px rgba(124,92,255,.25); }
+  button.btn:active { transform: translateY(1px); }
+  button.btn.primary {
+    background: linear-gradient(180deg, #8b6cff, #5b3ee0); border-color: transparent;
+    box-shadow: 0 10px 26px rgba(124,92,255,.35);
+  }
+  button.btn.ghost { background: transparent; }
+  button.btn.warn { color: #ffd0d8; border-color: rgba(255,85,119,.5); }
+  button.btn:disabled { opacity: .45; cursor: not-allowed; box-shadow: none; }
+
+  /* Camera stage */
+  .stage {
+    display: grid; grid-template-columns: 1fr; gap: 16px;
+  }
+  .videoWrap, .canvasWrap {
+    position: relative; background: #000; border-radius: 12px; overflow: hidden;
+    border: 1px solid var(--line);
+    aspect-ratio: 1 / 1; width: 100%; max-width: 540px; margin: 0 auto;
+  }
+  video, canvas#capture { width: 100%; height: 100%; object-fit: cover; display: block; transform: scaleX(-1); /* mirror */ }
+  canvas#capture { transform: none; }
+  .overlay {
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      radial-gradient(closest-side at 50% 50%, transparent 58%, rgba(0,0,0,.55) 62%);
+  }
+  .overlay::before, .overlay::after {
+    content: ""; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: 60%; aspect-ratio: 1/1; border-radius: 50%;
+    border: 2px dashed rgba(255,255,255,.4);
+  }
+  .hint { color: var(--text-dim); font-size: 13px; text-align: center; margin-top: 10px; }
+  .err { color: var(--bad); font-size: 13px; text-align: center; margin-top: 10px; }
+
+  /* Difficulty chooser */
+  .diff { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 10px 0 4px; }
+  .diff button {
+    padding: 16px; border-radius: 14px; border: 1px solid var(--line);
+    background: linear-gradient(180deg, #1c1c2c, #15151f); color: var(--text);
+    cursor: pointer; transition: transform .08s, border-color .12s, box-shadow .12s;
+  }
+  .diff button:hover { border-color: var(--accent-2); }
+  .diff button .big { font-size: 26px; font-weight: 800; letter-spacing: 1px; }
+  .diff button .small { font-size: 12px; color: var(--text-dim); margin-top: 4px; }
+  .diff button.active { border-color: var(--accent); box-shadow: 0 10px 24px rgba(124,92,255,.25); }
+
+  /* Game area */
+  .gameTop { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .stat {
+    background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px;
+    padding: 8px 12px; font-size: 13px; color: var(--text-dim);
+  }
+  .stat b { color: var(--text); font-variant-numeric: tabular-nums; }
+
+  .boardWrap {
+    position: relative;
+    width: min(100%, 540px); margin: 0 auto;
+    aspect-ratio: 1/1; background: #000;
+    border-radius: 14px; border: 1px solid var(--line);
+    overflow: hidden;
+    touch-action: none;
+  }
+  .piece {
+    position: absolute; background-repeat: no-repeat;
+    border: 2px solid rgba(255,255,255,.06);
+    border-radius: 6px;
+    transition: left .18s ease, top .18s ease, box-shadow .12s, border-color .12s;
+    will-change: left, top, transform;
+    user-select: none; -webkit-user-drag: none;
+  }
+  .piece.dragging {
+    border-color: var(--accent-2);
+    box-shadow: 0 12px 28px rgba(0,212,255,.35);
+    transition: none; z-index: 10;
+  }
+  .piece.correct { border-color: var(--good); box-shadow: inset 0 0 0 2px rgba(45,212,168,.5); }
+
+  /* Win overlay */
+  .winWrap {
+    position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
+    background: rgba(8,8,14,.78); backdrop-filter: blur(6px);
+    text-align: center; padding: 20px;
+  }
+  .winWrap.show { display: flex; }
+  .winCard {
+    background: linear-gradient(180deg, #1a1a25, #11111a);
+    border: 1px solid var(--line); border-radius: 16px; padding: 22px 22px 18px;
+    max-width: 340px;
+  }
+  .winCard h2 { margin: 4px 0 6px; font-size: 24px; }
+  .winCard p { margin: 6px 0; color: var(--text-dim); font-size: 14px; }
+  .winCard .stats { display: flex; gap: 12px; justify-content: center; margin: 12px 0; }
+  .winCard .stats div { background: var(--panel-2); padding: 8px 12px; border-radius: 10px; }
+  .winCard .stats b { display: block; font-size: 18px; }
+
+  /* Leaderboard */
+  .lb { width: 100%; }
+  .lb table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .lb th, .lb td { padding: 8px 10px; text-align: left; border-bottom: 1px solid var(--line); color: var(--text-dim); }
+  .lb th { color: #c8b8ff; font-weight: 700; letter-spacing: 1px; font-size: 11px; text-transform: uppercase; }
+  .lb td b { color: var(--text); font-variant-numeric: tabular-nums; }
+  .lb .empty { color: var(--text-dim); font-size: 13px; padding: 14px 4px; text-align: center; }
+
+  .footer { color: var(--text-dim); font-size: 12px; text-align: center; margin-top: 8px; }
+
+  /* Confetti */
+  .confetti { position: fixed; pointer-events: none; inset: 0; overflow: hidden; z-index: 50; display: none; }
+  .confetti.show { display: block; }
+  .confetti i {
+    position: absolute; top: -10px; width: 8px; height: 14px; opacity: .9;
+    animation: fall linear forwards;
+  }
+  @keyframes fall {
+    to { transform: translateY(110vh) rotate(720deg); opacity: .6; }
+  }
+
+  /* Hide elements */
+  .hidden { display: none !important; }
+
+  @media (max-width: 520px) {
+    h1 { font-size: 26px; }
+    .diff button .big { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand"><b>DAY 20</b> · #60DayClaudeChallenge</div>
+    <div class="pill">FACE PUZZLE</div>
+  </header>
+
+  <h1>Turn your face into a puzzle</h1>
+  <p class="sub">Snap a photo. Choose difficulty. Solve it before the timer roasts you.</p>
+
+  <!-- STEP 1: CAMERA / DEMO -->
+  <section id="step-camera" class="card">
+    <div class="stage">
+      <div class="videoWrap" id="videoWrap">
+        <video id="video" autoplay playsinline muted></video>
+        <div class="overlay"></div>
+      </div>
+      <div id="cameraErr" class="err hidden"></div>
+      <p class="hint">Front-facing camera preferred. Center your face inside the circle.</p>
+      <div class="row">
+        <button class="btn primary" id="takePhotoBtn">📸 Take Photo</button>
+        <button class="btn" id="demoBtn">🖼 Use Demo Image</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 2: CONFIRM + DIFFICULTY -->
+  <section id="step-confirm" class="card hidden">
+    <div class="stage">
+      <div class="canvasWrap">
+        <canvas id="capture"></canvas>
+      </div>
+      <p class="hint">Looking good? Pick a difficulty to start.</p>
+      <div class="diff" id="diffPicker">
+        <button data-n="3"><div class="big">3 × 3</div><div class="small">9 pieces · easy</div></button>
+        <button data-n="4"><div class="big">4 × 4</div><div class="small">16 pieces · medium</div></button>
+        <button data-n="5"><div class="big">5 × 5</div><div class="small">25 pieces · hard</div></button>
+      </div>
+      <div class="row">
+        <button class="btn ghost" id="retakeBtn">↺ Retake Photo</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- STEP 3: GAME -->
+  <section id="step-game" class="card hidden">
+    <div class="gameTop">
+      <div class="row" style="gap:8px;">
+        <div class="stat">⏱ Time <b id="timer">00:00.0</b></div>
+        <div class="stat">🎯 Moves <b id="moves">0</b></div>
+        <div class="stat">✅ Correct <b id="correct">0</b><span> / </span><b id="total">0</b></div>
+        <div class="stat">⚙️ <b id="diffLabel">3×3</b></div>
+      </div>
+      <div class="row" style="gap:8px;">
+        <button class="btn ghost" id="newPhotoBtn">🖼 New Photo</button>
+      </div>
+    </div>
+    <div class="boardWrap" id="board">
+      <div class="winWrap" id="winOverlay">
+        <div class="winCard">
+          <div style="font-size:38px;">🏆</div>
+          <h2>Solved!</h2>
+          <p>Look at you go.</p>
+          <div class="stats">
+            <div><span>Time</span><b id="winTime">00:00.0</b></div>
+            <div><span>Moves</span><b id="winMoves">0</b></div>
+            <div><span>Grid</span><b id="winDiff">3×3</b></div>
+          </div>
+          <div class="row" style="gap:8px; justify-content:center;">
+            <button class="btn primary" id="playAgainBtn">↻ Play Again</button>
+            <button class="btn" id="newPhotoBtn2">🖼 New Photo</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LEADERBOARD -->
+  <section class="card lb">
+    <div class="row" style="justify-content: space-between; gap: 8px;">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span style="font-size:18px;">🏅</span>
+        <strong>Top 5 Best Times</strong>
+      </div>
+      <button class="btn ghost" id="clearLbBtn" title="Clear leaderboard">Clear</button>
+    </div>
+    <div id="leaderboard"></div>
+  </section>
+
+  <p class="footer">Built for Day 20/60 · single HTML file · no frameworks · works on desktop & mobile</p>
+</div>
+
+<div class="confetti" id="confetti"></div>
+
+<script>
+(() => {
+  "use strict";
+
+  // ----------- State -----------
+  const els = {
+    video: document.getElementById("video"),
+    videoWrap: document.getElementById("videoWrap"),
+    cameraErr: document.getElementById("cameraErr"),
+    takePhotoBtn: document.getElementById("takePhotoBtn"),
+    demoBtn: document.getElementById("demoBtn"),
+    capture: document.getElementById("capture"),
+    stepCamera: document.getElementById("step-camera"),
+    stepConfirm: document.getElementById("step-confirm"),
+    stepGame: document.getElementById("step-game"),
+    diffPicker: document.getElementById("diffPicker"),
+    retakeBtn: document.getElementById("retakeBtn"),
+    newPhotoBtn: document.getElementById("newPhotoBtn"),
+    newPhotoBtn2: document.getElementById("newPhotoBtn2"),
+    playAgainBtn: document.getElementById("playAgainBtn"),
+    timer: document.getElementById("timer"),
+    moves: document.getElementById("moves"),
+    correct: document.getElementById("correct"),
+    total: document.getElementById("total"),
+    diffLabel: document.getElementById("diffLabel"),
+    board: document.getElementById("board"),
+    winOverlay: document.getElementById("winOverlay"),
+    winTime: document.getElementById("winTime"),
+    winMoves: document.getElementById("winMoves"),
+    winDiff: document.getElementById("winDiff"),
+    leaderboard: document.getElementById("leaderboard"),
+    clearLbBtn: document.getElementById("clearLbBtn"),
+    confetti: document.getElementById("confetti"),
+  };
+
+  let stream = null;
+  let imageBitmap = null;     // captured photo as ImageBitmap-like (we use HTMLImageElement)
+  let imageDataUrl = null;    // for piece backgrounds
+  let gridN = 3;
+  let pieces = [];            // [{id, correctRow, correctCol, row, col, el}]
+  let board = { size: 0 };    // size in px of the square board
+  let movesCount = 0;
+  let timerInterval = null;
+  let timerStart = 0;
+  let timerElapsedMs = 0;
+  let dragState = null;
+  let solved = false;
+
+  const LS_KEY = "facePuzzle.topTimes.v1";
+
+  // ----------- Camera -----------
+  async function startCamera() {
+    els.cameraErr.classList.add("hidden");
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      showCamErr("Camera API not available in this browser. Use the demo image option below.");
+      return;
+    }
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false,
+      });
+      els.video.srcObject = stream;
+    } catch (err) {
+      console.warn("Camera denied/unavailable:", err);
+      showCamErr("Camera permission denied or unavailable. You can still play using the demo image.");
+    }
+  }
+
+  function showCamErr(msg) {
+    els.cameraErr.textContent = msg;
+    els.cameraErr.classList.remove("hidden");
+  }
+
+  function stopCamera() {
+    if (stream) {
+      stream.getTracks().forEach(t => t.stop());
+      stream = null;
+    }
+  }
+
+  // ----------- Capture -----------
+  function captureFromVideo() {
+    if (!els.video.videoWidth) {
+      showCamErr("Video not ready. Wait a second and try again.");
+      return false;
+    }
+    const v = els.video;
+    const size = Math.min(v.videoWidth, v.videoHeight);
+    const sx = (v.videoWidth - size) / 2;
+    const sy = (v.videoHeight - size) / 2;
+    const canvas = els.capture;
+    canvas.width = 720; canvas.height = 720;
+    const ctx = canvas.getContext("2d");
+    // mirror to match preview
+    ctx.save();
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(v, sx, sy, size, size, 0, 0, canvas.width, canvas.height);
+    ctx.restore();
+    imageDataUrl = canvas.toDataURL("image/jpeg", 0.92);
+    return true;
+  }
+
+  function loadDemoImage() {
+    // Generate a fun gradient + emoji "face" so it's visually distinct
+    const canvas = els.capture;
+    canvas.width = 720; canvas.height = 720;
+    const ctx = canvas.getContext("2d");
+    const grd = ctx.createLinearGradient(0, 0, 720, 720);
+    grd.addColorStop(0, "#7c5cff");
+    grd.addColorStop(.5, "#00d4ff");
+    grd.addColorStop(1, "#2dd4a8");
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, 720, 720);
+    ctx.fillStyle = "rgba(255,255,255,.12)";
+    for (let i = 0; i < 60; i++) {
+      ctx.beginPath();
+      ctx.arc(Math.random()*720, Math.random()*720, Math.random()*40+10, 0, Math.PI*2);
+      ctx.fill();
+    }
+    ctx.font = "320px -apple-system, system-ui, sans-serif";
+    ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText("🙂", 360, 380);
+    ctx.font = "bold 36px -apple-system, system-ui, sans-serif";
+    ctx.fillStyle = "rgba(255,255,255,.9)";
+    ctx.fillText("DEMO MODE", 360, 660);
+    imageDataUrl = canvas.toDataURL("image/jpeg", 0.92);
+  }
+
+  // ----------- Flow -----------
+  function goToConfirm() {
+    els.stepCamera.classList.add("hidden");
+    els.stepConfirm.classList.remove("hidden");
+    stopCamera();
+  }
+
+  function goToCamera() {
+    solved = false;
+    stopTimer(); resetGameState();
+    els.stepGame.classList.add("hidden");
+    els.stepConfirm.classList.add("hidden");
+    els.stepCamera.classList.remove("hidden");
+    startCamera();
+  }
+
+  function goToGame(n) {
+    gridN = n;
+    els.stepConfirm.classList.add("hidden");
+    els.stepGame.classList.remove("hidden");
+    els.diffLabel.textContent = `${n}×${n}`;
+    els.winOverlay.classList.remove("show");
+    buildBoard();
+    startTimer();
+  }
+
+  // ----------- Game build -----------
+  function resetGameState() {
+    pieces = [];
+    movesCount = 0; els.moves.textContent = "0";
+    els.correct.textContent = "0";
+    els.total.textContent = "0";
+    els.timer.textContent = "00:00.0";
+    timerElapsedMs = 0;
+    els.board.querySelectorAll(".piece").forEach(p => p.remove());
+  }
+
+  function buildBoard() {
+    resetGameState();
+    // measure board
+    const rect = els.board.getBoundingClientRect();
+    board.size = Math.floor(Math.min(rect.width, rect.height));
+    const N = gridN;
+    const cell = board.size / N;
+    const totalPieces = N * N;
+    els.total.textContent = totalPieces;
+
+    // Build positions array: 0..N*N-1 representing where each correct piece currently sits
+    // We'll guarantee solvable + non-identity scramble
+    let order = [...Array(totalPieces).keys()];
+    do { order = shuffle(order); } while (!isScrambled(order));
+
+    // Each cell at index i now hosts piece "order[i]" (the correct piece-id)
+    // We need pieces array keyed by piece id
+    for (let id = 0; id < totalPieces; id++) {
+      const correctRow = Math.floor(id / N);
+      const correctCol = id % N;
+      const currentIndex = order.indexOf(id);
+      const row = Math.floor(currentIndex / N);
+      const col = currentIndex % N;
+      const el = document.createElement("div");
+      el.className = "piece";
+      el.style.width = `${cell}px`;
+      el.style.height = `${cell}px`;
+      el.style.left = `${col * cell}px`;
+      el.style.top = `${row * cell}px`;
+      el.style.backgroundImage = `url(${imageDataUrl})`;
+      el.style.backgroundSize = `${board.size}px ${board.size}px`;
+      el.style.backgroundPosition = `-${correctCol * cell}px -${correctRow * cell}px`;
+      el.dataset.id = id;
+      el.dataset.row = row;
+      el.dataset.col = col;
+      attachDragHandlers(el);
+      els.board.appendChild(el);
+      const piece = { id, correctRow, correctCol, row, col, el };
+      pieces.push(piece);
+      if (row === correctRow && col === correctCol) el.classList.add("correct");
+    }
+    updateCorrectCount();
+  }
+
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  function isScrambled(order) {
+    // ensure at least one piece is out of place
+    for (let i = 0; i < order.length; i++) if (order[i] !== i) return true;
+    return false;
+  }
+
+  // ----------- Drag handling (mouse + touch) -----------
+  function attachDragHandlers(el) {
+    el.addEventListener("pointerdown", onPointerDown);
+  }
+
+  function onPointerDown(e) {
+    if (solved) return;
+    const el = e.currentTarget;
+    el.setPointerCapture(e.pointerId);
+    const boardRect = els.board.getBoundingClientRect();
+    const startLeft = parseFloat(el.style.left);
+    const startTop = parseFloat(el.style.top);
+    dragState = {
+      el, pointerId: e.pointerId,
+      offsetX: e.clientX - (boardRect.left + startLeft),
+      offsetY: e.clientY - (boardRect.top + startTop),
+      startLeft, startTop, boardRect,
+    };
+    el.classList.add("dragging");
+    el.addEventListener("pointermove", onPointerMove);
+    el.addEventListener("pointerup", onPointerUp);
+    el.addEventListener("pointercancel", onPointerUp);
+    e.preventDefault();
+  }
+
+  function onPointerMove(e) {
+    if (!dragState) return;
+    const { el, offsetX, offsetY, boardRect } = dragState;
+    let x = e.clientX - boardRect.left - offsetX;
+    let y = e.clientY - boardRect.top - offsetY;
+    const cell = board.size / gridN;
+    x = Math.max(0, Math.min(board.size - cell, x));
+    y = Math.max(0, Math.min(board.size - cell, y));
+    el.style.left = `${x}px`;
+    el.style.top = `${y}px`;
+  }
+
+  function onPointerUp(e) {
+    if (!dragState) return;
+    const { el, startLeft, startTop } = dragState;
+    el.classList.remove("dragging");
+    el.removeEventListener("pointermove", onPointerMove);
+    el.removeEventListener("pointerup", onPointerUp);
+    el.removeEventListener("pointercancel", onPointerUp);
+
+    const cell = board.size / gridN;
+    const currentLeft = parseFloat(el.style.left);
+    const currentTop = parseFloat(el.style.top);
+    const targetCol = Math.round(currentLeft / cell);
+    const targetRow = Math.round(currentTop / cell);
+    const movedId = parseInt(el.dataset.id, 10);
+    const fromRow = parseInt(el.dataset.row, 10);
+    const fromCol = parseInt(el.dataset.col, 10);
+
+    // Did we actually move to a different cell?
+    if (targetRow === fromRow && targetCol === fromCol) {
+      // snap back
+      el.style.left = `${startLeft}px`;
+      el.style.top = `${startTop}px`;
+      dragState = null;
+      return;
+    }
+
+    // Find the piece currently sitting in target cell (if any)
+    const occupant = pieces.find(p => p.id !== movedId && p.row === targetRow && p.col === targetCol);
+    const moved = pieces.find(p => p.id === movedId);
+
+    // Swap their positions
+    moved.row = targetRow; moved.col = targetCol;
+    moved.el.dataset.row = targetRow; moved.el.dataset.col = targetCol;
+    moved.el.style.left = `${targetCol * cell}px`;
+    moved.el.style.top = `${targetRow * cell}px`;
+
+    if (occupant) {
+      occupant.row = fromRow; occupant.col = fromCol;
+      occupant.el.dataset.row = fromRow; occupant.el.dataset.col = fromCol;
+      occupant.el.style.left = `${fromCol * cell}px`;
+      occupant.el.style.top = `${fromRow * cell}px`;
+    }
+
+    movesCount++;
+    els.moves.textContent = movesCount;
+
+    // Recompute correctness
+    updateCorrectCount();
+    dragState = null;
+    checkWin();
+  }
+
+  function updateCorrectCount() {
+    let count = 0;
+    pieces.forEach(p => {
+      const ok = (p.row === p.correctRow && p.col === p.correctCol);
+      p.el.classList.toggle("correct", ok);
+      if (ok) count++;
+    });
+    els.correct.textContent = count;
+  }
+
+  function checkWin() {
+    const allCorrect = pieces.every(p => p.row === p.correctRow && p.col === p.correctCol);
+    if (allCorrect) {
+      solved = true;
+      stopTimer();
+      els.winTime.textContent = formatTime(timerElapsedMs);
+      els.winMoves.textContent = movesCount;
+      els.winDiff.textContent = `${gridN}×${gridN}`;
+      saveTime({
+        date: new Date().toISOString(),
+        time: timerElapsedMs,
+        moves: movesCount,
+        difficulty: `${gridN}×${gridN}`,
+      });
+      renderLeaderboard();
+      els.winOverlay.classList.add("show");
+      burstConfetti();
+    }
+  }
+
+  // ----------- Timer -----------
+  function startTimer() {
+    stopTimer();
+    timerStart = performance.now();
+    timerInterval = setInterval(() => {
+      timerElapsedMs = performance.now() - timerStart;
+      els.timer.textContent = formatTime(timerElapsedMs);
+    }, 80);
+  }
+  function stopTimer() {
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+  }
+  function formatTime(ms) {
+    const totalSec = Math.floor(ms / 1000);
+    const tenths = Math.floor((ms % 1000) / 100);
+    const mm = String(Math.floor(totalSec / 60)).padStart(2, "0");
+    const ss = String(totalSec % 60).padStart(2, "0");
+    return `${mm}:${ss}.${tenths}`;
+  }
+
+  // ----------- Leaderboard -----------
+  function loadTimes() {
+    try { return JSON.parse(localStorage.getItem(LS_KEY) || "[]"); }
+    catch { return []; }
+  }
+  function saveTime(entry) {
+    const all = loadTimes();
+    all.push(entry);
+    all.sort((a, b) => a.time - b.time);
+    const top5 = all.slice(0, 5);
+    localStorage.setItem(LS_KEY, JSON.stringify(top5));
+  }
+  function renderLeaderboard() {
+    const all = loadTimes();
+    if (!all.length) {
+      els.leaderboard.innerHTML = `<div class="empty">No best times yet. Solve a puzzle to make the leaderboard.</div>`;
+      return;
+    }
+    const rows = all.map((e, i) => {
+      const d = new Date(e.date);
+      const dateStr = `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+      return `<tr>
+        <td>#${i + 1}</td>
+        <td><b>${formatTime(e.time)}</b></td>
+        <td><b>${e.moves}</b></td>
+        <td>${e.difficulty}</td>
+        <td>${dateStr}</td>
+      </tr>`;
+    }).join("");
+    els.leaderboard.innerHTML = `<table>
+      <thead><tr><th>Rank</th><th>Time</th><th>Moves</th><th>Grid</th><th>When</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+  }
+
+  // ----------- Confetti -----------
+  function burstConfetti() {
+    const c = els.confetti;
+    c.innerHTML = "";
+    const colors = ["#7c5cff", "#00d4ff", "#2dd4a8", "#ffd166", "#ff5577"];
+    for (let i = 0; i < 80; i++) {
+      const piece = document.createElement("i");
+      piece.style.left = Math.random() * 100 + "vw";
+      piece.style.background = colors[i % colors.length];
+      piece.style.animationDuration = (1.6 + Math.random() * 1.6) + "s";
+      piece.style.transform = `rotate(${Math.random() * 360}deg)`;
+      c.appendChild(piece);
+    }
+    c.classList.add("show");
+    setTimeout(() => c.classList.remove("show"), 3200);
+  }
+
+  // ----------- Wire events -----------
+  els.takePhotoBtn.addEventListener("click", () => {
+    if (captureFromVideo()) goToConfirm();
+  });
+  els.demoBtn.addEventListener("click", () => {
+    loadDemoImage();
+    goToConfirm();
+  });
+  els.retakeBtn.addEventListener("click", goToCamera);
+  els.newPhotoBtn.addEventListener("click", goToCamera);
+  els.newPhotoBtn2.addEventListener("click", goToCamera);
+  els.playAgainBtn.addEventListener("click", () => {
+    els.winOverlay.classList.remove("show");
+    solved = false;
+    buildBoard();
+    startTimer();
+  });
+  els.diffPicker.querySelectorAll("button").forEach(b => {
+    b.addEventListener("click", () => {
+      els.diffPicker.querySelectorAll("button").forEach(x => x.classList.remove("active"));
+      b.classList.add("active");
+      const n = parseInt(b.dataset.n, 10);
+      goToGame(n);
+    });
+  });
+  els.clearLbBtn.addEventListener("click", () => {
+    if (confirm("Clear all leaderboard times?")) {
+      localStorage.removeItem(LS_KEY);
+      renderLeaderboard();
+    }
+  });
+
+  // Rebuild board on resize so cell math stays correct
+  let resizeTimer = null;
+  window.addEventListener("resize", () => {
+    if (!els.stepGame.classList.contains("hidden") && pieces.length) {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        const rect = els.board.getBoundingClientRect();
+        board.size = Math.floor(Math.min(rect.width, rect.height));
+        const cell = board.size / gridN;
+        pieces.forEach(p => {
+          p.el.style.width = `${cell}px`;
+          p.el.style.height = `${cell}px`;
+          p.el.style.left = `${p.col * cell}px`;
+          p.el.style.top = `${p.row * cell}px`;
+          p.el.style.backgroundSize = `${board.size}px ${board.size}px`;
+          p.el.style.backgroundPosition = `-${p.correctCol * cell}px -${p.correctRow * cell}px`;
+        });
+      }, 120);
+    }
+  });
+
+  // ----------- Init -----------
+  renderLeaderboard();
+  startCamera();
+})();
+</script>
+</body>
+</html>
