@@ -1,0 +1,417 @@
+<style>
+:root{
+  --bg:#f6f5f0; --paper:#fdfcf8; --ink:#0f1115; --ink-2:#3a3f4a; --mute:#6a7180; --line:#dcd7c8;
+  --accent:#1a3a5f; --accent-2:#7b1f2b; --gold:#a8862d; --good:#1e7a4a; --warn:#a8651b; --bad:#9b2730;
+  --shadow:0 30px 60px rgba(20,18,12,.10);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:Georgia,"Times New Roman",serif;-webkit-font-smoothing:antialiased;}
+.page{max-width:1200px;margin:24px auto;background:var(--paper);box-shadow:var(--shadow);padding:48px 56px 64px;border:1px solid var(--line);}
+@media(max-width:780px){.page{padding:28px 22px;margin:8px;}}
+
+/* TYPOGRAPHY */
+h1,h2,h3,h4{font-family:Georgia,"Times New Roman",serif;color:var(--ink);margin:0;}
+h1{font-size:38px;line-height:1.15;letter-spacing:-.3px;font-weight:700;}
+h2{font-size:22px;font-weight:700;margin:36px 0 10px;letter-spacing:.2px;border-bottom:2px solid var(--ink);padding-bottom:6px;text-transform:uppercase;}
+h3{font-size:15px;font-weight:700;margin:18px 0 6px;letter-spacing:1.5px;color:var(--accent);text-transform:uppercase;}
+h4{font-size:14px;font-weight:700;margin:14px 0 4px;color:var(--ink-2);}
+p{margin:8px 0;line-height:1.6;font-size:15px;color:var(--ink-2);}
+ul{margin:8px 0;padding-left:22px;line-height:1.7;color:var(--ink-2);}
+ul li::marker{color:var(--accent);}
+
+/* MASTHEAD */
+.masthead{border-top:6px solid var(--ink);padding-top:14px;display:flex;justify-content:space-between;align-items:flex-end;}
+.masthead .left{font-family:-apple-system,system-ui,sans-serif;font-size:11px;letter-spacing:4px;font-weight:700;color:var(--ink);text-transform:uppercase;}
+.masthead .right{font-family:-apple-system,system-ui,sans-serif;font-size:10px;letter-spacing:3px;color:var(--mute);text-transform:uppercase;}
+.subtitle{font-style:italic;color:var(--mute);font-size:16px;margin-top:6px;}
+
+.cover{display:grid;grid-template-columns:2fr 1fr;gap:32px;margin:32px 0 12px;}
+@media(max-width:780px){.cover{grid-template-columns:1fr;}}
+.coverMeta{background:#f0eadb;border:1px solid var(--line);padding:18px;}
+.coverMeta .row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--line);font-size:13px;}
+.coverMeta .row:last-child{border:none;}
+.coverMeta .row b{font-family:-apple-system,system-ui,sans-serif;font-size:11px;letter-spacing:2px;color:var(--mute);text-transform:uppercase;}
+.coverMeta .row span{color:var(--ink);font-weight:700;}
+
+/* KPI ROW */
+.kpiRow{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0 6px;}
+@media(max-width:780px){.kpiRow{grid-template-columns:repeat(2,1fr);}}
+.kpi{background:var(--paper);border:1px solid var(--line);padding:14px 16px;position:relative;}
+.kpi .lbl{font-family:-apple-system,system-ui,sans-serif;font-size:9px;letter-spacing:2px;color:var(--mute);text-transform:uppercase;font-weight:700;}
+.kpi .val{font-size:30px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums;color:var(--ink);}
+.kpi .sub{font-size:11px;color:var(--mute);margin-top:2px;font-style:italic;}
+.kpi.accent{background:linear-gradient(180deg,#fbf5e3,#f7eccc);border-color:var(--gold);}
+.kpi.accent .val{color:var(--accent-2);}
+
+/* EXECUTIVE SUMMARY VERDICT */
+.verdictBox{display:grid;grid-template-columns:120px 1fr;gap:22px;align-items:center;background:#f0eadb;border-left:6px solid var(--good);padding:18px 22px;margin:14px 0 6px;}
+.verdictScore{font-size:64px;font-weight:700;color:var(--good);line-height:1;font-variant-numeric:tabular-nums;text-align:center;}
+.verdictScore span{display:block;font-family:-apple-system,system-ui,sans-serif;font-size:10px;letter-spacing:3px;color:var(--good);margin-top:6px;text-transform:uppercase;font-weight:800;}
+.verdictText p{margin:0;font-size:15px;color:var(--ink);font-style:italic;}
+.verdictText p b{font-style:normal;color:var(--ink);}
+
+/* TABLES */
+table.t{width:100%;border-collapse:collapse;margin:10px 0 12px;font-size:13px;font-family:Georgia,"Times New Roman",serif;}
+table.t th,table.t td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;}
+table.t thead th{background:#f0eadb;border-bottom:2px solid var(--ink);font-family:-apple-system,system-ui,sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink);font-weight:700;}
+table.t td b{color:var(--ink);}
+table.t td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink);}
+table.t tr.total td{border-top:2px solid var(--ink);background:#f7eccc;font-weight:700;}
+
+/* SCORE BAR */
+.scoreRow{display:grid;grid-template-columns:160px 1fr 56px;align-items:center;gap:14px;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13px;}
+.scoreRow b{color:var(--ink);font-weight:700;}
+.scoreRow .barTrack{height:10px;background:#ece6d4;border-radius:0;position:relative;}
+.scoreRow .barFill{height:100%;background:linear-gradient(90deg,var(--accent),var(--gold));}
+.scoreRow .scoreN{text-align:right;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink);}
+
+/* TAM CHART */
+.funnel{display:flex;flex-direction:column;gap:10px;margin:14px 0;}
+.funnelStep{display:grid;grid-template-columns:90px 1fr 180px;gap:14px;align-items:center;}
+.funnelStep .tag{font-family:-apple-system,system-ui,sans-serif;font-size:11px;letter-spacing:2px;font-weight:800;color:var(--mute);text-transform:uppercase;}
+.funnelStep .bar{height:38px;background:linear-gradient(90deg,var(--accent),var(--accent-2));display:flex;align-items:center;padding-left:14px;color:#fbf5e3;font-weight:700;font-family:-apple-system,system-ui,sans-serif;font-size:14px;letter-spacing:.5px;}
+.funnelStep .meta{font-size:12px;color:var(--mute);line-height:1.4;}
+.funnelStep.s2 .bar{width:46%;background:linear-gradient(90deg,#3a5a7f,#7b1f2b);}
+.funnelStep.s3 .bar{width:18%;background:linear-gradient(90deg,#5a7a9f,#a8651b);}
+
+/* TWO COLUMN */
+.cols-2{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin:10px 0;}
+.cols-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:10px 0;}
+@media(max-width:780px){.cols-2,.cols-3{grid-template-columns:1fr;}}
+.block{background:#fbf8ee;border:1px solid var(--line);padding:14px 16px;}
+.block h4{margin-top:0;}
+.block.persona{background:#f0eadb;}
+.block.warn{background:#fcf2e2;border-left:4px solid var(--warn);}
+.block.bad{background:#fbebec;border-left:4px solid var(--bad);}
+.block.good{background:#e9f3eb;border-left:4px solid var(--good);}
+
+/* JOURNEY */
+.journey{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:14px 0;}
+@media(max-width:780px){.journey{grid-template-columns:repeat(2,1fr);}}
+.jStep{border:1px solid var(--line);background:#fbf8ee;padding:12px;text-align:center;}
+.jStep .n{font-family:-apple-system,system-ui,sans-serif;font-size:10px;font-weight:800;color:var(--mute);letter-spacing:2px;}
+.jStep b{display:block;font-size:13px;margin:4px 0 6px;color:var(--ink);}
+.jStep span{font-size:11px;color:var(--mute);line-height:1.4;}
+
+/* RISKS */
+.riskGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+@media(max-width:780px){.riskGrid{grid-template-columns:1fr;}}
+.risk{display:grid;grid-template-columns:60px 1fr;gap:12px;border:1px solid var(--line);padding:12px 14px;background:#fbf8ee;align-items:center;}
+.risk .sev{text-align:center;font-family:-apple-system,system-ui,sans-serif;font-size:10px;font-weight:800;letter-spacing:2px;padding:8px 6px;color:#fff;}
+.risk .sev.h{background:var(--bad);}
+.risk .sev.m{background:var(--warn);}
+.risk .sev.l{background:var(--good);}
+.risk h4{margin:0 0 2px;font-size:13px;}
+.risk p{margin:0;font-size:12px;color:var(--mute);line-height:1.5;}
+
+/* ACTION PLAN */
+.weekRow{display:grid;grid-template-columns:120px 1fr;gap:18px;padding:12px 0;border-bottom:1px solid var(--line);}
+.weekRow .w{font-family:-apple-system,system-ui,sans-serif;font-size:11px;letter-spacing:2px;font-weight:800;color:var(--accent-2);text-transform:uppercase;}
+.weekRow .w span{display:block;font-family:Georgia,serif;font-size:18px;color:var(--ink);margin-top:4px;font-weight:700;letter-spacing:0;text-transform:none;}
+.weekRow ul{margin:0;padding-left:18px;}
+
+/* GO/NO-GO */
+.goBox{background:#e9f3eb;border:2px solid var(--good);padding:24px;display:grid;grid-template-columns:130px 1fr;gap:24px;align-items:center;margin:14px 0;}
+.goBig{font-family:-apple-system,system-ui,sans-serif;font-weight:800;font-size:54px;color:var(--good);text-align:center;letter-spacing:1px;line-height:1;}
+.goBig span{display:block;font-size:11px;letter-spacing:3px;margin-top:8px;}
+.goRationale p{margin:0;font-size:14px;color:var(--ink);}
+.goRationale ul{margin:8px 0 0;font-size:13px;}
+
+/* FOOTNOTE */
+.footnotes{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);font-size:11px;color:var(--mute);}
+.footnotes b{color:var(--ink);}
+.colophon{margin-top:18px;text-align:center;font-family:-apple-system,system-ui,sans-serif;font-size:10px;letter-spacing:3px;color:var(--mute);text-transform:uppercase;}
+.stamp{display:inline-block;border:2px solid var(--accent-2);color:var(--accent-2);padding:4px 10px;font-family:-apple-system,system-ui,sans-serif;font-size:10px;font-weight:800;letter-spacing:3px;transform:rotate(-3deg);}
+</style>
+
+<div class="page">
+
+<!-- MASTHEAD -->
+<div class="masthead">
+  <div class="left">Startup Validation Report</div>
+  <div class="right">Confidential · Day 22 · #60DayClaudeChallenge · Prepared June 21, 2026</div>
+</div>
+
+<div class="cover">
+  <div>
+    <h1>OpsBrief: AI Operations Analyst Copilot</h1>
+    <p class="subtitle">A morning-briefing tool that lets SMB analysts skip the first 90 minutes of dashboard refreshing — and start the day already informed.</p>
+    <p style="margin-top:14px;">Prepared by <b>Garvit Mittal</b> · MS Business Analytics &amp; AI · UT Dallas · Currently Operations Analyst Intern, The Chicago School. This report assesses the OpsBrief concept on the same dimensions a Y Combinator partner or McKinsey market-entry team would use: founder-market fit, market size, competitor landscape, ICP precision, risk register, and a Go/No-Go recommendation.</p>
+  </div>
+  <div class="coverMeta">
+    <div class="row"><b>Idea</b><span>OpsBrief</span></div>
+    <div class="row"><b>Category</b><span>B2B SaaS · Analytics</span></div>
+    <div class="row"><b>Stage</b><span>Day-0 (pre-MVP)</span></div>
+    <div class="row"><b>Geography</b><span>United States</span></div>
+    <div class="row"><b>Buyer</b><span>SMB Ops/Finance Analyst</span></div>
+    <div class="row"><b>Verdict</b><span style="color:var(--good);">CONDITIONAL GO</span></div>
+    <div class="row"><b>FMF Score</b><span>78 / 100</span></div>
+    <div class="row"><b>Path</b><span>Bootstrap → SMB</span></div>
+  </div>
+</div>
+
+<!-- KPI STRIP -->
+<div class="kpiRow">
+  <div class="kpi"><div class="lbl">TAM</div><div class="val">$0.80B</div><div class="sub">1.67M US analyst seats × $480 ACV</div></div>
+  <div class="kpi"><div class="lbl">SAM</div><div class="val">$0.37B</div><div class="sub">768K SMB analyst seats</div></div>
+  <div class="kpi accent"><div class="lbl">SOM (Year 3)</div><div class="val">$2.4M</div><div class="sub">5K paying users · 0.65% of SAM</div></div>
+  <div class="kpi"><div class="lbl">Founder-Market Fit</div><div class="val">78 / 100</div><div class="sub">High direct experience</div></div>
+</div>
+
+<!-- EXECUTIVE SUMMARY -->
+<h2>1 · Executive Summary</h2>
+<div class="verdictBox">
+  <div class="verdictScore">GO<span>Conditional · 90-Day Test</span></div>
+  <div class="verdictText">
+    <p>"<b>OpsBrief</b> solves a recurring, time-boxed pain that the founder lives daily. The market is large enough for a bootstrapped business but not VC-scale. The dominant risk is not demand — it is integration breadth. Recommendation: 90-day validation sprint targeting 25 customer-discovery calls, then a no-code MVP for the first 10 paying users at $20/mo before any platform build."</p>
+  </div>
+</div>
+<p>The opportunity sits at the intersection of three observed trends: (1) AI-generated daily briefings have crossed the credibility threshold for routine business use; (2) SMBs (50–500 employees) increasingly run their analytics out of a fragmented stack — Sheets + a warehouse + Slack + an ad-hoc dashboard tool — that nobody is gluing together; and (3) the analyst role at this tier is overweight on report production and underweight on judgment. OpsBrief reclaims the first 90 minutes of every analyst's day and converts it into manager-ready summary output.</p>
+
+<!-- 2. PROBLEM VALIDATION -->
+<h2>2 · Problem Validation</h2>
+<div class="cols-2">
+  <div class="block">
+    <h4>Pain Frequency</h4>
+    <p style="margin:0;">Daily. Every business day, an SMB analyst opens the same 3–6 dashboards, copies yesterday's metrics into a Slack message or email, writes "no anomalies" or "X is down 4% — looking into it," and sends it to their manager.</p>
+  </div>
+  <div class="block">
+    <h4>Pain Intensity</h4>
+    <p style="margin:0;">Medium-high. Not catastrophic. But it consumes the analyst's freshest 90 minutes on the lowest-leverage work of their day, and it pushes the actual analysis they were hired to do into post-lunch fatigue hours.</p>
+  </div>
+  <div class="block warn">
+    <h4>Today's Workaround</h4>
+    <p style="margin:0;">Manual. Some teams build Looker dashboards or Hex notebooks but those still require the analyst to open them, read them, and write the summary. There is no "give me yesterday in 6 sentences" product in this tier.</p>
+  </div>
+  <div class="block good">
+    <h4>Willingness to Pay Signal</h4>
+    <p style="margin:0;">Indirect but real: SMBs already pay $30–$80/seat for Looker, Hex, Sigma, Mode. A $20–$40/seat briefing layer that sits on top is a price increment they can absorb without procurement review.</p>
+  </div>
+</div>
+<p><b>Verdict:</b> Problem is recurring, time-boxed, and unaddressed by current dashboard tooling. The pain is not "I don't have data" — it is "I have too many places where the data lives and I am the integration layer."</p>
+
+<!-- 3. FOUNDER-MARKET FIT -->
+<h2>3 · Founder-Market Fit Score</h2>
+<div class="scoreRow"><b>Direct user experience</b><div class="barTrack"><div class="barFill" style="width:95%;"></div></div><div class="scoreN">95</div></div>
+<div class="scoreRow"><b>Domain depth (analytics)</b><div class="barTrack"><div class="barFill" style="width:85%;"></div></div><div class="scoreN">85</div></div>
+<div class="scoreRow"><b>Technical build capacity</b><div class="barTrack"><div class="barFill" style="width:80%;"></div></div><div class="scoreN">80</div></div>
+<div class="scoreRow"><b>SMB go-to-market access</b><div class="barTrack"><div class="barFill" style="width:55%;"></div></div><div class="scoreN">55</div></div>
+<div class="scoreRow"><b>Enterprise sales experience</b><div class="barTrack"><div class="barFill" style="width:30%;"></div></div><div class="scoreN">30</div></div>
+<div class="scoreRow"><b>Time runway (next 12 mo)</b><div class="barTrack"><div class="barFill" style="width:85%;"></div></div><div class="scoreN">85</div></div>
+<div class="scoreRow" style="border:none;"><b style="color:var(--accent-2);">Composite FMF Score</b><div class="barTrack" style="background:#f7eccc;"><div class="barFill" style="width:78%;background:linear-gradient(90deg,var(--accent-2),var(--gold));"></div></div><div class="scoreN" style="color:var(--accent-2);">78</div></div>
+
+<p style="margin-top:12px;"><b>Reading:</b> Founder is the user. That single fact is worth more than any other input on this row. The two below-average dimensions (SMB GTM access, enterprise sales experience) are not blockers for a bootstrapped SMB motion — they are blockers if the strategy ever pivots to mid-market or enterprise. Stay SMB-native.</p>
+
+<!-- 4. TAM / SAM / SOM -->
+<h2>4 · Market Sizing (TAM / SAM / SOM)</h2>
+<div class="funnel">
+  <div class="funnelStep">
+    <div class="tag">TAM</div>
+    <div class="bar">$0.80B · 1.67M US analyst seats × $480 ACV</div>
+    <div class="meta">US Business Operations Specialists (1.18M) + Operations Research Analysts (113K) + Financial Analysts (376K). Source: BLS OEW.</div>
+  </div>
+  <div class="funnelStep s2">
+    <div class="tag">SAM</div>
+    <div class="bar">$0.37B · 768K SMB seats</div>
+    <div class="meta">Filtered to SMBs (≤500 employees, ~46% of US private employment per SBA).</div>
+  </div>
+  <div class="funnelStep s3">
+    <div class="tag">SOM (Y3)</div>
+    <div class="bar">$2.4M ARR</div>
+    <div class="meta">5,000 paying seats at $40/mo. Conservative 3-year bootstrap target.</div>
+  </div>
+</div>
+
+<table class="t">
+  <thead><tr><th>Year</th><th>Customers</th><th>ACV</th><th class="num">ARR</th><th>SAM penetration</th></tr></thead>
+  <tbody>
+    <tr><td>Year 1</td><td>100</td><td>$480 ($40/mo)</td><td class="num">$48,000</td><td>0.013%</td></tr>
+    <tr><td>Year 2</td><td>1,000</td><td>$480</td><td class="num">$480,000</td><td>0.130%</td></tr>
+    <tr class="total"><td>Year 3</td><td>5,000</td><td>$480</td><td class="num">$2,400,000</td><td>0.651%</td></tr>
+  </tbody>
+</table>
+<p><b>Reading:</b> This is not a venture-scale market — it is a real business market. $2.4M ARR at 0.65% penetration is achievable solo or with a 2-person team. The headroom (768K SMB seats) is large enough that competition does not have to be zero-sum.</p>
+
+<!-- 5. COMPETITOR ANALYSIS -->
+<h2>5 · Competitor Analysis</h2>
+<table class="t">
+  <thead><tr><th>Competitor</th><th>Category</th><th>Tier they own</th><th>Where they leave a gap</th></tr></thead>
+  <tbody>
+    <tr><td><b>Looker (Google)</b></td><td>BI dashboard</td><td>Mid-market+</td><td>Heavy setup, no daily summary layer, no narrative output.</td></tr>
+    <tr><td><b>Hex / Mode / Sigma</b></td><td>Analyst notebook</td><td>Mid-market</td><td>Built for the analyst to author in, not for the analyst's manager to consume.</td></tr>
+    <tr><td><b>Tableau Pulse</b></td><td>AI insight summaries</td><td>Tableau install base</td><td>Locked to Tableau data. Doesn't read Sheets/Excel-native SMB stacks.</td></tr>
+    <tr><td><b>Google Sheets + Gemini</b></td><td>Embedded AI</td><td>Sheets users</td><td>Single-source. Cannot triangulate across Sheets + warehouse + Slack.</td></tr>
+    <tr><td><b>ThoughtSpot</b></td><td>Search-driven BI</td><td>Mid-market+</td><td>Pull model (analyst asks); OpsBrief is push (briefing arrives).</td></tr>
+    <tr><td><b>Custom Python scripts</b></td><td>DIY</td><td>Bigger SMBs with eng</td><td>Brittle, owned by one analyst, dies when they leave.</td></tr>
+  </tbody>
+</table>
+
+<!-- 6. MARKET GAP -->
+<h2>6 · Market Gap Analysis</h2>
+<div class="cols-2">
+  <div class="block good">
+    <h4>The Wedge</h4>
+    <p>No incumbent owns the <b>SMB daily briefing</b> use case. Every tool above either targets a larger company or assumes the analyst will <em>compose</em> the summary, not receive it. The wedge is "the briefing your manager wants to read at 8:55 a.m." — not "another place to build a chart."</p>
+  </div>
+  <div class="block warn">
+    <h4>Why It's Still Open</h4>
+    <p>Mid-market tools price out SMBs ($30–60/seat × 50-person plans is a procurement event). Single-source AI features (Sheets+Gemini) cannot triangulate across the typical SMB's fragmented stack. The SMB tier is too small for enterprise vendors to bother with the integrations.</p>
+  </div>
+</div>
+
+<!-- 7. ICP -->
+<h2>7 · Ideal Customer Profile (ICP)</h2>
+<table class="t">
+  <thead><tr><th>Attribute</th><th>Definition</th></tr></thead>
+  <tbody>
+    <tr><td><b>Company size</b></td><td>50–500 employees (SMB tier)</td></tr>
+    <tr><td><b>Industry</b></td><td>Services, healthcare-adjacent, education, e-commerce, SaaS sub-$50M ARR</td></tr>
+    <tr><td><b>Analytics maturity</b></td><td>Has at least 1 dedicated analyst; uses ≥2 of: Sheets/Excel, Snowflake/BigQuery, Looker/Hex/Sigma, Slack/Teams reporting</td></tr>
+    <tr><td><b>Buyer</b></td><td>Operations Analyst, Business Analyst, or Financial Analyst (end user); Director of Ops or Head of Finance (approver)</td></tr>
+    <tr><td><b>Geography</b></td><td>United States (English-language launch market)</td></tr>
+    <tr><td><b>Disqualifiers</b></td><td>&lt;50 employees (no dedicated analyst), regulated finance/healthcare with custom data residency, companies on a single enterprise stack (already covered by Looker/Tableau)</td></tr>
+  </tbody>
+</table>
+
+<!-- 8. BUYER PERSONA -->
+<h2>8 · Buyer Persona</h2>
+<div class="block persona">
+  <h4>"Maya — The Lone Analyst"</h4>
+  <p style="margin:6px 0 0;">28 years old. Operations Analyst at a 180-person logistics SaaS. Three years out of a Business Analytics master's. Reports to a VP of Ops who joined from McKinsey and expects a Slack-message briefing every morning by 9 a.m. ET. Owns 4 dashboards in Hex, 7 sheets in Google Drive, a Snowflake read connection, and a Slack channel called <em>#daily-ops</em>. Spends her first 60–90 minutes opening tabs, copying numbers, and writing the same sentence structure she wrote yesterday.</p>
+  <p style="margin:8px 0 0;"><b>What she actually wants:</b> the next promotion. What is in her way: she does not have time to do <em>analysis</em>, only <em>reporting</em>. Every minute spent refreshing dashboards is a minute not spent on the kind of work that gets her recognized.</p>
+</div>
+
+<!-- 9. CUSTOMER PAIN POINTS -->
+<h2>9 · Customer Pain Points</h2>
+<div class="cols-3">
+  <div class="block"><h4>Pain 1 · Time tax</h4><p>60–90 minutes/day reclaiming the same numbers across 4–6 sources. ~6 hours/week of repetitive manual aggregation.</p></div>
+  <div class="block"><h4>Pain 2 · Inconsistency</h4><p>Different analysts write briefs in different formats. Manager spends time figuring out what changed, not what matters.</p></div>
+  <div class="block"><h4>Pain 3 · Anomaly blindness</h4><p>"Looks fine" is the default when the analyst is rushing. Real anomalies get missed until end-of-week or end-of-month.</p></div>
+  <div class="block"><h4>Pain 4 · Vacation collapse</h4><p>When the analyst is out, the brief stops. Manager either flies blind or asks 3 different people for partial data.</p></div>
+  <div class="block"><h4>Pain 5 · Career stagnation</h4><p>The analyst becomes the briefing machine. Strategic projects keep getting bumped. Promotion velocity slows.</p></div>
+  <div class="block"><h4>Pain 6 · Knowledge loss</h4><p>The "how" of the brief lives in the analyst's head. When they leave, the institutional rhythm leaves with them.</p></div>
+</div>
+
+<!-- 10. BUYING TRIGGERS & OBJECTIONS -->
+<h2>10 · Buying Triggers &amp; Objections</h2>
+<div class="cols-2">
+  <div class="block good">
+    <h4>Top 5 Buying Triggers</h4>
+    <ul>
+      <li>New manager joins, asks "where's my morning brief?"</li>
+      <li>Analyst leaves; manager realises the brief was 100% in their head</li>
+      <li>Quarterly all-hands prep — manager wants a clean 90-day summary</li>
+      <li>An anomaly got missed → "this shouldn't happen again" mandate</li>
+      <li>Analyst hits burnout/notice — retention manager pays $40/mo to make their day easier</li>
+    </ul>
+  </div>
+  <div class="block bad">
+    <h4>Top 5 Objections</h4>
+    <ul>
+      <li>"Can't we just use ChatGPT on our Sheets?" → Answer: not across sources, not on a schedule, not with anomaly memory.</li>
+      <li>"Security — you'll have access to our financial data" → Answer: read-only connectors, SOC2 on roadmap, customer-controlled scope.</li>
+      <li>"What if the AI hallucinates a number?" → Answer: every figure in the brief links back to the source row; the brief is a summary, not a synthesis.</li>
+      <li>"We already pay for Hex/Looker" → Answer: OpsBrief sits on top, not instead. $20–$40 increment, not a replacement.</li>
+      <li>"My analyst will see this as a threat" → Answer: gives them time back for higher-leverage work, not replaces them.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 11. CUSTOMER JOURNEY -->
+<h2>11 · Customer Journey</h2>
+<div class="journey">
+  <div class="jStep"><div class="n">STAGE 1</div><b>Trigger</b><span>Manager asks for a daily brief, or analyst burns out on manual prep.</span></div>
+  <div class="jStep"><div class="n">STAGE 2</div><b>Search</b><span>"AI daily report SaaS", "operations briefing automation", asks LinkedIn network.</span></div>
+  <div class="jStep"><div class="n">STAGE 3</div><b>Trial</b><span>Connects one data source. Receives a sample brief next morning at 8:55 a.m.</span></div>
+  <div class="jStep"><div class="n">STAGE 4</div><b>Approve</b><span>Sends sample brief to manager. Manager says "this is exactly it."</span></div>
+  <div class="jStep"><div class="n">STAGE 5</div><b>Purchase</b><span>$40/mo on personal or team card. No procurement gate.</span></div>
+  <div class="jStep"><div class="n">STAGE 6</div><b>Expand</b><span>Adds 2 more data sources. Onboards a teammate. Becomes the team standard.</span></div>
+</div>
+
+<!-- 12. RISK ASSESSMENT -->
+<h2>12 · Risk Assessment</h2>
+<div class="riskGrid">
+  <div class="risk"><div class="sev h">HIGH</div><div><h4>Integration Breadth</h4><p>Building reliable read-connectors for Sheets, Snowflake, BigQuery, Looker, Slack is 70% of the engineering cost. Each new connector is a long tail of edge cases.</p></div></div>
+  <div class="risk"><div class="sev h">HIGH</div><div><h4>Incumbent Squeeze</h4><p>Google adding Gemini summaries to Sheets, or Hex/Looker adding native daily briefs, could collapse the wedge. Window may be 18–24 months.</p></div></div>
+  <div class="risk"><div class="sev m">MED</div><div><h4>Trust on Numbers</h4><p>One hallucinated metric in a CFO's brief and the product dies in that account. Requires source-link-back design from Day 1.</p></div></div>
+  <div class="risk"><div class="sev m">MED</div><div><h4>GTM Channel</h4><p>SMB analyst persona is hard to reach at scale. Likely channels: LinkedIn content, founder-led sales, communities (r/analytics, Locally Optimistic, Operators Guild).</p></div></div>
+  <div class="risk"><div class="sev l">LOW</div><div><h4>Solo-founder Burnout</h4><p>Founder is already employed (internship) + grad student. Calendar load is real. Mitigated by 90-day discovery-only sprint before any build commitment.</p></div></div>
+  <div class="risk"><div class="sev l">LOW</div><div><h4>Demand</h4><p>Pain is recurring and felt by the founder. Discovery risk is low; the unknown is willingness-to-pay at $40/mo (vs $0 status quo).</p></div></div>
+</div>
+
+<!-- 13. PIVOT OPPORTUNITIES -->
+<h2>13 · Pivot Opportunities</h2>
+<div class="cols-3">
+  <div class="block"><h4>Pivot 1 · Manager-side</h4><p>If analysts won't pay, sell to their managers instead. "$200/mo per team, every analyst gets briefing automation." Higher ACV, slower sales cycle, but procurement-defensible.</p></div>
+  <div class="block"><h4>Pivot 2 · Vertical</h4><p>Focus only on one industry (e.g., e-commerce ops) and ship vertical-specific KPI templates. Smaller TAM, much faster GTM.</p></div>
+  <div class="block"><h4>Pivot 3 · Consumer-of-one</h4><p>Sell directly to individual analysts as a personal productivity tool, no team or admin gates. $15/mo, viral PLG via LinkedIn.</p></div>
+</div>
+
+<!-- 14. GO / NO-GO -->
+<h2>14 · Go / No-Go Recommendation</h2>
+<div class="goBox">
+  <div class="goBig">GO<span>CONDITIONAL</span></div>
+  <div class="goRationale">
+    <p><b>Recommendation:</b> Proceed with a 90-day validation sprint. Do not build the platform until 25 customer-discovery calls and 10 letters-of-intent are in hand. If 10 prospects say they would pay $20/mo for a no-code MVP brief delivered to their Slack, then commit to the build.</p>
+    <ul>
+      <li><b>Founder-market fit (78/100)</b> is high enough to invest founder time</li>
+      <li><b>Pain is daily, recurring, and observable</b> — easy to validate in 30-min calls</li>
+      <li><b>Market is bootstrap-realistic</b> — $2.4M ARR Y3 at 0.65% SAM penetration</li>
+      <li><b>Wedge is real</b> — no incumbent owns the SMB-daily-briefing use case today</li>
+      <li><b>Window is closing</b> — 18–24 months before Google/Hex collapse the wedge</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 15. 30-DAY ACTION PLAN -->
+<h2>15 · 30-Day Action Plan</h2>
+<div class="weekRow">
+  <div class="w">Week 1 · Days 1–7<span>Sharpen the wedge</span></div>
+  <ul>
+    <li>Write the one-paragraph product positioning for the Maya persona</li>
+    <li>Identify 50 target ICP companies via LinkedIn Sales Navigator</li>
+    <li>Reach out to 20 SMB analysts in your network for 25-min discovery calls</li>
+    <li>Build a 5-question discovery script focused on the 90-minute morning routine</li>
+  </ul>
+</div>
+<div class="weekRow">
+  <div class="w">Week 2 · Days 8–14<span>Run 8 discovery calls</span></div>
+  <ul>
+    <li>Complete 8 discovery calls; transcribe and code answers</li>
+    <li>Build the "would you pay $20/mo for X?" landing page (no product yet — Carrd or Framer)</li>
+    <li>Post 2 LinkedIn observations from the calls; collect inbound interest</li>
+    <li>Identify the top 3 most-painful sub-segments (e.g., e-commerce ops, healthcare ops, SaaS finance)</li>
+  </ul>
+</div>
+<div class="weekRow">
+  <div class="w">Week 3 · Days 15–21<span>Build the no-code MVP</span></div>
+  <ul>
+    <li>Wire Google Sheets + Slack + Claude API for one ICP company (yours, if Chicago School will sponsor a pilot)</li>
+    <li>Deliver the first real morning brief to a real manager</li>
+    <li>Iterate the brief format with that single user for 5 consecutive workdays</li>
+    <li>Document the prompt template and the brief schema as the product MVP</li>
+  </ul>
+</div>
+<div class="weekRow">
+  <div class="w">Week 4 · Days 22–30<span>Convert to first paying users</span></div>
+  <ul>
+    <li>Run 8 more discovery calls focused on the segments validated in Week 2</li>
+    <li>Pitch the no-code MVP to 10 warm prospects at $20/mo</li>
+    <li>Target: 3 paying customers signed by Day 30 (any paid logo proves the wedge)</li>
+    <li>Decision point at Day 30: if &lt;3 paid customers → pivot to consumer-of-one or kill</li>
+  </ul>
+</div>
+
+<!-- FOOTNOTES -->
+<div class="footnotes">
+  <p><b>Methodology &amp; Sources.</b> TAM/SAM derived from US Bureau of Labor Statistics Occupational Employment and Wage Statistics (Business Operations Specialists 13-1199, Operations Research Analysts 15-2031, Financial Analysts 13-2051). SMB share-of-employment from US Small Business Administration. ACV ($40/mo) benchmarked against analyst-tier SaaS pricing (Hex, Sigma, Mode individual seats). Competitor intel from public product pages and pricing sheets. Buyer persona "Maya" is a composite character based on the founder's direct experience as an Operations Analyst Intern.</p>
+  <p><b>Limitations.</b> Zero customer-discovery calls completed at time of report. All willingness-to-pay claims are inferred from comparable category pricing, not validated by interviews. The 90-day sprint exists specifically to test those inferences before committing build resources.</p>
+  <p><b>What this report is not.</b> It is not a fundraising pitch — the market is not VC-scale and the recommendation is bootstrap. It is not a build plan — the build only triggers after 10 LOIs.</p>
+</div>
+
+<div class="colophon">
+  <span class="stamp">CONFIDENTIAL · DAY 22 · 60-DAY CLAUDE CHALLENGE</span>
+  <div style="margin-top:14px;">Prepared by Garvit Mittal · Single HTML artifact · Print-ready for direct PDF export</div>
+</div>
+
+</div>
