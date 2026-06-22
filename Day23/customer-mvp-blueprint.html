@@ -1,0 +1,449 @@
+<style>
+:root{
+  --bg:#f6f5f0; --paper:#fdfcf8; --ink:#0f1115; --ink-2:#3a3f4a; --mute:#6a7180; --line:#dcd7c8; --line-2:#c9c2ac;
+  --accent:#1a3a5f; --accent-2:#7b1f2b; --gold:#a8862d;
+  --good:#1e7a4a; --good-bg:#e9f3eb;
+  --warn:#a8651b; --warn-bg:#fcf2e2;
+  --bad:#9b2730; --bad-bg:#fbebec;
+  --amber:#d4a017; --amber-bg:#fdf3d6;
+  --shadow:0 30px 60px rgba(20,18,12,.10);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:Georgia,"Times New Roman",serif;-webkit-font-smoothing:antialiased;}
+.page{max-width:1200px;margin:24px auto;background:var(--paper);box-shadow:var(--shadow);padding:48px 56px 56px;border:1px solid var(--line);}
+@media(max-width:780px){.page{padding:28px 22px;margin:8px;}}
+
+h1,h2,h3,h4{font-family:Georgia,"Times New Roman",serif;color:var(--ink);margin:0;}
+h1{font-size:36px;line-height:1.15;letter-spacing:-.3px;font-weight:700;}
+h2{font-size:20px;font-weight:700;margin:32px 0 10px;letter-spacing:.2px;border-bottom:2px solid var(--ink);padding-bottom:6px;text-transform:uppercase;}
+h3{font-size:13px;font-weight:700;margin:14px 0 6px;letter-spacing:1.5px;color:var(--accent);text-transform:uppercase;}
+h4{font-size:13px;font-weight:700;margin:10px 0 4px;color:var(--ink-2);}
+p{margin:6px 0;line-height:1.6;font-size:14px;color:var(--ink-2);}
+ul{margin:6px 0;padding-left:20px;line-height:1.65;color:var(--ink-2);font-size:14px;}
+ul li::marker{color:var(--accent);}
+
+/* MASTHEAD */
+.masthead{border-top:6px solid var(--ink);padding-top:12px;display:flex;justify-content:space-between;align-items:flex-end;}
+.masthead .left{font-family:-apple-system,system-ui,sans-serif;font-size:10px;letter-spacing:4px;font-weight:800;color:var(--ink);text-transform:uppercase;}
+.masthead .right{font-family:-apple-system,system-ui,sans-serif;font-size:10px;letter-spacing:3px;color:var(--mute);text-transform:uppercase;}
+.subtitle{font-style:italic;color:var(--mute);font-size:15px;margin-top:6px;}
+
+.cover{display:grid;grid-template-columns:2fr 1fr;gap:28px;margin:24px 0 8px;}
+@media(max-width:780px){.cover{grid-template-columns:1fr;}}
+.coverMeta{background:#f0eadb;border:1px solid var(--line);padding:16px;}
+.coverMeta .row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--line);font-size:12px;}
+.coverMeta .row:last-child{border:none;}
+.coverMeta .row b{font-family:-apple-system,system-ui,sans-serif;font-size:10px;letter-spacing:2px;color:var(--mute);text-transform:uppercase;}
+.coverMeta .row span{color:var(--ink);font-weight:700;}
+
+/* SCORE STRIP */
+.scores{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0 8px;}
+@media(max-width:780px){.scores{grid-template-columns:repeat(2,1fr);}}
+.scoreBox{background:var(--paper);border:1px solid var(--line);padding:12px 14px;text-align:center;}
+.scoreBox .lbl{font-family:-apple-system,system-ui,sans-serif;font-size:9px;letter-spacing:2px;color:var(--mute);text-transform:uppercase;font-weight:700;}
+.scoreBox .val{font-size:34px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink);line-height:1.1;margin-top:4px;}
+.scoreBox .max{font-size:14px;color:var(--mute);}
+.scoreBox.good{background:linear-gradient(180deg,#fbf5e3,#f7eccc);border-color:var(--gold);}
+.scoreBox.good .val{color:var(--accent-2);}
+
+/* TABLES */
+table.t{width:100%;border-collapse:collapse;margin:8px 0 10px;font-size:12px;font-family:Georgia,"Times New Roman",serif;}
+table.t th,table.t td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;}
+table.t thead th{background:#f0eadb;border-bottom:2px solid var(--ink);font-family:-apple-system,system-ui,sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink);font-weight:700;}
+table.t td b{color:var(--ink);}
+table.t td.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink);}
+table.t tr.total td{border-top:2px solid var(--ink);background:#f7eccc;font-weight:700;}
+
+/* VERDICT BOX */
+.verdictBox{display:grid;grid-template-columns:130px 1fr;gap:20px;align-items:center;background:#fbf5e3;border-left:6px solid var(--amber);padding:16px 20px;margin:12px 0;}
+.verdictBox .vBig{font-family:-apple-system,system-ui,sans-serif;font-weight:800;font-size:28px;color:var(--amber);text-align:center;line-height:1.1;letter-spacing:1px;}
+.verdictBox .vBig span{display:block;font-size:9px;letter-spacing:3px;margin-top:6px;}
+.verdictBox p{margin:0;font-size:14px;color:var(--ink);font-style:italic;}
+.verdictBox p b{font-style:normal;}
+
+/* COLUMNS */
+.cols-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:8px 0;}
+.cols-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:8px 0;}
+@media(max-width:780px){.cols-2,.cols-3{grid-template-columns:1fr;}}
+.block{background:#fbf8ee;border:1px solid var(--line);padding:12px 14px;}
+.block h4{margin-top:0;}
+.block.good{background:var(--good-bg);border-left:4px solid var(--good);}
+.block.warn{background:var(--warn-bg);border-left:4px solid var(--warn);}
+.block.bad{background:var(--bad-bg);border-left:4px solid var(--bad);}
+.block.persona{background:#f0eadb;}
+
+/* JOURNEY */
+.journey{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0;}
+@media(max-width:780px){.journey{grid-template-columns:repeat(2,1fr);}}
+.jStep{border:1px solid var(--line);background:#fbf8ee;padding:10px;text-align:center;position:relative;}
+.jStep .n{font-family:-apple-system,system-ui,sans-serif;font-size:9px;font-weight:800;color:var(--mute);letter-spacing:2px;}
+.jStep b{display:block;font-size:13px;margin:4px 0 6px;color:var(--accent-2);}
+.jStep span{font-size:11px;color:var(--mute);line-height:1.4;display:block;}
+
+/* MOSCOW */
+.moscow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:8px 0;}
+@media(max-width:780px){.moscow{grid-template-columns:1fr 1fr;}}
+.moscowCol{border:1px solid var(--line);padding:12px;}
+.moscowCol h4{margin:0 0 8px;font-family:-apple-system,system-ui,sans-serif;font-size:11px;letter-spacing:2px;text-align:center;padding:6px;border-radius:3px;text-transform:uppercase;}
+.moscowCol.must h4{background:var(--good);color:#fff;}
+.moscowCol.should h4{background:var(--amber);color:#fff;}
+.moscowCol.could h4{background:var(--warn);color:#fff;}
+.moscowCol.wont h4{background:var(--bad);color:#fff;}
+.moscowCol ul{margin:0;padding-left:18px;font-size:12px;}
+
+/* RISKS */
+.riskGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+@media(max-width:780px){.riskGrid{grid-template-columns:1fr;}}
+.risk{display:grid;grid-template-columns:50px 1fr;gap:10px;border:1px solid var(--line);padding:10px 12px;background:#fbf8ee;align-items:center;}
+.risk .sev{text-align:center;font-family:-apple-system,system-ui,sans-serif;font-size:9px;font-weight:800;letter-spacing:1.5px;padding:6px 4px;color:#fff;}
+.risk .sev.h{background:var(--bad);}
+.risk .sev.m{background:var(--warn);}
+.risk .sev.l{background:var(--good);}
+.risk h4{margin:0 0 2px;font-size:13px;}
+.risk p{margin:0;font-size:11px;color:var(--mute);line-height:1.5;}
+
+/* 30 DAY */
+.weekRow{display:grid;grid-template-columns:130px 1fr;gap:16px;padding:10px 0;border-bottom:1px solid var(--line);}
+.weekRow .w{font-family:-apple-system,system-ui,sans-serif;font-size:10px;letter-spacing:2px;font-weight:800;color:var(--accent-2);text-transform:uppercase;}
+.weekRow .w span{display:block;font-family:Georgia,serif;font-size:15px;color:var(--ink);margin-top:4px;font-weight:700;letter-spacing:0;text-transform:none;}
+.weekRow ul{margin:0;padding-left:16px;font-size:12px;}
+
+/* PAIN LIST */
+.painList{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+@media(max-width:780px){.painList{grid-template-columns:1fr;}}
+.painItem{display:grid;grid-template-columns:36px 1fr;gap:8px;padding:8px 14px 8px 8px;border-bottom:1px dashed var(--line);align-items:start;}
+.painItem .num{font-family:-apple-system,system-ui,sans-serif;font-weight:800;color:var(--accent-2);font-size:18px;text-align:center;}
+.painItem b{font-size:13px;color:var(--ink);}
+.painItem span{font-size:11px;color:var(--mute);line-height:1.4;display:block;margin-top:2px;}
+
+/* PRICING */
+.priceCards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+@media(max-width:780px){.priceCards{grid-template-columns:1fr;}}
+.priceCard{border:1px solid var(--line);padding:14px;background:#fbf8ee;text-align:center;}
+.priceCard.middle{background:linear-gradient(180deg,#fbf5e3,#f7eccc);border-color:var(--gold);}
+.priceCard .tier{font-family:-apple-system,system-ui,sans-serif;font-size:10px;letter-spacing:2px;color:var(--mute);text-transform:uppercase;font-weight:700;}
+.priceCard .price{font-size:28px;font-weight:700;color:var(--ink);margin:4px 0;}
+.priceCard .price span{font-size:13px;color:var(--mute);}
+.priceCard .price.rec{color:var(--accent-2);}
+.priceCard ul{margin:8px 0 0;padding-left:18px;font-size:11px;text-align:left;}
+
+/* FOOTNOTES */
+.footnotes{margin-top:24px;padding-top:12px;border-top:1px solid var(--line);font-size:10px;color:var(--mute);}
+.footnotes b{color:var(--ink);}
+.colophon{margin-top:12px;text-align:center;font-family:-apple-system,system-ui,sans-serif;font-size:9px;letter-spacing:3px;color:var(--mute);text-transform:uppercase;}
+.stamp{display:inline-block;border:2px solid var(--accent-2);color:var(--accent-2);padding:3px 8px;font-family:-apple-system,system-ui,sans-serif;font-size:9px;font-weight:800;letter-spacing:3px;transform:rotate(-3deg);}
+
+/* Action sheet */
+.actionTable td{vertical-align:top;}
+.actionTable td.priority{font-weight:800;color:var(--accent-2);}
+
+/* signal pip */
+.pip{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle;}
+</style>
+
+<div class="page">
+
+<!-- MASTHEAD -->
+<div class="masthead">
+  <div class="left">Customer &amp; MVP Blueprint · Day 23 of 60</div>
+  <div class="right">Confidential · #60DayClaudeChallenge · Prepared June 22, 2026</div>
+</div>
+
+<div class="cover">
+  <div>
+    <h1>OpsBrief — Customer &amp; MVP Blueprint</h1>
+    <p class="subtitle">Building on the Day 22 Startup Validation Report. From "should we build this?" to "what exactly do we build, for whom, and how do we know it worked?"</p>
+    <p style="margin-top:12px;font-size:14px;">This blueprint translates the Day 22 conditional GO into a concrete MVP plan. It assumes the founder will not write a single line of platform code until 10 paying users at $20/mo are signed at the no-code MVP stage. Every section is calibrated to that constraint.</p>
+  </div>
+  <div class="coverMeta">
+    <div class="row"><b>Idea</b><span>OpsBrief</span></div>
+    <div class="row"><b>Stage</b><span>Pre-MVP · Discovery</span></div>
+    <div class="row"><b>Buyer</b><span>SMB Ops Analyst</span></div>
+    <div class="row"><b>Geo</b><span>United States</span></div>
+    <div class="row"><b>Verdict</b><span style="color:var(--amber);">PROMISING · UNVALIDATED</span></div>
+    <div class="row"><b>PMF Score</b><span>62 / 100</span></div>
+    <div class="row"><b>MVP Path</b><span>No-code Slack brief</span></div>
+  </div>
+</div>
+
+<!-- SCORE STRIP -->
+<div class="scores">
+  <div class="scoreBox"><div class="lbl">Customer Clarity</div><div class="val">74<span class="max">/100</span></div></div>
+  <div class="scoreBox"><div class="lbl">Problem Severity</div><div class="val">68<span class="max">/100</span></div></div>
+  <div class="scoreBox good"><div class="lbl">PMF Potential</div><div class="val">62<span class="max">/100</span></div></div>
+  <div class="scoreBox"><div class="lbl">MVP Readiness</div><div class="val">81<span class="max">/100</span></div></div>
+</div>
+
+<!-- 1. EXEC SUMMARY -->
+<h2>1 · Executive Summary</h2>
+<p>OpsBrief is a morning briefing tool that connects to an SMB's Sheets, Snowflake, Looker, and Slack and writes the analyst's daily standup before they open their laptop. The Day 22 validation produced a Founder-Market Fit score of 78/100 and a conditional GO. This blueprint operationalizes that GO into a 30-day, no-code, no-platform MVP designed to prove a single hypothesis: <b>that an SMB analyst's manager will pay $20/month for an automated morning brief delivered to Slack</b>. If the hypothesis fails at 30 days, the founder kills or pivots — no sunk platform cost.</p>
+
+<!-- 2. ICP -->
+<h2>2 · Ideal Customer Profile</h2>
+<table class="t">
+  <thead><tr><th>Dimension</th><th>Definition</th><th>Disqualifier</th></tr></thead>
+  <tbody>
+    <tr><td><b>Company size</b></td><td>50–500 employees</td><td>&lt;50 (no dedicated analyst) or &gt;500 (mid-market tooling already in place)</td></tr>
+    <tr><td><b>Industry</b></td><td>Services, e-commerce, SaaS sub-$50M ARR, healthcare-adjacent, education-adjacent</td><td>Regulated finance, HIPAA-heavy healthcare, defense</td></tr>
+    <tr><td><b>Stack signal</b></td><td>Uses Slack (or Teams) + at least 2 of: Google Sheets, Excel, Snowflake, BigQuery, Hex, Looker, Sigma, Mode</td><td>Single-source Looker shop (already covered by Tableau Pulse)</td></tr>
+    <tr><td><b>Role signal</b></td><td>At least one Ops Analyst, Business Analyst, or Financial Analyst</td><td>No dedicated analyst — owner is also the analyst</td></tr>
+    <tr><td><b>Manager rhythm</b></td><td>Manager expects a written status update most mornings</td><td>Asynchronous-first culture with no daily reporting expectation</td></tr>
+    <tr><td><b>Geography</b></td><td>United States, English-language</td><td>Multi-language reporting requirements out of scope for MVP</td></tr>
+  </tbody>
+</table>
+
+<!-- 3. BUYER PERSONA -->
+<h2>3 · Buyer Persona</h2>
+<div class="block persona">
+  <h4>"Maya — The Lone Analyst" (Primary user)</h4>
+  <p style="margin:4px 0 0;font-size:13px;">28 years old. Operations Analyst at a 180-person logistics SaaS. Three years out of a Business Analytics master's. Reports to a VP of Operations who joined from McKinsey and expects a Slack-message briefing every business day by 9 a.m. ET. Owns 4 dashboards in Hex, 7 sheets in Google Drive, a Snowflake read connection, and a Slack channel called <em>#daily-ops</em>. Spends her first 60–90 minutes opening tabs, copying numbers, and writing the same sentence structure she wrote yesterday.</p>
+  <p style="margin:6px 0 0;font-size:13px;"><b>What she wants:</b> the next promotion. <b>What's in her way:</b> she does not have time to do <em>analysis</em>, only <em>reporting</em>. <b>Pays via:</b> personal/team card (no procurement gate at $20–$40/mo).</p>
+</div>
+<div class="block persona" style="margin-top:8px;">
+  <h4>"Daniel — The Briefed Manager" (Secondary buyer)</h4>
+  <p style="margin:4px 0 0;font-size:13px;">42 years old. VP of Operations or Head of Finance. Reads the morning brief on his phone before his first meeting. Doesn't care how it gets written — cares that it's correct, on time, and the same format every day. <b>Approves the $40/mo charge</b> if Maya brings it to him with one sentence: "this saves me an hour a day."</p>
+</div>
+
+<!-- 4. PAIN POINTS -->
+<h2>4 · Top 10 Customer Pain Points</h2>
+<div class="painList">
+  <div class="painItem"><div class="num">1</div><div><b>The 90-minute morning tax</b><span>60–90 min/day reclaiming the same numbers across 4–6 sources.</span></div></div>
+  <div class="painItem"><div class="num">2</div><div><b>Inconsistent brief format</b><span>Different analysts write briefs differently. Manager loses time figuring out what changed.</span></div></div>
+  <div class="painItem"><div class="num">3</div><div><b>Anomaly blindness</b><span>"Looks fine" is the default when rushing. Real anomalies missed until end-of-week.</span></div></div>
+  <div class="painItem"><div class="num">4</div><div><b>Vacation collapse</b><span>When analyst is out, briefs stop. Manager flies blind or asks 3 people for partial data.</span></div></div>
+  <div class="painItem"><div class="num">5</div><div><b>Career stagnation</b><span>Analyst becomes the briefing machine. Strategic work bumped. Promotion velocity slows.</span></div></div>
+  <div class="painItem"><div class="num">6</div><div><b>Knowledge loss on turnover</b><span>The "how" of the brief lives in the analyst's head. They leave, it leaves.</span></div></div>
+  <div class="painItem"><div class="num">7</div><div><b>Tab fatigue</b><span>4–6 dashboards refreshed in sequence, every single morning.</span></div></div>
+  <div class="painItem"><div class="num">8</div><div><b>Friday-night dread</b><span>Weekly brief on Sunday night because no time on Friday after the morning.</span></div></div>
+  <div class="painItem"><div class="num">9</div><div><b>Inability to triangulate</b><span>Sheets, warehouse, and Slack data live in silos. No single AI feature reads across them.</span></div></div>
+  <div class="painItem"><div class="num">10</div><div><b>Manager pressure for "instant" answers</b><span>"Why is X down 4%?" — answered after a 20-minute scramble, every time.</span></div></div>
+</div>
+
+<!-- 5. CUSTOMER JOURNEY -->
+<h2>5 · Customer Journey</h2>
+<div class="journey">
+  <div class="jStep"><div class="n">STAGE 1</div><b>Awareness</b><span>Sees a LinkedIn post or peer mention about "AI morning brief" tooling. Trigger: new manager, recent vacation collapse, or burnout.</span></div>
+  <div class="jStep"><div class="n">STAGE 2</div><b>Consideration</b><span>Visits landing page. Watches 60-second demo. Submits email for sample brief. Receives one personalized brief next morning.</span></div>
+  <div class="jStep"><div class="n">STAGE 3</div><b>Purchase</b><span>Forwards sample brief to manager. Manager says "this is exactly it." Charges $20/mo to personal or team card. No procurement.</span></div>
+  <div class="jStep"><div class="n">STAGE 4</div><b>Retention</b><span>Opens brief daily on phone. Adds 2 more data sources. Onboards a teammate. Becomes the team standard. Refers a peer.</span></div>
+</div>
+
+<!-- 6. OBJECTIONS + TRIGGERS -->
+<div class="cols-2">
+  <div class="block bad">
+    <h4>6a · Key Customer Objections</h4>
+    <ul>
+      <li><b>"Can't we just use ChatGPT on our Sheets?"</b> → Counter: cross-source, scheduled, with anomaly memory across days.</li>
+      <li><b>"You'll have access to our financial data."</b> → Counter: read-only connectors, customer-controlled scope, SOC 2 on Q3 roadmap.</li>
+      <li><b>"What if the AI hallucinates a number?"</b> → Counter: every figure links back to the source row; the brief is summary, not synthesis.</li>
+      <li><b>"My analyst will see this as a threat."</b> → Counter: gives them time back for higher-leverage work, not replaces.</li>
+      <li><b>"We already pay for Hex/Looker."</b> → Counter: OpsBrief sits on top, not instead. $20–$40 increment.</li>
+    </ul>
+  </div>
+  <div class="block good">
+    <h4>6b · Key Buying Triggers</h4>
+    <ul>
+      <li>New manager joins, asks "where's my morning brief?"</li>
+      <li>Star analyst leaves; manager realizes the brief was 100% in their head.</li>
+      <li>Quarterly all-hands prep — manager wants a clean 90-day summary.</li>
+      <li>An anomaly got missed → "this shouldn't happen again" mandate from leadership.</li>
+      <li>Analyst is on the edge of burnout/notice — retention manager pays $40/mo to make their day easier.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 7. MVP RECOMMENDATION -->
+<h2>7 · MVP Recommendation</h2>
+<div class="cols-3">
+  <div class="block good">
+    <h4>What to build first</h4>
+    <p style="font-size:13px;margin:4px 0 0;">A Google Apps Script + Claude API + Slack webhook that reads one Google Sheet for one customer, generates a 6-sentence morning brief, and posts it to a designated Slack channel at 8:55 a.m. each business day. 5 lines of code. Zero front-end.</p>
+  </div>
+  <div class="block bad">
+    <h4>What NOT to build</h4>
+    <p style="font-size:13px;margin:4px 0 0;">No login. No website. No connector marketplace. No multi-tenant database. No admin dashboard. No mobile app. No team-management UI. No SSO. No pricing page. No "Plans" tab. Nothing that doesn't directly contribute to a brief landing in Slack at 8:55 a.m.</p>
+  </div>
+  <div class="block warn">
+    <h4>Success metrics</h4>
+    <ul style="font-size:12px;margin:4px 0 0;padding-left:16px;">
+      <li>≥5 paid customers at $20/mo by Day 30</li>
+      <li>≥80% morning open rate on the Slack brief</li>
+      <li>≥3 customers explicitly forward the brief to their manager</li>
+      <li>≥1 unsolicited referral by Day 30</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 8. MOSCOW -->
+<h2>8 · MoSCoW Prioritization</h2>
+<div class="moscow">
+  <div class="moscowCol must">
+    <h4>Must Have</h4>
+    <ul>
+      <li>Read 1 Google Sheet</li>
+      <li>Call Claude API for summary</li>
+      <li>Post to 1 Slack channel</li>
+      <li>Run on schedule (8:55 a.m.)</li>
+      <li>Manual onboarding (15 min/customer)</li>
+    </ul>
+  </div>
+  <div class="moscowCol should">
+    <h4>Should Have</h4>
+    <ul>
+      <li>Brief template per customer</li>
+      <li>Source-link-back on each figure</li>
+      <li>"No anomalies to flag" default</li>
+      <li>Customer can edit yesterday's template</li>
+    </ul>
+  </div>
+  <div class="moscowCol could">
+    <h4>Could Have</h4>
+    <ul>
+      <li>Snowflake / BigQuery read</li>
+      <li>Anomaly memory across days</li>
+      <li>Slack thread Q&amp;A on the brief</li>
+      <li>Weekly digest version on Fridays</li>
+    </ul>
+  </div>
+  <div class="moscowCol wont">
+    <h4>Won't Have (yet)</h4>
+    <ul>
+      <li>Login / multi-user UI</li>
+      <li>Self-serve signup</li>
+      <li>Connector marketplace</li>
+      <li>Mobile app</li>
+      <li>SSO / SOC 2</li>
+    </ul>
+  </div>
+</div>
+
+<!-- 9. PRICING -->
+<h2>9 · Pricing Hypothesis</h2>
+<div class="priceCards">
+  <div class="priceCard">
+    <div class="tier">Solo</div>
+    <div class="price">$20<span>/mo</span></div>
+    <ul>
+      <li>1 data source</li>
+      <li>1 Slack channel</li>
+      <li>Daily brief, M–F</li>
+      <li>Email support</li>
+    </ul>
+  </div>
+  <div class="priceCard middle">
+    <div class="tier">Team <span style="font-size:9px;background:var(--gold);color:#fff;padding:2px 5px;border-radius:3px;margin-left:4px;">DEFAULT</span></div>
+    <div class="price rec">$40<span>/mo</span></div>
+    <ul>
+      <li>Up to 3 data sources</li>
+      <li>Up to 3 Slack channels</li>
+      <li>Weekly digest included</li>
+      <li>Source-link-back</li>
+      <li>Priority email support</li>
+    </ul>
+  </div>
+  <div class="priceCard">
+    <div class="tier">Office</div>
+    <div class="price">$120<span>/mo</span></div>
+    <ul>
+      <li>Up to 10 data sources</li>
+      <li>Unlimited Slack channels</li>
+      <li>Anomaly memory</li>
+      <li>Founder onboarding call</li>
+    </ul>
+  </div>
+</div>
+<p style="font-size:12px;margin-top:8px;"><b>Anchor logic:</b> the Solo tier exists to make the Team tier feel like the value choice. Per Day 22 SOM math, Team-tier ACV of $480/year × 5,000 users = $2.4M ARR by Year 3. <b>Test this:</b> charge $20/mo to the first 10 customers regardless of tier — if they upgrade willingly to $40 at Day 60, pricing hypothesis is validated.</p>
+
+<!-- 10. TOP 5 RISKS -->
+<h2>10 · Top 5 Risks</h2>
+<div class="riskGrid">
+  <div class="risk"><div class="sev h">HIGH</div><div><h4>Willingness-to-pay at $20/mo</h4><p>Day 22 SOM math assumes $20–$40 ACV. Reality may be $0 — analysts may refuse to pay personally, and managers may say "we already pay for Hex." 30-day test answers this.</p></div></div>
+  <div class="risk"><div class="sev h">HIGH</div><div><h4>Hallucinated metric in a CFO brief</h4><p>One wrong number sent to a real CFO and the product dies in that account. Source-link-back design is non-negotiable from Day 1.</p></div></div>
+  <div class="risk"><div class="sev m">MED</div><div><h4>Incumbent wedge closure</h4><p>Google Sheets + Gemini, Hex Magic, Tableau Pulse closing the gap. Estimated window: 18–24 months. Must move on the no-code MVP within Q3 2026.</p></div></div>
+  <div class="risk"><div class="sev m">MED</div><div><h4>F-1 visa monetization constraint</h4><p>Founder cannot legally take revenue from a US-incorporated startup as F-1 student. Mitigation: defer revenue to OPT period or partner with US co-founder. Must consult UTD ISS before charging.</p></div></div>
+  <div class="risk"><div class="sev l">LOW</div><div><h4>Discovery-call channel</h4><p>Reaching 25 SMB analysts in 30 days requires LinkedIn outreach discipline. Founder is already posting daily — pipeline is warm. Low risk if framing is right.</p></div></div>
+</div>
+
+<!-- 11. 30-DAY MVP PLAN -->
+<h2>11 · 30-Day MVP Plan</h2>
+<div class="weekRow">
+  <div class="w">Week 1 · Days 1–7<span>Sharpen the wedge</span></div>
+  <ul>
+    <li>Reach out to 20 SMB analysts in your LinkedIn network for 25-min discovery calls</li>
+    <li>Identify 50 target ICP companies via LinkedIn Sales Navigator</li>
+    <li>Build a 5-question discovery script focused on the 90-minute morning routine</li>
+    <li>Spin up a single-page Carrd site: "Your morning brief, automated. $20/mo." Email collection only.</li>
+  </ul>
+</div>
+<div class="weekRow">
+  <div class="w">Week 2 · Days 8–14<span>Run 8 discovery calls</span></div>
+  <ul>
+    <li>Complete 8 discovery calls; transcribe and code answers in a sheet</li>
+    <li>Identify the top 3 most-painful sub-segments (e-commerce ops? Healthcare ops? SaaS finance?)</li>
+    <li>Post 2 LinkedIn observations from the calls; collect inbound interest in DMs</li>
+    <li>Iterate the discovery script based on what's resonating</li>
+  </ul>
+</div>
+<div class="weekRow">
+  <div class="w">Week 3 · Days 15–21<span>Build the no-code MVP</span></div>
+  <ul>
+    <li>Wire Google Apps Script + Claude API + Slack webhook for ONE pilot customer</li>
+    <li>Deliver the first real morning brief Tuesday at 8:55 a.m.</li>
+    <li>Iterate the brief format with that single customer for 5 consecutive workdays</li>
+    <li>Document the prompt template and the brief schema as the productized v1</li>
+  </ul>
+</div>
+<div class="weekRow">
+  <div class="w">Week 4 · Days 22–30<span>Convert to first paying users</span></div>
+  <ul>
+    <li>Run 8 more discovery calls focused on validated sub-segments</li>
+    <li>Pitch the no-code MVP to 10 warm prospects at $20/mo (free 7-day trial)</li>
+    <li><b>Target: 5 paying customers signed by Day 30</b></li>
+    <li>Decision point at Day 30: ≥5 paid → continue; &lt;5 paid → pivot to consumer-of-one or kill</li>
+  </ul>
+</div>
+
+<!-- 12. FOUNDER ACTION SHEET -->
+<h2>12 · Founder Action Sheet — Top 10 Next Actions</h2>
+<table class="t actionTable">
+  <thead><tr><th style="width:36px;">#</th><th>Action</th><th style="width:100px;">By when</th><th style="width:80px;">Cost</th></tr></thead>
+  <tbody>
+    <tr><td class="priority">1</td><td><b>Talk to UTD ISS</b> about CPT/OPT implications of charging US customers as F-1</td><td>This week</td><td>$0</td></tr>
+    <tr><td class="priority">2</td><td><b>Build the Carrd landing page</b> with one promise and one email field</td><td>Day 5</td><td>$20/yr</td></tr>
+    <tr><td class="priority">3</td><td><b>Send 50 LinkedIn outreach DMs</b> to SMB analysts for discovery calls (template-driven)</td><td>Day 7</td><td>$0</td></tr>
+    <tr><td class="priority">4</td><td><b>Complete 8 discovery calls</b> (25 minutes each) — record + transcribe</td><td>Day 14</td><td>$0</td></tr>
+    <tr><td class="priority">5</td><td><b>Identify pilot customer</b> — most-painful, most-bought-in, fastest to onboard</td><td>Day 15</td><td>$0</td></tr>
+    <tr><td class="priority">6</td><td><b>Wire Apps Script + Claude API + Slack webhook</b> for pilot customer</td><td>Day 18</td><td>$0–20</td></tr>
+    <tr><td class="priority">7</td><td><b>Deliver first morning brief</b> on Tuesday Week 3 at 8:55 a.m.</td><td>Day 16</td><td>$0</td></tr>
+    <tr><td class="priority">8</td><td><b>Iterate brief format for 5 workdays</b> with pilot customer</td><td>Day 21</td><td>$0</td></tr>
+    <tr><td class="priority">9</td><td><b>Pitch no-code MVP to 10 warm prospects</b> at $20/mo with 7-day free trial</td><td>Day 26</td><td>$0</td></tr>
+    <tr><td class="priority">10</td><td><b>Day 30 decision point:</b> ≥5 paid customers → continue · &lt;5 → pivot or kill. No middle path.</td><td>Day 30</td><td>$0</td></tr>
+  </tbody>
+</table>
+
+<!-- 13. FINAL VERDICT -->
+<h2>13 · Final Verdict</h2>
+<div class="verdictBox">
+  <div class="vBig">🟡<br/>PROMISING<span>UNVALIDATED</span></div>
+  <div>
+    <p><b>OpsBrief shows strong founder-market fit and a legible pain point, but zero customer-discovery data exists today.</b> The verdict is "Promising but Unvalidated" — not "Strong Demand," not "Low Demand." The next 30 days exist specifically to move this signal one direction or the other. If ≥5 customers pay $20/mo at the end of Day 30, the verdict upgrades to Strong Demand and the founder commits to the platform build. If &lt;5 pay, the verdict downgrades and the founder pivots or kills.</p>
+    <p style="margin-top:8px;font-size:12px;"><b>Demand signal legend:</b>
+      <span class="pip" style="background:var(--good);"></span>Strong &nbsp;
+      <span class="pip" style="background:var(--amber);"></span>Promising · Unvalidated &nbsp;
+      <span class="pip" style="background:var(--warn);"></span>Weak &nbsp;
+      <span class="pip" style="background:var(--bad);"></span>Low</p>
+  </div>
+</div>
+
+<!-- FOOTNOTES -->
+<div class="footnotes">
+  <p><b>Methodology &amp; Sources.</b> Built on the Day 22 Startup Validation Report (OpsBrief). ICP definition draws from Day 22 founder-market fit dimensions. Pain points refined from the Day 22 buyer persona. TAM/SAM/SOM math unchanged from Day 22 (TAM $0.80B, SAM $0.37B, SOM $2.4M Year 3). Pricing benchmarked against analyst-tier SaaS (Hex, Sigma, Mode individual seats $30–$80/mo). All willingness-to-pay claims remain inferred, not interview-validated — the 30-day MVP plan exists specifically to validate them.</p>
+  <p><b>Limitations.</b> Zero discovery calls completed at time of report. Maya persona is a composite based on founder's direct experience. Pricing tiers are anchored, not split-tested. Risk-rated assumptions become decisions only after Day 30.</p>
+</div>
+
+<div class="colophon">
+  <span class="stamp">CONFIDENTIAL · DAY 23 · 60-DAY CLAUDE CHALLENGE</span>
+  <div style="margin-top:10px;">Prepared by Garvit Mittal · Single HTML artifact · Print-ready under 8 pages · PDF export–ready</div>
+</div>
+
+</div>
