@@ -1,0 +1,571 @@
+<style>
+:root{
+  --bg:#f6f5f0; --paper:#fdfcf8; --ink:#0f1115; --ink-2:#3a3f4a; --mute:#6a7180; --line:#dcd7c8; --line-2:#c9c2ac;
+  --accent:#1a3a5f; --accent-2:#7b1f2b; --gold:#a8862d;
+  --good:#1e7a4a; --good-bg:#e9f3eb;
+  --warn:#a8651b; --warn-bg:#fcf2e2;
+  --bad:#9b2730; --bad-bg:#fbebec;
+  --amber:#d4a017; --amber-bg:#fdf3d6;
+  --shadow:0 30px 60px rgba(20,18,12,.10);
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:Georgia,"Times New Roman",serif;-webkit-font-smoothing:antialiased;}
+.page{max-width:1200px;margin:24px auto;background:var(--paper);box-shadow:var(--shadow);padding:48px 56px 56px;border:1px solid var(--line);}
+@media(max-width:780px){.page{padding:28px 22px;margin:8px;}}
+
+h1,h2,h3,h4{font-family:Georgia,"Times New Roman",serif;color:var(--ink);margin:0;}
+h1{font-size:36px;line-height:1.15;letter-spacing:-.3px;font-weight:700;}
+h2{font-size:20px;font-weight:700;margin:34px 0 10px;letter-spacing:.2px;border-bottom:2px solid var(--ink);padding-bottom:6px;text-transform:uppercase;}
+h3{font-size:13px;font-weight:700;margin:14px 0 6px;letter-spacing:1.5px;color:var(--accent);text-transform:uppercase;}
+h4{font-size:13px;font-weight:700;margin:10px 0 4px;color:var(--ink-2);}
+p{margin:6px 0;line-height:1.6;font-size:14px;color:var(--ink-2);}
+ul{margin:6px 0;padding-left:20px;line-height:1.65;color:var(--ink-2);font-size:14px;}
+ul li::marker{color:var(--accent);}
+
+.pageBreak{border:none;border-top:2px dashed var(--line-2);margin:36px 0 10px;}
+.pageBreak::before{content:"— PAGE BREAK —";display:block;text-align:center;font-family:-apple-system,system-ui,sans-serif;font-size:9px;letter-spacing:3px;color:var(--mute);font-weight:700;margin-top:-13px;background:var(--paper);width:130px;margin-left:auto;margin-right:auto;padding:0 10px;}
+
+/* COVER */
+.cover{text-align:center;padding:60px 20px 30px;}
+.cover .kicker{font-family:-apple-system,system-ui,sans-serif;font-size:11px;letter-spacing:6px;color:var(--accent-2);font-weight:800;margin-bottom:18px;}
+.cover h1{font-size:52px;margin:0 0 8px;letter-spacing:-.5px;}
+.cover .sub{font-family:Georgia,serif;font-style:italic;color:var(--mute);font-size:18px;margin-bottom:32px;}
+.cover .meta{display:inline-block;background:#f0eadb;border:1px solid var(--line);padding:18px 28px;text-align:left;margin-top:18px;}
+.cover .meta .row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px dashed var(--line);font-size:12px;gap:60px;}
+.cover .meta .row:last-child{border:none;}
+.cover .meta .row b{font-family:-apple-system,system-ui,sans-serif;font-size:10px;letter-spacing:2px;color:var(--mute);text-transform:uppercase;}
+.cover .meta .row span{color:var(--ink);font-weight:700;}
+
+/* TOC */
+.toc{margin:14px 0;}
+.tocRow{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px dotted var(--line-2);font-size:13px;}
+.tocRow .num{font-family:-apple-system,system-ui,sans-serif;font-size:10px;color:var(--mute);letter-spacing:1.5px;width:32px;font-weight:700;}
+.tocRow .title{flex:1;color:var(--ink);font-weight:600;}
+.tocRow .pg{color:var(--mute);font-family:-apple-system,system-ui,sans-serif;font-size:11px;}
+
+/* TABLES */
+table.t{width:100%;border-collapse:collapse;margin:8px 0 12px;font-size:12px;font-family:Georgia,"Times New Roman",serif;}
+table.t th,table.t td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;}
+table.t thead th{background:#f0eadb;border-bottom:2px solid var(--ink);font-family:-apple-system,system-ui,sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--ink);font-weight:700;}
+table.t td b{color:var(--ink);}
+
+/* BLOCKS */
+.cols-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:8px 0;}
+.cols-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:8px 0;}
+@media(max-width:780px){.cols-2,.cols-3{grid-template-columns:1fr;}}
+.block{background:#fbf8ee;border:1px solid var(--line);padding:12px 14px;}
+.block h4{margin-top:0;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);}
+.block.good{background:var(--good-bg);border-left:4px solid var(--good);}
+.block.warn{background:var(--warn-bg);border-left:4px solid var(--warn);}
+.block.bad{background:var(--bad-bg);border-left:4px solid var(--bad);}
+
+/* BUSINESS MODEL CANVAS */
+.bmc{display:grid;grid-template-columns:repeat(5,1fr);grid-auto-rows:minmax(110px,auto);gap:6px;margin:10px 0;}
+@media(max-width:780px){.bmc{grid-template-columns:1fr;}}
+.bmcCell{background:#fbf8ee;border:1px solid var(--line);padding:10px;font-size:11px;}
+.bmcCell h4{margin:0 0 6px;font-family:-apple-system,system-ui,sans-serif;font-size:9px;letter-spacing:1.5px;color:var(--accent-2);text-transform:uppercase;font-weight:800;}
+.bmcCell ul{margin:0;padding-left:14px;font-size:11px;line-height:1.5;}
+.bmc-kp{grid-column:1;grid-row:1/3;background:#f0eadb;}
+.bmc-ka{grid-column:2;grid-row:1;}
+.bmc-vp{grid-column:3;grid-row:1/3;background:#fbf5e3;border-color:var(--gold);}
+.bmc-cr{grid-column:4;grid-row:1;}
+.bmc-cs{grid-column:5;grid-row:1/3;background:#f0eadb;}
+.bmc-kr{grid-column:2;grid-row:2;}
+.bmc-ch{grid-column:4;grid-row:2;}
+.bmc-cost{grid-column:1/4;background:#fbebec;border-color:#dcc;}
+.bmc-rev{grid-column:4/6;background:#e9f3eb;border-color:#bdb;}
+
+/* SCORECARD */
+.scoreGrid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin:12px 0;}
+@media(max-width:780px){.scoreGrid{grid-template-columns:repeat(2,1fr);}}
+.scoreCard{background:var(--paper);border:1px solid var(--line);padding:12px;text-align:center;}
+.scoreCard .lbl{font-family:-apple-system,system-ui,sans-serif;font-size:9px;letter-spacing:1.5px;color:var(--mute);text-transform:uppercase;font-weight:700;}
+.scoreCard .val{font-size:32px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink);line-height:1.1;margin-top:4px;}
+.scoreCard .max{font-size:12px;color:var(--mute);}
+.scoreCard .reason{font-size:10px;color:var(--mute);margin-top:6px;line-height:1.3;}
+.scoreCard.lead{background:#fbf5e3;border-color:var(--gold);}
+.scoreCard.lead .val{color:var(--accent-2);}
+
+/* SWOT */
+.swot{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0;}
+@media(max-width:780px){.swot{grid-template-columns:1fr;}}
+.swotCell{padding:12px;border:1px solid var(--line);}
+.swotCell h4{margin:0 0 6px;font-family:-apple-system,system-ui,sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;font-weight:800;}
+.swotCell.s{background:var(--good-bg);}
+.swotCell.s h4{color:var(--good);}
+.swotCell.w{background:var(--warn-bg);}
+.swotCell.w h4{color:var(--warn);}
+.swotCell.o{background:#e8eef9;}
+.swotCell.o h4{color:var(--accent);}
+.swotCell.t{background:var(--bad-bg);}
+.swotCell.t h4{color:var(--bad);}
+.swotCell ul{font-size:12px;margin:0;padding-left:16px;}
+
+/* FIRST 100 USERS */
+.cohortRow{display:grid;grid-template-columns:80px 1fr 70px;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);align-items:center;font-size:12px;}
+.cohortRow .label{font-family:-apple-system,system-ui,sans-serif;font-weight:800;color:var(--accent-2);font-size:11px;letter-spacing:1px;}
+.cohortRow .desc b{display:block;font-size:13px;color:var(--ink);}
+.cohortRow .desc span{font-size:11px;color:var(--mute);}
+.cohortRow .ct{text-align:right;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;font-size:16px;}
+
+/* PITCH */
+.pitchBox{background:#f0eadb;border:1px solid var(--line);padding:18px;border-left:6px solid var(--accent);margin:8px 0;}
+.pitchBox p{margin:0;font-size:14px;line-height:1.7;font-style:italic;color:var(--ink);}
+.pitchBox.investor{border-left-color:var(--gold);background:#fbf5e3;}
+
+/* DASHBOARD */
+.dashboard{background:#fafaf2;border:2px solid var(--ink);padding:18px;margin:14px 0;}
+.dashboard .dHead{display:flex;justify-content:space-between;border-bottom:2px solid var(--ink);padding-bottom:8px;margin-bottom:14px;}
+.dashboard .dHead h3{margin:0;color:var(--ink);}
+.dashboard .dHead .stamp{font-family:-apple-system,system-ui,sans-serif;font-size:10px;letter-spacing:2px;color:var(--accent-2);font-weight:800;border:2px solid var(--accent-2);padding:3px 8px;}
+.dashGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+@media(max-width:780px){.dashGrid{grid-template-columns:repeat(2,1fr);}}
+.dashCell{background:var(--paper);border:1px solid var(--line);padding:10px;font-size:11px;}
+.dashCell h5{margin:0 0 4px;font-family:-apple-system,system-ui,sans-serif;font-size:9px;letter-spacing:1.5px;color:var(--mute);text-transform:uppercase;font-weight:700;}
+.dashCell .v{font-size:18px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;}
+.dashCell.wide{grid-column:span 2;}
+.dashCell.full{grid-column:span 4;}
+@media(max-width:780px){.dashCell.wide,.dashCell.full{grid-column:span 2;}}
+.dashCell ul{margin:4px 0 0;padding-left:14px;font-size:11px;}
+
+/* VERDICT */
+.verdictBox{display:grid;grid-template-columns:140px 1fr;gap:20px;align-items:center;background:#fdf3d6;border-left:6px solid var(--amber);padding:18px 22px;margin:12px 0;}
+.verdictBox .vBig{font-family:-apple-system,system-ui,sans-serif;font-weight:800;font-size:28px;color:var(--amber);text-align:center;line-height:1.15;}
+.verdictBox .vBig span{display:block;font-size:9px;letter-spacing:3px;margin-top:6px;color:var(--warn);}
+.verdictBox p{margin:0;font-size:14px;color:var(--ink);font-style:italic;}
+.verdictBox p b{font-style:normal;}
+
+/* ACTION SHEET */
+.actionTable td.priority{font-weight:800;color:var(--accent-2);}
+
+/* GTM FLOW */
+.flow{display:flex;align-items:stretch;gap:8px;flex-wrap:wrap;margin:10px 0;}
+.flowStep{flex:1;min-width:140px;background:#fbf8ee;border:1px solid var(--line);padding:10px;font-size:11px;position:relative;}
+.flowStep h4{margin:0 0 4px;font-family:-apple-system,system-ui,sans-serif;font-size:9px;letter-spacing:1.5px;color:var(--accent-2);text-transform:uppercase;}
+.flowStep b{font-size:12px;color:var(--ink);}
+.flowStep span{font-size:11px;color:var(--mute);display:block;margin-top:2px;}
+.flowArrow{display:flex;align-items:center;font-size:18px;color:var(--accent);font-weight:700;}
+@media(max-width:780px){.flowArrow{display:none;}.flowStep{min-width:100%;}}
+
+/* footnotes */
+.footnotes{margin-top:24px;padding-top:12px;border-top:1px solid var(--line);font-size:10px;color:var(--mute);}
+.footnotes b{color:var(--ink);}
+.colophon{margin-top:14px;text-align:center;font-family:-apple-system,system-ui,sans-serif;font-size:9px;letter-spacing:3px;color:var(--mute);text-transform:uppercase;}
+</style>
+
+<div class="page">
+
+<!-- ============================ TITLE PAGE ============================ -->
+<div class="cover">
+  <div class="kicker">CONFIDENTIAL · STRATEGY REPORT</div>
+  <h1>OpsBrief</h1>
+  <h1 style="font-size:28px;font-weight:600;color:var(--accent);margin-top:8px;">Business Strategy Report</h1>
+  <p class="sub">Translating the Day 23 Customer &amp; MVP Blueprint into a sustainable business model — revenue, distribution, moat, and investment posture.</p>
+  <div class="meta">
+    <div class="row"><b>Document</b><span>Business Strategy Report v1.0</span></div>
+    <div class="row"><b>Project</b><span>OpsBrief (Concept)</span></div>
+    <div class="row"><b>Builds on</b><span>Day 22 Validation + Day 23 Blueprint</span></div>
+    <div class="row"><b>Prepared by</b><span>Garvit Mittal</span></div>
+    <div class="row"><b>Date</b><span>June 23, 2026</span></div>
+    <div class="row"><b>Verdict</b><span style="color:var(--warn);">🟡 VALIDATE</span></div>
+  </div>
+</div>
+
+<hr class="pageBreak">
+
+<!-- ============================ TABLE OF CONTENTS ============================ -->
+<h2>Table of Contents</h2>
+<div class="toc">
+  <div class="tocRow"><span class="num">01</span><span class="title">Executive Summary</span><span class="pg">3</span></div>
+  <div class="tocRow"><span class="num">02</span><span class="title">Business Reality Check</span><span class="pg">3</span></div>
+  <div class="tocRow"><span class="num">03</span><span class="title">Business Model Canvas</span><span class="pg">4</span></div>
+  <div class="tocRow"><span class="num">04</span><span class="title">Revenue &amp; Pricing Strategy</span><span class="pg">5</span></div>
+  <div class="tocRow"><span class="num">05</span><span class="title">Go-To-Market Strategy</span><span class="pg">5</span></div>
+  <div class="tocRow"><span class="num">06</span><span class="title">Customer Acquisition Strategy</span><span class="pg">6</span></div>
+  <div class="tocRow"><span class="num">07</span><span class="title">First 100 Users Plan</span><span class="pg">6</span></div>
+  <div class="tocRow"><span class="num">08</span><span class="title">Competitive Position &amp; Moat</span><span class="pg">7</span></div>
+  <div class="tocRow"><span class="num">09</span><span class="title">Reverse SWOT Analysis</span><span class="pg">7</span></div>
+  <div class="tocRow"><span class="num">10</span><span class="title">Investor One-Liner &amp; 30-Second Pitch</span><span class="pg">8</span></div>
+  <div class="tocRow"><span class="num">11</span><span class="title">Investment Scorecard</span><span class="pg">8</span></div>
+  <div class="tocRow"><span class="num">12</span><span class="title">Visual Dashboard</span><span class="pg">9</span></div>
+  <div class="tocRow"><span class="num">13</span><span class="title">Founder Action Sheet — Top 10</span><span class="pg">10</span></div>
+  <div class="tocRow"><span class="num">14</span><span class="title">Sustainability Verdict</span><span class="pg">10</span></div>
+</div>
+
+<hr class="pageBreak">
+
+<!-- ============================ EXEC SUMMARY ============================ -->
+<h2>1 · Executive Summary</h2>
+<p><b>OpsBrief</b> is a morning briefing concept for Operations and Business Analysts at US small-to-mid market companies (50–500 employees). It connects to the customer's Google Sheets, Snowflake, and Slack and posts an automated 6-sentence morning brief at 8:55 a.m. each business day, reclaiming the 60–90 minutes analysts currently spend doing manual aggregation.</p>
+<p><b>Inputs from the prior reports:</b> Founder-Market Fit 78/100 (Day 22). Customer Clarity 74, Problem Severity 68, MVP Readiness 81, PMF Potential 62 (Day 23). Both reports recommended proceeding to the next validation phase.</p>
+<p><b>Today's question:</b> can OpsBrief become a sustainable business — not just a defensible idea? The analysis below evaluates revenue durability, distribution efficiency, competitive moat, and execution discipline. The verdict at the end is structured to be defensible whether the next step is operator-led validation or investor-funded scale.</p>
+
+<!-- ============================ BUSINESS REALITY CHECK ============================ -->
+<h2>2 · Business Reality Check</h2>
+<table class="t">
+  <thead><tr><th>Reality Question</th><th>Honest Answer</th></tr></thead>
+  <tbody>
+    <tr><td><b>Who pays?</b></td><td>Primary: the SMB analyst (Maya) at $20/mo personal/team card. Secondary buyer: her manager (Daniel) at $40/mo on a team card. No procurement gate at this price point.</td></tr>
+    <tr><td><b>Why do they pay?</b></td><td>The brief reclaims 60–90 minutes of the analyst's freshest morning hour and gives her manager a consistent daily report without her having to write it. Two stakeholders win at once — that's what makes the spend defensible.</td></tr>
+    <tr><td><b>How will they discover the product?</b></td><td>Founder-led LinkedIn content (already in motion via the 60-Day Challenge), warm referrals from peer analysts, and SMB ops communities. Paid acquisition is out of scope until LTV is proven.</td></tr>
+    <tr><td><b>Biggest growth risks?</b></td><td>(1) SMB analyst persona is hard to reach at scale via cold channels. (2) Google Sheets + Gemini adding native summaries could collapse the wedge in 18–24 months.</td></tr>
+    <tr><td><b>Biggest monetization risks?</b></td><td>(1) Willingness-to-pay at $20/mo is inferred, not proven. (2) Self-paid model has lower expansion potential than team-side selling.</td></tr>
+    <tr><td><b>Weak assumptions to validate?</b></td><td>(a) Maya will forward the brief to Daniel. (b) Daniel will approve the upgrade to Team tier. (c) Brief format will not need per-customer customization beyond a template. All three resolved by the Day 23 30-day validation plan.</td></tr>
+  </tbody>
+</table>
+
+<hr class="pageBreak">
+
+<!-- ============================ BUSINESS MODEL CANVAS ============================ -->
+<h2>3 · Business Model Canvas</h2>
+<div class="bmc">
+  <div class="bmcCell bmc-kp">
+    <h4>Key Partners</h4>
+    <ul>
+      <li>Anthropic (Claude API)</li>
+      <li>Google Workspace (Sheets API)</li>
+      <li>Slack (webhook API)</li>
+      <li>SMB analytics influencers on LinkedIn</li>
+    </ul>
+  </div>
+  <div class="bmcCell bmc-ka">
+    <h4>Key Activities</h4>
+    <ul>
+      <li>Manual onboarding (15 min/customer)</li>
+      <li>Brief template iteration</li>
+      <li>LinkedIn content + outreach</li>
+    </ul>
+  </div>
+  <div class="bmcCell bmc-vp">
+    <h4>Value Proposition</h4>
+    <ul>
+      <li><b>For the analyst:</b> 90 minutes back every morning.</li>
+      <li><b>For her manager:</b> a consistent daily brief without the analyst writing it.</li>
+      <li><b>Format:</b> Slack message at 8:55 a.m.</li>
+    </ul>
+  </div>
+  <div class="bmcCell bmc-cr">
+    <h4>Customer Relationships</h4>
+    <ul>
+      <li>Founder-led onboarding</li>
+      <li>Email support</li>
+      <li>Quarterly NPS check-in</li>
+    </ul>
+  </div>
+  <div class="bmcCell bmc-cs">
+    <h4>Customer Segments</h4>
+    <ul>
+      <li>SMB Ops Analysts (primary)</li>
+      <li>SMB Finance Analysts</li>
+      <li>SMB Business Analysts</li>
+      <li>Their managers (secondary)</li>
+    </ul>
+  </div>
+  <div class="bmcCell bmc-kr">
+    <h4>Key Resources</h4>
+    <ul>
+      <li>Founder (domain + AI build skills)</li>
+      <li>Prompt library</li>
+      <li>LinkedIn audience</li>
+    </ul>
+  </div>
+  <div class="bmcCell bmc-ch">
+    <h4>Channels</h4>
+    <ul>
+      <li>Direct (founder-led)</li>
+      <li>LinkedIn organic</li>
+      <li>Peer referrals</li>
+    </ul>
+  </div>
+  <div class="bmcCell bmc-cost">
+    <h4>Cost Structure</h4>
+    <ul>
+      <li>Claude API: ~$2/customer/mo (variable)</li>
+      <li>Hosting: $0–$20/mo flat (Apps Script)</li>
+      <li>Founder time: opportunity cost</li>
+      <li>Customer support: ~10 min/customer/mo</li>
+    </ul>
+  </div>
+  <div class="bmcCell bmc-rev">
+    <h4>Revenue Streams</h4>
+    <ul>
+      <li>Solo tier subscription: $20/mo</li>
+      <li>Team tier (default): $40/mo</li>
+      <li>Office tier: $120/mo</li>
+      <li>No usage-based pricing in v1</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================ REVENUE & PRICING ============================ -->
+<h2>4 · Revenue &amp; Pricing Strategy</h2>
+<table class="t">
+  <thead><tr><th>Tier</th><th>Price</th><th>Target user</th><th>Gross margin assumption</th></tr></thead>
+  <tbody>
+    <tr><td><b>Solo</b></td><td>$20/mo</td><td>Individual analyst, 1 data source, 1 Slack channel</td><td>~90% (Claude API ~$2/mo)</td></tr>
+    <tr><td><b>Team (default)</b></td><td>$40/mo</td><td>Analyst + manager, up to 3 sources, 3 channels</td><td>~93% (Claude API ~$3/mo)</td></tr>
+    <tr><td><b>Office</b></td><td>$120/mo</td><td>Team of 5+, anomaly memory, founder onboarding</td><td>~92% (Claude API ~$8/mo)</td></tr>
+  </tbody>
+</table>
+<p><b>Pricing logic:</b> The Solo tier exists as an anchor to make Team feel like the value choice. Gross margins are SaaS-grade because the only variable cost is the Claude API call per brief. The path from $48K Y1 ARR → $480K Y2 → $2.4M Y3 (per Day 22) is driven by seat expansion within Team, not by pricing increases. <b>Pricing test:</b> charge first 10 customers $20/mo regardless of stack size; measure who voluntarily upgrades to Team at Day 60.</p>
+
+<!-- ============================ GTM ============================ -->
+<h2>5 · Go-To-Market Strategy</h2>
+<div class="flow">
+  <div class="flowStep"><h4>STAGE 1 · TOP OF FUNNEL</h4><b>LinkedIn content</b><span>3 posts/week from founder. SMB analyst pain stories. Inbound DMs collected.</span></div>
+  <div class="flowArrow">→</div>
+  <div class="flowStep"><h4>STAGE 2 · DISCOVERY</h4><b>25-min discovery call</b><span>5-question script. Maps morning routine, current pain, willingness-to-test.</span></div>
+  <div class="flowArrow">→</div>
+  <div class="flowStep"><h4>STAGE 3 · TRIAL</h4><b>Sample brief</b><span>Personalized 1-day sample delivered to their Slack. Free, no commitment.</span></div>
+  <div class="flowArrow">→</div>
+  <div class="flowStep"><h4>STAGE 4 · CONVERSION</h4><b>$20/mo subscription</b><span>7-day free trial → personal/team card. No procurement, no contract.</span></div>
+  <div class="flowArrow">→</div>
+  <div class="flowStep"><h4>STAGE 5 · EXPANSION</h4><b>Team upgrade</b><span>Analyst forwards brief to manager. Manager approves Team tier upgrade ($40/mo).</span></div>
+</div>
+
+<!-- ============================ CUSTOMER ACQUISITION ============================ -->
+<h2>6 · Customer Acquisition Strategy</h2>
+<table class="t">
+  <thead><tr><th>Channel</th><th>Cost</th><th>Expected CAC</th><th>Notes</th></tr></thead>
+  <tbody>
+    <tr><td><b>Founder LinkedIn content</b></td><td>Free (time)</td><td>~$0–10 effective</td><td>Already in motion via 60-Day Challenge. Primary channel for first 100 users.</td></tr>
+    <tr><td><b>Cold LinkedIn DMs (warm intros)</b></td><td>Free (time)</td><td>~$10–25</td><td>50 DMs/week from warmed-up audience. Focus on visible analyst job titles.</td></tr>
+    <tr><td><b>Peer referrals (existing customers)</b></td><td>$10 referral credit</td><td>~$10</td><td>Highest-conversion channel once first 10 customers are live.</td></tr>
+    <tr><td><b>SMB ops communities (Slack/Reddit)</b></td><td>Free (time)</td><td>~$15</td><td>r/analytics, Locally Optimistic, Operators Guild. Soft engagement only.</td></tr>
+    <tr><td><b>Paid acquisition</b></td><td>Out of scope for v1</td><td>Unknown</td><td>Defer until LTV is measured. Likely LinkedIn Ads if pursued.</td></tr>
+  </tbody>
+</table>
+
+<hr class="pageBreak">
+
+<!-- ============================ FIRST 100 USERS ============================ -->
+<h2>7 · First 100 Users Plan</h2>
+<div class="cohortRow"><div class="label">Users 1–5</div><div class="desc"><b>Warm pilots from founder's direct network</b><span>Free 7-day trial. Personal onboarding. Goal: prove the brief saves real time.</span></div><div class="ct">5</div></div>
+<div class="cohortRow"><div class="label">Users 6–15</div><div class="desc"><b>LinkedIn DM converts from Days 8–14 discovery calls</b><span>$20/mo Solo. Founder onboarding. Source: warm DMs.</span></div><div class="ct">10</div></div>
+<div class="cohortRow"><div class="label">Users 16–35</div><div class="desc"><b>Inbound from LinkedIn content + first 5 referrals</b><span>$20/mo Solo, some Team. Self-service onboarding emerges here.</span></div><div class="ct">20</div></div>
+<div class="cohortRow"><div class="label">Users 36–65</div><div class="desc"><b>Community + Slack/Reddit + cohort referral</b><span>Mostly Solo, ~20% upgrade to Team. Founder load shifts to onboarding template.</span></div><div class="ct">30</div></div>
+<div class="cohortRow"><div class="label">Users 66–100</div><div class="desc"><b>Productized onboarding + Team upsell motion</b><span>~50% Solo / ~50% Team. First Office-tier customer arrives in this band.</span></div><div class="ct">35</div></div>
+<p style="font-size:12px;color:var(--mute);"><b>Timeline assumption:</b> 100 users by month 5–6 if Days 30 validation gate passes. <b>Mix at 100 users:</b> ~60 Solo, ~35 Team, ~5 Office = ~$3,800 MRR / ~$46K ARR run-rate.</p>
+
+<!-- ============================ MOAT ============================ -->
+<h2>8 · Competitive Position &amp; Moat</h2>
+<table class="t">
+  <thead><tr><th>Competitor / Substitute</th><th>Where they win</th><th>Where OpsBrief wins</th></tr></thead>
+  <tbody>
+    <tr><td><b>Google Sheets + Gemini</b></td><td>Free, embedded in Sheets, no new tool</td><td>Cross-source (Sheets + warehouse + Slack), scheduled, format-stable</td></tr>
+    <tr><td><b>Tableau Pulse</b></td><td>Enterprise polish, deep Tableau integration</td><td>SMB-priced ($20–$40 vs. enterprise contract), no procurement</td></tr>
+    <tr><td><b>Hex Magic / Mode AI</b></td><td>Strong notebook AI for analysts</td><td>For the manager, not the analyst. Brief is read, not authored.</td></tr>
+    <tr><td><b>DIY Python scripts</b></td><td>Free, customizable</td><td>Maintained product. Doesn't die when the analyst leaves.</td></tr>
+    <tr><td><b>ChatGPT / Claude direct</b></td><td>Free general-purpose AI</td><td>Scheduled, cross-source, manager-format. Not a chat — a delivery.</td></tr>
+  </tbody>
+</table>
+<h3>Moat sources (ranked)</h3>
+<ul>
+  <li><b>Distribution moat (strongest):</b> Founder-led LinkedIn audience already exists from the 60-Day Challenge. This is the channel competitors cannot copy.</li>
+  <li><b>Vertical brief templates (medium):</b> After 50 customers, the brief template library becomes a defensible asset for new customer onboarding speed.</li>
+  <li><b>Behavioural data (potential):</b> Anomaly memory across days — what each customer flags as "unusual" — becomes a learned per-customer signal over time. Not a moat in v1, but a path to one in v3.</li>
+  <li><b>Network effects (weak):</b> No direct network effect. Single-player tool.</li>
+  <li><b>Switching costs (weak):</b> Customer can leave any time. Low lock-in is honest and competitive at this price.</li>
+</ul>
+
+<!-- ============================ REVERSE SWOT ============================ -->
+<h2>9 · Reverse SWOT Analysis</h2>
+<p style="font-size:12px;color:var(--mute);">A reverse SWOT inverts each cell: "What would have to be true for this to fail?" — surfacing assumptions instead of celebrating them.</p>
+<div class="swot">
+  <div class="swotCell s">
+    <h4>Strengths → What if they're overrated?</h4>
+    <ul>
+      <li>FMF 78/100 assumes founder will sustain attention. F-1 visa + grad school + full-time job all compete for that attention.</li>
+      <li>"Founder is the user" is strong, but the founder is one person — pattern may not generalize.</li>
+      <li>LinkedIn audience is current; it dies if posting cadence breaks.</li>
+    </ul>
+  </div>
+  <div class="swotCell w">
+    <h4>Weaknesses → What if they're worse?</h4>
+    <ul>
+      <li>Zero customer-discovery calls completed. Persona is a composite, not interview-validated.</li>
+      <li>F-1 visa monetization remains the single biggest legal blocker. Unresolved.</li>
+      <li>SMB GTM access is rated 55/100 — likely the rate-limiting factor on growth.</li>
+    </ul>
+  </div>
+  <div class="swotCell o">
+    <h4>Opportunities → What if they don't materialize?</h4>
+    <ul>
+      <li>"SMB tier ignored by Looker/Tableau" is true today but closes once incumbents add SMB pricing.</li>
+      <li>Vertical templates assume the founder serves 50+ customers — a long lead time.</li>
+      <li>AI cost-down assumption ignores that competitors get the same cost-down.</li>
+    </ul>
+  </div>
+  <div class="swotCell t">
+    <h4>Threats → What if they're bigger?</h4>
+    <ul>
+      <li>Google Sheets + Gemini native summary is the canonical threat. Window: 18–24 months.</li>
+      <li>One hallucinated metric in a CFO brief = product death in that account.</li>
+      <li>F-1 status change between now and Q4 2026 could force an unplanned pause.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================ PITCH ============================ -->
+<h2>10 · Investor One-Liner &amp; 30-Second Pitch</h2>
+<h3>Investor One-Liner</h3>
+<div class="pitchBox investor">
+  <p>"<b>OpsBrief is the morning brief layer SMB analysts wish their dashboards already had</b> — a scheduled, cross-source, Slack-delivered summary at SaaS-grade gross margins, sold to a buyer who pays with a personal card."</p>
+</div>
+
+<h3>30-Second Founder Pitch</h3>
+<div class="pitchBox">
+  <p>"Every morning, an SMB Operations Analyst spends 60 to 90 minutes refreshing the same dashboards and writing the same Slack summary for their manager. We automate that. OpsBrief connects to their Sheets, warehouse, and Slack, and posts a 6-sentence morning brief at 8:55 a.m. Five lines of code, 90% gross margins, $20 to $40 a month, paid on a personal or team card with no procurement. I am the user. I do this exact job every morning at my internship. The first 100 customers come from a LinkedIn audience I have spent six months building daily, and the next 30 days are the test that proves whether that audience converts at $20 a month."</p>
+</div>
+
+<hr class="pageBreak">
+
+<!-- ============================ INVESTMENT SCORECARD ============================ -->
+<h2>11 · Investment Scorecard (0–100)</h2>
+<div class="scoreGrid">
+  <div class="scoreCard">
+    <div class="lbl">Business Viability</div>
+    <div class="val">68<span class="max">/100</span></div>
+    <div class="reason">Pricing logic and gross margins are SaaS-grade. Path to $2.4M ARR is plausible but bootstrap-paced.</div>
+  </div>
+  <div class="scoreCard">
+    <div class="lbl">Revenue Potential</div>
+    <div class="val">58<span class="max">/100</span></div>
+    <div class="reason">$800M TAM is real but capped. Self-paid motion limits ACV ceiling. Bootstrap-scale, not venture-scale.</div>
+  </div>
+  <div class="scoreCard">
+    <div class="lbl">GTM Strength</div>
+    <div class="val">72<span class="max">/100</span></div>
+    <div class="reason">Founder LinkedIn audience is the strongest single asset. Channel exists and is in motion.</div>
+  </div>
+  <div class="scoreCard">
+    <div class="lbl">Competitive Strength</div>
+    <div class="val">54<span class="max">/100</span></div>
+    <div class="reason">Wedge is real today. 18–24 month window before incumbents close it. Moat is mostly distribution-based.</div>
+  </div>
+  <div class="scoreCard lead">
+    <div class="lbl">Investor Readiness</div>
+    <div class="val">46<span class="max">/100</span></div>
+    <div class="reason">Bootstrap path, not VC-scale. Investor readiness is intentionally not the highest score — the right path is operator capital, not VC capital.</div>
+  </div>
+</div>
+<p style="font-size:12px;color:var(--mute);"><b>Reading the scorecard:</b> GTM and Business Viability lead. Investor Readiness is the lowest score — this is correct, not a flaw. OpsBrief is structured as a bootstrap-realistic small business, not a VC fund-returner. A high Investor Readiness score on this profile would be a red flag, not a green one.</p>
+
+<!-- ============================ VISUAL DASHBOARD ============================ -->
+<h2>12 · Visual Dashboard</h2>
+<div class="dashboard">
+  <div class="dHead">
+    <h3>OpsBrief · Business Strategy At-a-Glance</h3>
+    <div class="stamp">DAY 24 · v1.0</div>
+  </div>
+
+  <div class="dashGrid">
+    <!-- Row 1: Business Model -->
+    <div class="dashCell full">
+      <h5>Business Model</h5>
+      <p style="margin:4px 0 0;font-size:12px;color:var(--ink);"><b>SaaS subscription</b> · Founder-led GTM · SMB self-paid motion · 90%+ gross margins · No procurement gate.</p>
+    </div>
+
+    <!-- Row 2: Revenue / GTM / First 100 / Moat -->
+    <div class="dashCell">
+      <h5>Revenue Streams</h5>
+      <ul>
+        <li>Solo: $20/mo</li>
+        <li>Team: $40/mo (default)</li>
+        <li>Office: $120/mo</li>
+      </ul>
+    </div>
+    <div class="dashCell">
+      <h5>GTM Flow</h5>
+      <ul>
+        <li>LinkedIn content</li>
+        <li>Discovery call</li>
+        <li>Free sample brief</li>
+        <li>$20/mo conversion</li>
+      </ul>
+    </div>
+    <div class="dashCell">
+      <h5>First 100 Users</h5>
+      <ul>
+        <li>5 warm pilots</li>
+        <li>10 DM converts</li>
+        <li>85 inbound + referral</li>
+        <li>~$46K ARR run-rate</li>
+      </ul>
+    </div>
+    <div class="dashCell">
+      <h5>Competitive Moat</h5>
+      <ul>
+        <li>Distribution (LinkedIn)</li>
+        <li>Vertical brief templates</li>
+        <li>Per-customer memory</li>
+      </ul>
+    </div>
+
+    <!-- Row 3: Risks (wide) -->
+    <div class="dashCell wide">
+      <h5>Key Risks</h5>
+      <ul>
+        <li><b>Incumbent wedge closure</b> (Google + Gemini) — 18-24 month window</li>
+        <li><b>Willingness-to-pay unproven</b> — 30-day validation plan addresses</li>
+        <li><b>F-1 visa monetization</b> — UTD ISS consultation before charging</li>
+      </ul>
+    </div>
+    <div class="dashCell wide">
+      <h5>Score Cards</h5>
+      <ul>
+        <li>Business Viability: 68 · Revenue Potential: 58</li>
+        <li>GTM Strength: 72 · Competitive Strength: 54</li>
+        <li>Investor Readiness: 46 (intentional — bootstrap path)</li>
+      </ul>
+    </div>
+
+    <!-- Row 4: Verdict -->
+    <div class="dashCell full" style="background:#fdf3d6;border-color:var(--amber);">
+      <h5 style="color:var(--warn);">Verdict</h5>
+      <p style="margin:4px 0 0;font-size:13px;color:var(--ink);"><b>🟡 VALIDATE</b> — proceed to the 30-day customer-discovery and no-code MVP plan defined in Day 23. Decision milestone at Day 30: ≥5 paid customers signals continued investment; &lt;5 signals refinement of sub-segment, pricing, or persona.</p>
+    </div>
+  </div>
+</div>
+
+<hr class="pageBreak">
+
+<!-- ============================ ACTION SHEET ============================ -->
+<h2>13 · Founder Action Sheet — Top 10 Next Actions</h2>
+<table class="t actionTable">
+  <thead><tr><th style="width:36px;">#</th><th>Action</th><th style="width:90px;">By when</th><th style="width:80px;">Owner</th></tr></thead>
+  <tbody>
+    <tr><td class="priority">1</td><td><b>UTD ISS consultation</b> on F-1 monetization options</td><td>Day 3</td><td>Founder</td></tr>
+    <tr><td class="priority">2</td><td><b>Launch landing page</b> — single promise, single email field, conversion-tracked</td><td>Day 5</td><td>Founder</td></tr>
+    <tr><td class="priority">3</td><td><b>Run 8 discovery calls</b> from existing LinkedIn warm network</td><td>Day 14</td><td>Founder</td></tr>
+    <tr><td class="priority">4</td><td><b>Identify pilot customer</b> from discovery cohort — fastest to onboard, most-painful problem</td><td>Day 15</td><td>Founder</td></tr>
+    <tr><td class="priority">5</td><td><b>Wire no-code MVP</b> — Apps Script + Claude API + Slack webhook for pilot</td><td>Day 18</td><td>Founder</td></tr>
+    <tr><td class="priority">6</td><td><b>Deliver first morning brief</b> at 8:55 a.m. to pilot customer</td><td>Day 16</td><td>Founder</td></tr>
+    <tr><td class="priority">7</td><td><b>Iterate brief format</b> with pilot for 5 consecutive workdays</td><td>Day 21</td><td>Founder + Pilot</td></tr>
+    <tr><td class="priority">8</td><td><b>Pitch 10 warm prospects</b> at $20/mo with 7-day free trial</td><td>Day 26</td><td>Founder</td></tr>
+    <tr><td class="priority">9</td><td><b>Decision milestone</b> — ≥5 paid customers: commit to v2 build; &lt;5: refine and re-test sub-segment, pricing, or persona</td><td>Day 30</td><td>Founder</td></tr>
+    <tr><td class="priority">10</td><td><b>Document the lessons</b> — write a public retro of the 30-day test regardless of outcome</td><td>Day 33</td><td>Founder</td></tr>
+  </tbody>
+</table>
+
+<!-- ============================ VERDICT ============================ -->
+<h2>14 · Sustainability Verdict</h2>
+<div class="verdictBox">
+  <div class="vBig">🟡<br/>VALIDATE<span>NEXT-PHASE: CUSTOMER EVIDENCE</span></div>
+  <div>
+    <p><b>OpsBrief is structurally a sustainable small business, not a venture-scale opportunity — and the strategy is correctly built around that.</b> GTM and business viability lead the scorecard. Investor readiness is intentionally lower, reflecting an honest bootstrap-first path. The next 30 days exist specifically to convert the strongest unknown — willingness-to-pay at $20/mo — into evidence.</p>
+    <p style="margin-top:8px;font-size:12px;"><b>Sustainability verdict in one sentence:</b> A sustainable business, conditional on the Day 30 validation milestone. Operator capital, not venture capital. Bootstrap-friendly margins, founder-led GTM, and a defensible distribution moat. The remaining question is not "is this a real business?" — it is "will the first 5 customers actually pay?"</p>
+  </div>
+</div>
+
+<!-- ============================ FOOTNOTES ============================ -->
+<div class="footnotes">
+  <p><b>Methodology &amp; Sources.</b> Built on Day 22 Startup Validation Report and Day 23 Customer &amp; MVP Blueprint. TAM/SAM/SOM math unchanged ($0.80B / $0.37B / $2.4M Year 3). Investment Scorecard scores are composite estimates reflecting a 5-dimension rubric. Pricing benchmarked against analyst-tier SaaS (Hex, Sigma, Mode individual seats). Gross margin assumptions reflect Claude API per-customer cost at current published pricing.</p>
+  <p><b>Limitations.</b> Zero customer-discovery calls completed at report date. Persona "Maya" is a composite. Pricing tiers are anchored, not split-tested. The Day 30 milestone is the first real evidence checkpoint. <b>Document type:</b> structured strategy deliverable in the format a YC partner or business consultant would expect — designed to be defensible whether the next step is bootstrap-execution or operator-investor conversation.</p>
+</div>
+
+<div class="colophon">
+  CONFIDENTIAL · DAY 24 · 60-DAY CLAUDE CHALLENGE · Prepared by Garvit Mittal · Single HTML artifact · Print-ready
+</div>
+
+</div>
