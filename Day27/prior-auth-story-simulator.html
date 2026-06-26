@@ -1,0 +1,782 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Prior Authorization Story Simulator — Day 27 · #60DayClaudeChallenge</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root{
+    --bg:#f3f7fc;
+    --panel:#ffffff;
+    --ink:#0a0a0a;
+    --mute:#5a6b80;
+    --blue-50:#eaf2fb;
+    --blue-100:#d5e4f6;
+    --blue-200:#aec9ed;
+    --blue-300:#7fa6df;
+    --blue-400:#4b7ec9;
+    --blue-500:#235aa3;
+    --blue-600:#16447f;
+    --blue-700:#0d325e;
+    --blue-800:#08233f;
+    --good:#1c8a5a;
+    --warn:#a86517;
+    --bad:#a32430;
+  }
+  html,body{ margin:0; padding:0; background:var(--bg); color:var(--ink); }
+  body{ font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Roboto,system-ui,sans-serif; }
+  .grad-blue{ background:linear-gradient(135deg,var(--blue-500),var(--blue-700)); }
+  .bg-bluepanel{ background:var(--panel); }
+  .bg-progress{ background:var(--blue-100); }
+  .bar-fill{ background:linear-gradient(90deg,var(--blue-400),var(--blue-700)); }
+
+  /* Chat bubbles */
+  .bubble{ animation:bubbleIn .4s ease both; }
+  @keyframes bubbleIn{
+    from{ opacity:0; transform:translateY(10px); }
+    to{   opacity:1; transform:translateY(0); }
+  }
+  .bubble-left{ display:flex; gap:10px; align-items:flex-end; justify-content:flex-start; }
+  .bubble-right{ display:flex; gap:10px; align-items:flex-end; justify-content:flex-end; }
+
+  .ava{
+    width:38px; height:38px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; font-size:20px;
+    flex:0 0 38px; box-shadow:0 4px 12px rgba(13,50,94,.18);
+  }
+  .ava-rahul{ background:#d5e4f6; }
+  .ava-priya{ background:#7fa6df; color:#fff; }
+
+  .msg{
+    max-width:80%; padding:11px 14px; border-radius:16px; line-height:1.55;
+    font-size:14px; color:var(--ink); position:relative;
+  }
+  .msg-rahul{
+    background:var(--panel); border:1px solid #d5e4f6; border-bottom-left-radius:4px;
+  }
+  .msg-priya{
+    background:var(--blue-500); color:#fff; border-bottom-right-radius:4px;
+  }
+  .msg-priya b, .msg-priya strong{ color:#fff; }
+
+  .who{
+    font-size:10px; letter-spacing:1.5px; text-transform:uppercase;
+    font-weight:700; margin-bottom:3px;
+  }
+  .who-rahul{ color:var(--blue-600); }
+  .who-priya{ color:#cfe0f7; }
+
+  /* Centered narrator/doctor line */
+  .narrator{
+    text-align:center; font-style:italic; color:var(--blue-700);
+    font-size:13px; padding:6px 14px; margin:6px 0;
+    background:transparent;
+  }
+  .narrator.doctor{
+    color:var(--blue-800);
+    font-weight:500;
+  }
+  .narrator .label{
+    display:inline-block; font-style:normal; font-size:9px;
+    letter-spacing:2px; color:var(--mute); margin-right:8px;
+    background:var(--blue-50); border:1px solid var(--blue-100);
+    padding:2px 8px; border-radius:999px; vertical-align:middle;
+  }
+
+  /* Scene header */
+  .scene-header{
+    margin:18px 0 8px; padding:10px 14px;
+    background:linear-gradient(180deg,#fff,var(--blue-50));
+    border:1px solid var(--blue-100); border-left:4px solid var(--blue-500);
+    border-radius:10px;
+    animation:bubbleIn .4s ease both;
+  }
+  .scene-header .small{
+    font-size:10px; letter-spacing:2px; color:var(--blue-600);
+    text-transform:uppercase; font-weight:800;
+  }
+  .scene-header .title{
+    font-size:16px; font-weight:800; color:var(--ink); margin-top:2px;
+  }
+
+  /* Choices */
+  .choices{
+    margin:14px 0; display:grid; grid-template-columns:1fr 1fr; gap:10px;
+    animation:bubbleIn .4s ease both;
+  }
+  @media (max-width:600px){ .choices{ grid-template-columns:1fr; } }
+  .choice{
+    background:var(--panel); border:2px solid var(--blue-200); border-radius:12px;
+    padding:12px 14px; cursor:pointer; text-align:left;
+    transition:transform .08s, border-color .15s, box-shadow .15s;
+    font-family:inherit;
+  }
+  .choice:hover{ border-color:var(--blue-500); box-shadow:0 6px 16px rgba(35,90,163,.18); }
+  .choice:active{ transform:translateY(1px); }
+  .choice .label{
+    font-size:9px; letter-spacing:1.5px; color:var(--blue-600);
+    text-transform:uppercase; font-weight:800;
+  }
+  .choice .text{ font-size:13px; color:var(--ink); margin-top:4px; line-height:1.5; }
+
+  /* Citation/insight callouts inside Priya bubble */
+  .cite{
+    margin-top:8px; padding:8px 10px; border-radius:8px;
+    background:rgba(255,255,255,.12); border-left:3px solid #ffd166;
+    font-size:12px; font-style:italic; color:#fff;
+  }
+
+  /* Final takeaways panel */
+  .takeaway{
+    background:linear-gradient(135deg,#fff,var(--blue-50));
+    border:1px solid var(--blue-200); border-radius:12px;
+    padding:14px 16px; margin:8px 0;
+    animation:bubbleIn .4s ease both;
+  }
+  .takeaway h3{
+    font-size:11px; letter-spacing:2px; color:var(--blue-700);
+    text-transform:uppercase; font-weight:800; margin:0 0 8px;
+  }
+  .takeaway ul{ margin:0; padding-left:20px; font-size:13px; line-height:1.65; }
+  .takeaway li::marker{ color:var(--blue-500); }
+
+  /* Confetti */
+  .confetti{ position:fixed; pointer-events:none; inset:0; overflow:hidden; z-index:60; display:none; }
+  .confetti.show{ display:block; }
+  .confetti i{ position:absolute; top:-10px; width:8px; height:14px; opacity:.9; animation:fall linear forwards; }
+  @keyframes fall{ to{ transform:translateY(110vh) rotate(720deg); opacity:.6; } }
+
+  .scrollFade{
+    background:linear-gradient(180deg, rgba(243,247,252,1), rgba(243,247,252,0));
+    height:24px; pointer-events:none;
+  }
+</style>
+</head>
+<body class="bg-[#f3f7fc]">
+
+<div class="max-w-3xl mx-auto px-4 pb-16">
+
+  <!-- HEADER -->
+  <header class="flex justify-between items-center pt-6 pb-3 flex-wrap gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-11 h-11 rounded-xl grad-blue text-white flex items-center justify-center text-2xl">📖</div>
+      <div>
+        <h1 class="text-base font-extrabold tracking-tight m-0">Prior Authorization Story Simulator</h1>
+        <div class="text-[10px] tracking-[3px] text-slate-500 font-bold uppercase">Day 27 · #60DayClaudeChallenge</div>
+      </div>
+    </div>
+    <span class="text-[10px] font-extrabold tracking-[2px] px-3 py-1 rounded-full bg-[#d5e4f6] text-[#0d325e] border border-[#aec9ed]">STORY · v1</span>
+  </header>
+
+  <!-- PROGRESS -->
+  <div class="bg-bluepanel rounded-xl border border-[#c8d6e8] p-4 mb-3 shadow-sm">
+    <div class="flex justify-between items-center mb-2">
+      <div class="text-[10px] tracking-[2px] text-slate-500 font-bold uppercase">Rahul's Journey</div>
+      <div class="text-xs text-slate-600"><span id="progressLabel">Chapter 0 of 8</span></div>
+    </div>
+    <div class="w-full h-2 bg-progress rounded-full overflow-hidden">
+      <div id="progressBar" class="h-full bar-fill rounded-full transition-all" style="width:0%;"></div>
+    </div>
+    <div class="flex justify-between mt-3 text-[10px] text-slate-500 font-semibold">
+      <span>Doctor</span><span>Insurance</span><span>What is PA?</span><span>Review</span>
+      <span>Denial</span><span>Appeal</span><span>Approval</span><span>Lessons</span>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div class="flex flex-wrap gap-2 mb-3">
+    <button id="startBtn"
+      class="px-4 py-2 rounded-lg text-white text-sm font-bold border border-[#16447f]"
+      style="background:linear-gradient(180deg,#235aa3,#16447f);">
+      ▶ Start Story
+    </button>
+    <button id="restartBtn"
+      class="px-4 py-2 rounded-lg bg-white text-sm font-bold border border-[#c8d6e8] text-slate-700 hover:border-[#4b7ec9]">
+      ↻ Restart
+    </button>
+  </div>
+
+  <!-- CHAT FEED -->
+  <div class="bg-bluepanel rounded-xl border border-[#c8d6e8] p-4 shadow-md min-h-[300px]">
+    <div id="chat" class="flex flex-col gap-3"></div>
+    <div class="scrollFade -mt-6"></div>
+  </div>
+
+  <p class="text-[11px] text-slate-500 text-center mt-4">
+    Single HTML file · Tailwind via CDN · Vanilla JS · append-only chat feed · Built for Day 27 of #60DayClaudeChallenge
+  </p>
+</div>
+
+<div class="confetti" id="confetti"></div>
+
+<script>
+/* =================================================================
+   PRIOR AUTHORIZATION STORY SIMULATOR — Day 27
+   Single file, append-only chat feed.
+   Always uses createElement + appendChild — never innerHTML = on the
+   chat container itself (per the prompt requirement).
+   ================================================================= */
+
+const TOTAL_CHAPTERS = 8;
+
+const state = {
+  chapter: 0,         // 0 = not started, 1..8 = chapters
+  chat: document.getElementById("chat"),
+  progressBar: document.getElementById("progressBar"),
+  progressLabel: document.getElementById("progressLabel"),
+  pathChoices: [],    // user choices per chapter (for the final takeaway)
+  finished: false,
+};
+
+const els = {
+  startBtn: document.getElementById("startBtn"),
+  restartBtn: document.getElementById("restartBtn"),
+  confetti: document.getElementById("confetti"),
+};
+
+/* =================================================================
+   APPEND-ONLY PRIMITIVES
+   These never call innerHTML on the chat container.
+   They build sub-elements via createElement / appendChild.
+   ================================================================= */
+
+function appendBubble({ speaker, text, citation }) {
+  const wrap = document.createElement("div");
+  wrap.className = "bubble " + (speaker === "rahul" ? "bubble-left" : "bubble-right");
+
+  if (speaker === "rahul") {
+    const ava = document.createElement("div");
+    ava.className = "ava ava-rahul"; ava.textContent = "🧑";
+    wrap.appendChild(ava);
+  }
+
+  const msg = document.createElement("div");
+  msg.className = "msg " + (speaker === "rahul" ? "msg-rahul" : "msg-priya");
+
+  const who = document.createElement("div");
+  who.className = "who " + (speaker === "rahul" ? "who-rahul" : "who-priya");
+  who.textContent = speaker === "rahul" ? "Rahul — Patient" : "Priya — Healthcare Operations Specialist";
+  msg.appendChild(who);
+
+  const body = document.createElement("div");
+  body.textContent = text;
+  msg.appendChild(body);
+
+  if (citation) {
+    const cite = document.createElement("div");
+    cite.className = "cite";
+    cite.textContent = citation;
+    msg.appendChild(cite);
+  }
+
+  wrap.appendChild(msg);
+
+  if (speaker === "priya") {
+    const ava = document.createElement("div");
+    ava.className = "ava ava-priya"; ava.textContent = "👩‍⚕";
+    wrap.appendChild(ava);
+  }
+
+  state.chat.appendChild(wrap);
+  scrollToBottom();
+}
+
+function appendNarrator(text, isDoctor=false, label="Narrator") {
+  const div = document.createElement("div");
+  div.className = "narrator" + (isDoctor ? " doctor" : "");
+  const lbl = document.createElement("span");
+  lbl.className = "label";
+  lbl.textContent = label;
+  div.appendChild(lbl);
+  const txt = document.createElement("span");
+  txt.textContent = text;
+  div.appendChild(txt);
+  state.chat.appendChild(div);
+  scrollToBottom();
+}
+
+function appendSceneHeader(num, title) {
+  const div = document.createElement("div");
+  div.className = "scene-header";
+  const small = document.createElement("div");
+  small.className = "small";
+  small.textContent = "Chapter " + num + " of " + TOTAL_CHAPTERS;
+  div.appendChild(small);
+  const t = document.createElement("div");
+  t.className = "title";
+  t.textContent = title;
+  div.appendChild(t);
+  state.chat.appendChild(div);
+  scrollToBottom();
+}
+
+function appendChoices(choices, onPick) {
+  const wrap = document.createElement("div");
+  wrap.className = "choices";
+
+  choices.forEach((c, idx) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "choice";
+
+    const lab = document.createElement("div");
+    lab.className = "label";
+    lab.textContent = "OPTION " + String.fromCharCode(65 + idx);
+    btn.appendChild(lab);
+
+    const txt = document.createElement("div");
+    txt.className = "text";
+    txt.textContent = c.text;
+    btn.appendChild(txt);
+
+    btn.addEventListener("click", () => {
+      // Disable the choices wrap (so the user can't double-pick)
+      wrap.style.opacity = ".55";
+      wrap.style.pointerEvents = "none";
+      // Echo the player's choice as a centered marker (not a chat bubble)
+      appendChoiceMarker("Rahul chose: " + c.text);
+      // Record + advance
+      state.pathChoices.push({ chapter: state.chapter, label: "Option " + String.fromCharCode(65 + idx), text: c.text });
+      onPick(c);
+    });
+
+    wrap.appendChild(btn);
+  });
+
+  state.chat.appendChild(wrap);
+  scrollToBottom();
+}
+
+function appendChoiceMarker(text) {
+  const div = document.createElement("div");
+  div.className = "narrator";
+  div.style.color = "var(--blue-500)";
+  div.style.fontWeight = "600";
+  div.textContent = "→ " + text;
+  state.chat.appendChild(div);
+  scrollToBottom();
+}
+
+function appendTakeaway(titleText, items) {
+  const div = document.createElement("div");
+  div.className = "takeaway";
+  const h = document.createElement("h3");
+  h.textContent = titleText;
+  div.appendChild(h);
+  const ul = document.createElement("ul");
+  items.forEach(it => {
+    const li = document.createElement("li");
+    li.textContent = it;
+    ul.appendChild(li);
+  });
+  div.appendChild(ul);
+  state.chat.appendChild(div);
+  scrollToBottom();
+}
+
+function scrollToBottom() {
+  // Smooth scroll the page so newest content stays visible.
+  requestAnimationFrame(() => {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+  });
+}
+
+function updateProgress() {
+  const pct = (state.chapter / TOTAL_CHAPTERS) * 100;
+  state.progressBar.style.width = pct + "%";
+  state.progressLabel.textContent = "Chapter " + state.chapter + " of " + TOTAL_CHAPTERS;
+}
+
+/* =================================================================
+   STORY DEFINITIONS — 8 SCENES
+   ================================================================= */
+
+const SCENES = {
+  1: function chapter1_doctorVisit() {
+    appendSceneHeader(1, "Doctor Visit — Rahul Meets Dr. Patel");
+    appendNarrator("Rahul, 34, walks into City Medical Center. He's been waking up with stiff, painful joints for the past three months. His primary care physician referred him to a rheumatologist.");
+    setTimeout(() => {
+      appendBubble({
+        speaker: "rahul",
+        text: "I'm here because my joints have been getting worse. My fingers are swollen and my knees hurt every morning."
+      });
+    }, 400);
+    setTimeout(() => {
+      appendNarrator("Dr. Patel, a rheumatologist, reviews Rahul's labs and X-rays.", true, "Dr. Patel");
+    }, 1100);
+    setTimeout(() => {
+      appendNarrator("'Rahul, the labs confirm what I suspected. You have Rheumatoid Arthritis. The good news is, we have a very effective treatment. I'm going to prescribe Humira — adalimumab. It's a biologic medication that can prevent permanent joint damage.'", true, "Dr. Patel");
+    }, 1800);
+    setTimeout(() => {
+      appendBubble({
+        speaker: "rahul",
+        text: "Okay. So I can just pick it up at the pharmacy, right?"
+      });
+    }, 2700);
+    setTimeout(() => {
+      appendChoices([
+        { text: "Ask the doctor about side effects before worrying about the prescription.", next: "advance" },
+        { text: "Ask why a 'biologic' medication might be different from a regular prescription.", next: "advance" },
+      ], () => advance());
+    }, 3500);
+  },
+
+  2: function chapter2_insuranceRoadblock() {
+    appendSceneHeader(2, "Insurance Roadblock — The Pharmacy Calls");
+    appendNarrator("Two days later, Rahul tries to fill the prescription at his pharmacy. The pharmacist comes back to the counter shaking her head.");
+    setTimeout(() => {
+      appendNarrator("'I can't fill this today. Your insurance — StarCare Health — requires a Prior Authorization for Humira. The doctor's office has to submit it. The pharmacy can't process this until your insurer approves.'", true, "Pharmacist");
+    }, 700);
+    setTimeout(() => {
+      appendBubble({
+        speaker: "rahul",
+        text: "Wait — what's a Prior Authorization? My doctor literally just prescribed this. Why does the insurance need to approve it separately?"
+      });
+    }, 1500);
+    setTimeout(() => {
+      appendBubble({
+        speaker: "priya",
+        text: "Hi Rahul, I'm Priya. I work in healthcare operations. The pharmacist is right — Humira is one of about 1,500 prescription drugs that most major US insurers require Prior Authorization for. The provider's office submits the PA request directly to the payer. The pharmacy isn't involved in this part."
+      });
+    }, 2400);
+    setTimeout(() => {
+      appendNarrator("PA Flow: Provider → PA Request → Payer (StarCare Health). Approved authorizations are saved on file permanently.");
+    }, 3200);
+    setTimeout(() => {
+      appendChoices([
+        { text: "Ask Priya to explain what Prior Authorization actually is.", next: "advance" },
+        { text: "Ask why insurance gets to override what the doctor decided.", next: "advance" },
+      ], () => advance());
+    }, 4000);
+  },
+
+  3: function chapter3_whatIsPA() {
+    appendSceneHeader(3, "What is Prior Authorization?");
+    appendBubble({
+      speaker: "priya",
+      text: "Prior Authorization, or PA, is the insurer's way of saying: before we agree to pay for an expensive drug or procedure, the prescribing doctor has to prove the patient actually needs it. For most cheap, common medications, there's no PA. For high-cost or risky treatments, the payer wants documentation."
+    });
+    setTimeout(() => {
+      appendBubble({
+        speaker: "rahul",
+        text: "But Dr. Patel already decided I need it. Why does the insurance get to second-guess her?"
+      });
+    }, 1000);
+    setTimeout(() => {
+      appendBubble({
+        speaker: "priya",
+        text: "Honestly? Because insurers want to control costs. Humira is around $6,000 a month. Many payers require 'step therapy' first — proof the patient tried cheaper drugs and they didn't work. That's why your doctor's office has to send your full clinical history."
+      });
+    }, 2000);
+    setTimeout(() => {
+      appendBubble({
+        speaker: "priya",
+        text: "Here's the important part: PA isn't just paperwork. For aggressive autoimmune diseases like RA, delays in starting biologics can mean joint damage that doesn't reverse. Speed matters.",
+        citation: "AMA 2023 Prior Authorization Physician Survey: 93% of physicians reported that PA causes treatment delays in the majority of cases."
+      });
+    }, 3000);
+    setTimeout(() => {
+      appendChoices([
+        { text: "Ask what the insurance reviewer specifically looks at.", next: "advance" },
+        { text: "Ask how long this whole process usually takes.", next: "advance" },
+      ], () => advance());
+    }, 4000);
+  },
+
+  4: function chapter4_insuranceReview() {
+    appendSceneHeader(4, "Insurance Review — What StarCare Actually Checks");
+    appendBubble({
+      speaker: "priya",
+      text: "When StarCare Health receives Dr. Patel's PA request, their utilization management team checks four things in order. Let me walk you through each one."
+    });
+    setTimeout(() => {
+      appendBubble({
+        speaker: "priya",
+        text: "1. Eligibility. Are you actually covered under this plan on this date? Sounds obvious, but if your plan ended yesterday, the PA is auto-denied. This catches roughly 5% of submissions."
+      });
+    }, 800);
+    setTimeout(() => {
+      appendBubble({
+        speaker: "priya",
+        text: "2. Clinical documentation. Did Dr. Patel include your labs, X-rays, and exam notes? Without these, the reviewer has nothing to evaluate. This is the #1 cause of pends — insurer asks for more info before deciding."
+      });
+    }, 1600);
+    setTimeout(() => {
+      appendBubble({
+        speaker: "priya",
+        text: "3. ICD-10 diagnosis match. The submitted diagnosis code — for you, M06.9 (Rheumatoid Arthritis, unspecified) — has to match what the drug is approved to treat. Mismatches lead to denials."
+      });
+    }, 2400);
+    setTimeout(() => {
+      appendBubble({
+        speaker: "priya",
+        text: "4. Step therapy history. Did you try methotrexate first? Did it fail? Most plans require this before approving a $6,000-a-month biologic. If this isn't documented, the PA gets denied even when everything else is perfect."
+      });
+    }, 3200);
+    setTimeout(() => {
+      appendChoices([
+        { text: "Make sure Dr. Patel includes your step therapy history.", next: "advance" },
+        { text: "Trust that Dr. Patel's office knows what they're doing.", next: "advance" },
+      ], (c) => advance());
+    }, 4000);
+  },
+
+  5: function chapter5_denial() {
+    appendSceneHeader(5, "Denial — The First Decision Arrives");
+    appendNarrator("Seven days after Dr. Patel submitted the PA, Rahul receives a letter from StarCare Health.");
+    setTimeout(() => {
+      appendNarrator("'Your Prior Authorization request for Humira (adalimumab) has been DENIED. Reason: insufficient documentation of step therapy with conventional DMARDs.'", true, "StarCare Health Letter");
+    }, 700);
+    setTimeout(() => {
+      appendBubble({
+        speaker: "rahul",
+        text: "Denied?! I thought you said this was treatable. What do I do now?"
+      });
+    }, 1500);
+    setTimeout(() => {
+      appendBubble({
+        speaker: "priya",
+        text: "Take a breath, Rahul. A denial is NOT the end of the story. It's actually really common — about 1 in 5 PA requests get denied on first submission. Most of those denials get overturned on appeal."
+      });
+    }, 2300);
+    setTimeout(() => {
+      appendBubble({
+        speaker: "priya",
+        text: "The reason here is fixable. StarCare didn't see proof you tried methotrexate first. Dr. Patel can submit an appeal with documentation of your earlier treatment and the reason it wasn't enough. That's called a Letter of Medical Necessity.",
+        citation: "Industry data: PA denials cost physician offices an average of 2+ staff hours per case to resolve. That cost is invisible to patients."
+      });
+    }, 3300);
+    setTimeout(() => {
+      appendChoices([
+        { text: "File a formal appeal with a Letter of Medical Necessity.", next: "advance" },
+        { text: "Ask Dr. Patel to request a Peer-to-Peer review with StarCare's medical director.", next: "advance" },
+      ], () => advance());
+    }, 4200);
+  },
+
+  6: function chapter6_appeal() {
+    appendSceneHeader(6, "Appeal — Building the Case");
+    appendBubble({
+      speaker: "priya",
+      text: "Dr. Patel's office is putting together the appeal package. Three documents have to go in: your step therapy history, a Letter of Medical Necessity explaining why you specifically need Humira, and a formal appeal filing letter that references the denial reason."
+    });
+    setTimeout(() => {
+      appendBubble({
+        speaker: "rahul",
+        text: "What does the Letter of Medical Necessity actually say?"
+      });
+    }, 900);
+    setTimeout(() => {
+      appendBubble({
+        speaker: "priya",
+        text: "It's a clinical narrative from Dr. Patel. Something like: 'Rahul, 34, presents with progressive RA confirmed by elevated RF and anti-CCP labs. He completed an 8-week trial of methotrexate at maximum tolerated dose with continued disease activity. Continued conventional therapy carries documented risk of irreversible joint damage. Humira is medically necessary per ACR guidelines.'"
+      });
+    }, 1700);
+    setTimeout(() => {
+      appendBubble({
+        speaker: "priya",
+        text: "Notice how that letter ties to every single thing StarCare's reviewers check. Diagnosis with lab confirmation. Step therapy attempted. Clinical reason it failed. Cited guidelines. This is the difference between a successful appeal and another denial."
+      });
+    }, 2700);
+    setTimeout(() => {
+      appendBubble({
+        speaker: "rahul",
+        text: "How long does the appeal take?"
+      });
+    }, 3500);
+    setTimeout(() => {
+      appendBubble({
+        speaker: "priya",
+        text: "Standard appeal: up to 30 days. Expedited appeal, if your doctor certifies that delay would cause harm: 72 hours. For aggressive RA, Dr. Patel will file expedited."
+      });
+    }, 4100);
+    setTimeout(() => {
+      appendChoices([
+        { text: "File expedited appeal with full Letter of Medical Necessity.", next: "advance" },
+        { text: "File standard appeal with just the denial reason addressed.", next: "advance" },
+      ], () => advance());
+    }, 4900);
+  },
+
+  7: function chapter7_approval() {
+    appendSceneHeader(7, "Approval — The Second Decision");
+    appendNarrator("Three days after the expedited appeal was filed, Rahul's phone rings. It's Dr. Patel's nurse.");
+    setTimeout(() => {
+      appendNarrator("'Rahul — good news. StarCare approved the appeal. Your PA is on file now. You can pick up Humira at the pharmacy today.'", true, "Nurse");
+    }, 700);
+    setTimeout(() => {
+      appendBubble({
+        speaker: "rahul",
+        text: "Finally. Why did the appeal work when the first request didn't?"
+      });
+    }, 1400);
+    setTimeout(() => {
+      appendBubble({
+        speaker: "priya",
+        text: "The first submission was missing the step therapy documentation. The appeal added it. Same patient, same diagnosis, same drug — different documentation. That's the entire game."
+      });
+    }, 2200);
+    setTimeout(() => {
+      appendBubble({
+        speaker: "priya",
+        text: "One more important thing: this approval is now on file with StarCare. As long as you stay on Humira and the same diagnosis, you should NOT need a new PA every month. PAs typically renew at intervals — usually 6 or 12 months — but they don't restart from scratch each fill."
+      });
+    }, 3200);
+    setTimeout(() => {
+      appendBubble({
+        speaker: "rahul",
+        text: "So the worst part was the first month."
+      });
+    }, 4000);
+    setTimeout(() => {
+      appendBubble({
+        speaker: "priya",
+        text: "For most patients, yes. The first PA is the hardest. After that, it's routine."
+      });
+    }, 4600);
+    setTimeout(() => {
+      burstConfetti();
+    }, 5000);
+    setTimeout(() => {
+      appendChoices([
+        { text: "Move to the final takeaways for both perspectives.", next: "advance" },
+        { text: "Move to the final takeaways and review the path I chose.", next: "advance" },
+      ], () => advance());
+    }, 5400);
+  },
+
+  8: function chapter8_takeaways() {
+    appendSceneHeader(8, "Takeaways — Two Perspectives");
+    appendBubble({
+      speaker: "priya",
+      text: "Rahul's PA journey took 14 days total, included one denial, one appeal, and ended in approval. Here's what each side learned."
+    });
+
+    setTimeout(() => {
+      appendTakeaway("What Rahul Learned (Patient Perspective)", [
+        "Prior Authorization isn't a yes/no — it's a process with multiple checkpoints, and a denial is not the end.",
+        "The first submission almost always involves some friction. About 1 in 5 PAs are denied on first try.",
+        "Step therapy history is the #1 reason for denials. The doctor's office must include it explicitly.",
+        "An expedited appeal can resolve in 72 hours when delay would cause harm.",
+        "Approved PAs stay on file. The first month is the hardest. After that, refills are routine.",
+      ]);
+    }, 800);
+
+    setTimeout(() => {
+      appendTakeaway("How Health Systems Track This (System Perspective)", [
+        "Denial Rate: % of PAs denied on first submission. Target: under 20%. StarCare's industry-typical rate is ~18%.",
+        "Appeal Rate: % of denied PAs that get appealed. Target: above 60%. Most denials are appealable but never get appealed.",
+        "Appeal Overturn Rate: % of appeals that get approved. Industry benchmark: 40–65% when documentation is added.",
+        "Time to Resolution: average days from initial PA submission to final approval. Best-in-class: under 7 days. Median: 12 days.",
+        "Staff Hours per PA: hidden cost. Median is 16 minutes per request; denials add 2+ hours each.",
+      ]);
+    }, 1800);
+
+    setTimeout(() => {
+      appendBubble({
+        speaker: "priya",
+        text: "Most patients only ever see the patient-side story. Most administrators only ever see the system-side metrics. The hard part of healthcare operations is that both perspectives are true simultaneously — and they describe the same workflow."
+      });
+    }, 2800);
+
+    setTimeout(() => {
+      const pathDiv = document.createElement("div");
+      pathDiv.className = "takeaway";
+      const h = document.createElement("h3");
+      h.textContent = "The Path You Chose";
+      pathDiv.appendChild(h);
+      const ul = document.createElement("ul");
+      state.pathChoices.forEach(c => {
+        const li = document.createElement("li");
+        li.textContent = "Chapter " + c.chapter + ": " + c.text;
+        ul.appendChild(li);
+      });
+      pathDiv.appendChild(ul);
+      state.chat.appendChild(pathDiv);
+      scrollToBottom();
+    }, 3800);
+
+    setTimeout(() => {
+      appendNarrator("Story complete. Use Restart to walk a different path.", false, "End");
+      state.finished = true;
+    }, 4800);
+  },
+};
+
+/* =================================================================
+   ADVANCEMENT
+   ================================================================= */
+
+function advance() {
+  state.chapter++;
+  updateProgress();
+  if (state.chapter > TOTAL_CHAPTERS) {
+    return;
+  }
+  const fn = SCENES[state.chapter];
+  if (fn) fn();
+}
+
+function startStory() {
+  resetChat();
+  state.chapter = 1;
+  state.pathChoices = [];
+  state.finished = false;
+  updateProgress();
+  SCENES[1]();
+  els.startBtn.textContent = "▶ Story Running";
+  els.startBtn.disabled = true;
+  els.startBtn.style.opacity = ".55";
+  els.startBtn.style.cursor = "not-allowed";
+}
+
+function resetChat() {
+  // The ONLY place we touch innerHTML — clearing the container before restart.
+  // The prompt says: never call innerHTML = on the chat container DURING the
+  // append cycle. Clearing on full restart is acceptable.
+  while (state.chat.firstChild) state.chat.removeChild(state.chat.firstChild);
+}
+
+function restartStory() {
+  resetChat();
+  state.chapter = 0;
+  state.pathChoices = [];
+  state.finished = false;
+  updateProgress();
+  els.startBtn.textContent = "▶ Start Story";
+  els.startBtn.disabled = false;
+  els.startBtn.style.opacity = "1";
+  els.startBtn.style.cursor = "pointer";
+}
+
+/* =================================================================
+   CONFETTI ON APPROVAL
+   ================================================================= */
+function burstConfetti() {
+  const c = els.confetti;
+  while (c.firstChild) c.removeChild(c.firstChild);
+  const colors = ["#235aa3","#4b7ec9","#7fa6df","#aec9ed","#1c8a5a","#ffd166"];
+  for (let i = 0; i < 80; i++) {
+    const piece = document.createElement("i");
+    piece.style.left = Math.random() * 100 + "vw";
+    piece.style.background = colors[i % colors.length];
+    piece.style.animationDuration = (1.7 + Math.random() * 1.8) + "s";
+    piece.style.transform = `rotate(${Math.random()*360}deg)`;
+    c.appendChild(piece);
+  }
+  c.classList.add("show");
+  setTimeout(() => c.classList.remove("show"), 3500);
+}
+
+/* =================================================================
+   WIRE UP
+   ================================================================= */
+els.startBtn.addEventListener("click", startStory);
+els.restartBtn.addEventListener("click", restartStory);
+
+updateProgress();
+</script>
+
+</body>
+</html>
