@@ -1,0 +1,1187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>🧩 Prompt Puzzle — Master AI Prompting Through Play · Day 35</title>
+<style>
+/* =============================================================
+   PROMPT PUZZLE — Day 35
+   Domain: Product & Business Strategy · Difficulty: Intermediate
+   Single HTML file · Vanilla CSS + JavaScript · No frameworks
+   ============================================================= */
+
+:root {
+  --bg:        #0a0912;
+  --bg-2:      #0f0d1c;
+  --panel:     #16132b;
+  --panel-2:   #1d1836;
+  --line:      #2a2450;
+  --line-2:    #3a3268;
+  --text:      #f0eaff;
+  --text-dim:  #b8afd8;
+  --text-mute: #7c749c;
+
+  --accent:    #e46c2b;
+  --accent-2:  #f2a24a;
+  --accent-soft: rgba(228,108,43,.16);
+
+  --good:      #63d095;
+  --warn:      #f6b83a;
+  --bad:       #ff5f7e;
+  --gold:      #ffd166;
+  --electric:  #7aa6ff;
+
+  --shadow:    0 24px 60px rgba(0,0,0,.55);
+  --radius:    14px;
+}
+[data-theme="claude"]   { --accent:#e46c2b; --accent-2:#f2a24a; --accent-soft:rgba(228,108,43,.18); }
+[data-theme="electric"] { --accent:#7aa6ff; --accent-2:#a9c3ff; --accent-soft:rgba(122,166,255,.18); }
+[data-theme="neon"]     { --accent:#3ce6c8; --accent-2:#84f3dc; --accent-soft:rgba(60,230,200,.18); }
+[data-theme="rose"]     { --accent:#ff6b95; --accent-2:#ff97b6; --accent-soft:rgba(255,107,149,.18); }
+[data-theme="gold"]     { --accent:#f6c04a; --accent-2:#ffd772; --accent-soft:rgba(246,192,74,.18); }
+
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body {
+  margin:0; padding:0; min-height:100%;
+  background:
+    radial-gradient(1000px 700px at 8% -8%, var(--accent-soft), transparent 60%),
+    radial-gradient(900px 600px at 110% 110%, rgba(122,166,255,.08), transparent 60%),
+    var(--bg);
+  color:var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.mono { font-family: "JetBrains Mono", "Fira Code", ui-monospace, Menlo, Consolas, monospace; }
+
+.app { max-width:1180px; margin:0 auto; padding:22px 20px 60px; }
+
+/* ========== HEADER ========== */
+header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:14px 0 12px; margin-bottom:16px; flex-wrap:wrap; gap:12px;
+  border-bottom:1px solid var(--line);
+}
+.brand { display:flex; align-items:center; gap:14px; }
+.logo {
+  width:52px; height:52px; border-radius:14px;
+  background:linear-gradient(135deg, var(--accent), var(--accent-2));
+  display:flex; align-items:center; justify-content:center; font-size:26px;
+  box-shadow:0 12px 30px rgba(0,0,0,.5);
+}
+.brand h1 { margin:0; font-size:22px; letter-spacing:-.3px; font-weight:800; }
+.brand .sub { font-size:11px; color:var(--text-mute); letter-spacing:2px; text-transform:uppercase; font-weight:700; }
+
+.hudGroup { display:flex; gap:16px; align-items:center; flex-wrap:wrap; }
+.hud {
+  background:var(--panel); border:1px solid var(--line);
+  padding:6px 12px; border-radius:10px;
+  display:flex; align-items:center; gap:8px;
+  font-size:12px; color:var(--text-dim); font-weight:700;
+}
+.hud b { color:var(--text); font-family: "JetBrains Mono", ui-monospace, monospace; font-variant-numeric:tabular-nums; }
+.hud.accent { border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
+
+.themePicker { display:flex; gap:6px; align-items:center; }
+.themePicker .lbl { font-size:9px; letter-spacing:2px; color:var(--text-mute); text-transform:uppercase; font-weight:800; margin-right:4px; }
+.swatch {
+  width:22px; height:22px; border-radius:8px; cursor:pointer;
+  border:2px solid transparent; transition:transform .12s, border-color .15s;
+}
+.swatch:hover { transform:scale(1.08); }
+.swatch.active { border-color: var(--text); }
+.swatch.claude   { background:linear-gradient(135deg,#e46c2b,#f2a24a); }
+.swatch.electric { background:linear-gradient(135deg,#7aa6ff,#a9c3ff); }
+.swatch.neon     { background:linear-gradient(135deg,#3ce6c8,#84f3dc); }
+.swatch.rose     { background:linear-gradient(135deg,#ff6b95,#ff97b6); }
+.swatch.gold     { background:linear-gradient(135deg,#f6c04a,#ffd772); }
+
+/* ========== STEPPER ========== */
+.steps { display:flex; gap:6px; margin-bottom:20px; }
+.step { flex:1; height:5px; background:rgba(255,255,255,.05); border-radius:3px; }
+.step.done    { background: linear-gradient(90deg, var(--accent), var(--accent-2)); }
+.step.current { background: linear-gradient(90deg, var(--accent), var(--accent-2)); box-shadow:0 0 14px var(--accent); }
+
+/* ========== BUTTONS ========== */
+.btn {
+  appearance:none; border:1px solid var(--line);
+  background:transparent; color:var(--text); font-weight:700;
+  padding:11px 20px; border-radius:10px; cursor:pointer;
+  font-size:13px; letter-spacing:.4px;
+  transition:transform .08s, border-color .12s, background .15s;
+}
+.btn:hover  { border-color:var(--accent); background:var(--accent-soft); }
+.btn:active { transform:translateY(1px); }
+.btn.primary {
+  background:linear-gradient(180deg, var(--accent), var(--accent-2));
+  color:#1a0e00; border:none; font-weight:800;
+  box-shadow:0 10px 26px rgba(228,108,43,.35);
+}
+.btn.primary:hover { transform: translateY(-1px); }
+.btn.ghost { background:var(--panel); }
+.btn:disabled { opacity:.45; cursor:not-allowed; }
+
+/* ========== CARDS ========== */
+.card {
+  background:linear-gradient(180deg, var(--panel), var(--bg-2));
+  border:1px solid var(--line); border-radius:var(--radius);
+  padding:26px; box-shadow:var(--shadow); margin-bottom:16px;
+  animation: fadeIn .35s ease both;
+}
+@keyframes fadeIn { from { opacity:0; transform:translateY(8px);} to { opacity:1; transform:translateY(0);} }
+
+.card h2 { margin:0 0 6px; font-size:26px; letter-spacing:-.4px; font-weight:800; }
+.card .lead { color:var(--text-dim); font-size:14.5px; line-height:1.65; margin-top:4px; }
+
+.tag {
+  display:inline-block; font-size:10px; padding:3px 10px; border-radius:999px;
+  background:var(--accent-soft); color:var(--accent); border:1px solid var(--accent);
+  font-weight:800; letter-spacing:1.5px;
+}
+.badge { display:inline-block; padding:4px 10px; border-radius:8px; font-size:10px; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; background:var(--panel-2); color:var(--text-dim); border:1px solid var(--line-2); }
+.badge.hot { background:var(--accent-soft); color:var(--accent); border-color:var(--accent); }
+.badge.ok  { background:rgba(99,208,149,.14); color:var(--good); border-color:var(--good); }
+
+/* ========== WELCOME ========== */
+.welcome { text-align:center; padding:24px 20px; }
+.welcome .title-big {
+  font-size:52px; font-weight:900; letter-spacing:-1.4px;
+  background: linear-gradient(90deg, #fff, var(--accent-2) 60%, var(--accent));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  line-height:1.05;
+}
+.welcome .tag-big { color:var(--text-dim); font-size:15px; margin-top:12px; max-width:640px; margin-left:auto; margin-right:auto; line-height:1.65; }
+.rules { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:22px; text-align:left; }
+@media(max-width:720px){ .rules { grid-template-columns:1fr; } }
+.rule {
+  background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:14px 16px;
+}
+.rule .n { color:var(--accent); font-family:"JetBrains Mono", monospace; font-weight:800; font-size:12px; letter-spacing:2px; }
+.rule .t { font-weight:800; margin:4px 0 4px; font-size:14px; }
+.rule .d { color:var(--text-dim); font-size:12.5px; line-height:1.55; }
+
+.pillRow { display:flex; gap:8px; justify-content:center; margin-top:8px; flex-wrap:wrap; }
+.pill { padding:6px 14px; border-radius:999px; background:var(--panel-2); border:1px solid var(--line); font-size:11px; color:var(--text-dim); letter-spacing:1.5px; font-weight:700; text-transform:uppercase; }
+.pill b { color:var(--accent); }
+
+/* ========== CHALLENGE HEADER ========== */
+.chHead {
+  display:flex; justify-content:space-between; align-items:flex-start;
+  border-bottom:1px dashed var(--line); padding-bottom:14px; margin-bottom:14px;
+  flex-wrap:wrap; gap:12px;
+}
+.chHead .k { font-size:10px; letter-spacing:2px; color:var(--accent); font-weight:800; text-transform:uppercase; }
+.chHead h3 { margin:6px 0 0; font-size:22px; font-weight:800; letter-spacing:-.3px; }
+.chHead .goal { color:var(--text-dim); font-size:13.5px; margin-top:6px; max-width:640px; line-height:1.55; }
+
+.desiredBox {
+  background:var(--panel-2); border:1px solid var(--line);
+  border-radius:10px; padding:14px 16px; margin-bottom:16px;
+}
+.desiredBox .k { font-size:10px; letter-spacing:1.8px; color:var(--accent); font-weight:800; text-transform:uppercase; }
+.desiredBox .v { font-size:14px; color:var(--text); margin-top:4px; line-height:1.55; }
+
+/* ========== BUILD-THE-PROMPT ========== */
+.buildLayout { display:grid; grid-template-columns: 1fr 1fr; gap:14px; }
+@media(max-width:760px){ .buildLayout { grid-template-columns:1fr; } }
+.tray, .slotBox { background:rgba(0,0,0,.25); border:1.5px dashed var(--line-2); border-radius:12px; padding:12px; min-height:220px; }
+.trayLabel, .slotLabel {
+  font-size:10px; letter-spacing:2px; color:var(--text-mute);
+  font-weight:800; text-transform:uppercase; margin-bottom:10px;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.slotLabel b { color:var(--accent); }
+
+.block {
+  display:block; background:var(--panel-2); border:1.5px solid var(--line);
+  padding:10px 12px; border-radius:9px; margin-bottom:8px;
+  cursor:grab; font-size:13.2px; line-height:1.4;
+  transition:border-color .15s, background .15s, transform .1s;
+}
+.block:hover { border-color:var(--accent); background:var(--accent-soft); }
+.block:active { cursor:grabbing; }
+.block.dragging { opacity:.45; }
+.block .cat { display:block; font-size:9px; font-weight:800; letter-spacing:1.5px; color:var(--accent); margin-bottom:3px; text-transform:uppercase; font-family:"JetBrains Mono", monospace; }
+.block.distractor .cat { color:var(--warn); }
+.block.correct { border-color:var(--good); background:rgba(99,208,149,.10); }
+.block.wrong   { border-color:var(--bad);  background:rgba(255,95,126,.10); }
+
+.slotHint { text-align:center; color:var(--text-mute); font-size:12px; margin-top:60px; letter-spacing:1.5px; }
+.dropzone { min-height:180px; }
+.dropzone.hover { border-color:var(--accent); background:var(--accent-soft); }
+
+/* ========== CLEAN-THE-PROMPT ========== */
+.promptBlock {
+  background:var(--panel-2); border:1px solid var(--line);
+  border-radius:12px; padding:14px 16px; font-family:"JetBrains Mono", monospace;
+  font-size:13.2px; line-height:1.7; color:var(--text);
+  margin-bottom:12px;
+}
+.chunk {
+  display:inline; padding:2px 4px; border-radius:5px; cursor:pointer;
+  transition: background .12s, color .12s, text-decoration .12s;
+}
+.chunk:hover { background:var(--accent-soft); }
+.chunk.removed { text-decoration: line-through; color:var(--text-mute); background:rgba(255,95,126,.08); }
+.chunk.correctRemove { text-decoration: line-through; color:var(--good); background:rgba(99,208,149,.14); }
+.chunk.wrongRemove   { text-decoration: line-through; color:var(--bad);  background:rgba(255,95,126,.14); }
+.chunk.missed        { background:rgba(246,184,58,.14); color:var(--warn); }
+
+/* ========== CHOOSE-THE-BEST ========== */
+.chooseGrid { display:grid; gap:12px; margin-top:8px; }
+.chooseCard {
+  background:var(--panel-2); border:1.5px solid var(--line); border-radius:12px;
+  padding:14px 16px; cursor:pointer;
+  transition:border-color .12s, background .15s;
+}
+.chooseCard:hover { border-color:var(--accent); background:var(--accent-soft); }
+.chooseCard.selected { border-color:var(--accent); background:var(--accent-soft); }
+.chooseCard.correct  { border-color:var(--good); background:rgba(99,208,149,.10); }
+.chooseCard.wrong    { border-color:var(--bad);  background:rgba(255,95,126,.10); }
+.chooseCard .kind { font-size:9px; letter-spacing:2px; color:var(--text-mute); font-weight:800; text-transform:uppercase; }
+.chooseCard.selected .kind { color:var(--accent); }
+.chooseCard .body { font-family:"JetBrains Mono", monospace; font-size:13px; color:var(--text); line-height:1.6; margin-top:6px; white-space:pre-wrap; }
+
+/* ========== ACTIONS ========== */
+.actions { display:flex; flex-wrap:wrap; gap:10px; justify-content:flex-end; margin-top:16px; }
+.leftActions { margin-right:auto; }
+
+.explainer {
+  background:rgba(0,0,0,.28); border-left:3px solid var(--accent);
+  padding:12px 14px; border-radius:8px; color:var(--text-dim);
+  font-size:13px; line-height:1.6; margin-top:14px;
+}
+.explainer b { color:var(--text); }
+.explainer.good { border-left-color:var(--good); }
+.explainer.warn { border-left-color:var(--warn); }
+
+/* ========== REPORT ========== */
+.reportGrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px; }
+@media(max-width:640px){ .reportGrid { grid-template-columns:1fr; } }
+.reportTile {
+  background: linear-gradient(180deg, var(--panel-2), var(--bg-2));
+  border:1px solid var(--line); border-radius:12px; padding:16px 18px;
+}
+.reportTile h4 { margin:0 0 6px; font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--accent); font-weight:800; }
+.reportTile .body { color:var(--text-dim); font-size:13.5px; line-height:1.65; }
+.reportTile ul { margin:6px 0 0; padding-left:18px; }
+.reportTile ul li::marker { color:var(--accent); }
+.reportTile.full { grid-column:1 / -1; }
+
+.metricBars { display:grid; gap:8px; }
+.metricRow {
+  display:grid; grid-template-columns:110px 1fr 40px; gap:10px; align-items:center;
+  font-size:12px; color:var(--text);
+}
+.metricRow .lbl { color:var(--text-mute); letter-spacing:1.5px; text-transform:uppercase; font-weight:800; }
+.metricRow .bar { height:10px; background:rgba(255,255,255,.06); border-radius:5px; overflow:hidden; }
+.metricRow .bar i { display:block; height:100%; background:linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width 1.2s cubic-bezier(.2,.8,.2,1); }
+.metricRow .v { text-align:right; color:var(--text); font-variant-numeric:tabular-nums; font-family:"JetBrains Mono", monospace; }
+
+.scoreHero {
+  text-align:center; padding:22px 12px; border-radius:12px;
+  background: radial-gradient(circle at 50% 30%, var(--accent-soft), transparent 60%), var(--panel-2);
+  border:1px solid var(--line);
+}
+.scoreHero .num {
+  font-size:88px; font-weight:900; line-height:1;
+  background:linear-gradient(135deg, #fff, var(--accent-2), var(--accent));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.scoreHero .lbl { font-size:11px; letter-spacing:3px; color:var(--text-mute); font-weight:800; text-transform:uppercase; margin-top:6px; }
+.scoreHero .rating { margin-top:14px; font-size:20px; font-weight:800; letter-spacing:.4px; }
+.scoreHero .rank { color:var(--accent); font-family:"JetBrains Mono", monospace; font-size:12px; margin-top:4px; letter-spacing:2px; }
+
+.dna { display:flex; gap:8px; align-items:flex-end; height:70px; margin-top:8px; }
+.dna .strand { flex:1; border-radius:6px 6px 4px 4px; background:linear-gradient(180deg, var(--accent-2), var(--accent)); transition: height 1s cubic-bezier(.2,.8,.2,1); }
+.dnaLabels { display:flex; gap:8px; margin-top:4px; }
+.dnaLabels div { flex:1; text-align:center; font-size:9px; letter-spacing:1.2px; color:var(--text-mute); font-weight:800; text-transform:uppercase; }
+
+/* ========== FLOATING TOAST ========== */
+.toast {
+  position:fixed; top:20px; right:20px; z-index:70;
+  background:var(--panel-2); border:1px solid var(--accent);
+  color:var(--text); padding:11px 16px; border-radius:10px;
+  font-size:13px; font-weight:700; box-shadow:var(--shadow);
+  animation: toastIn .3s ease-out, toastOut .3s ease-in 1.7s forwards;
+}
+.toast.good { border-color:var(--good); color:var(--good); }
+.toast.bad  { border-color:var(--bad);  color:var(--bad); }
+@keyframes toastIn  { from { opacity:0; transform:translateX(20px);} to { opacity:1; transform:translateX(0); } }
+@keyframes toastOut { to { opacity:0; transform:translateX(20px); } }
+
+.footer { color:var(--text-mute); font-size:11px; text-align:center; margin-top:16px; letter-spacing:1px; }
+
+.hidden { display:none !important; }
+
+/* Confetti */
+.confetti { position:fixed; pointer-events:none; inset:0; overflow:hidden; z-index:60; display:none; }
+.confetti.show { display:block; }
+.confetti i { position:absolute; top:-10px; width:8px; height:14px; opacity:.9; animation:fall linear forwards; }
+@keyframes fall { to { transform:translateY(110vh) rotate(720deg); opacity:.4; } }
+
+/* Progress ring for hint */
+.hintDot { display:inline-block; width:8px; height:8px; background:var(--accent); border-radius:50%; box-shadow:0 0 8px var(--accent); }
+
+.principle {
+  background:linear-gradient(135deg, var(--accent-soft), transparent);
+  border:1px solid var(--accent); border-radius:12px; padding:14px 16px;
+  color:var(--text); font-size:14px; line-height:1.6; margin-top:14px;
+  font-weight:600;
+}
+.principle b { color:var(--accent); letter-spacing:1px; text-transform:uppercase; font-size:11px; font-weight:800; display:block; margin-bottom:4px; }
+</style>
+</head>
+<body data-theme="claude">
+
+<div class="app">
+
+  <!-- ============ HEADER ============ -->
+  <header>
+    <div class="brand">
+      <div class="logo">🧩</div>
+      <div>
+        <h1>Prompt Puzzle</h1>
+        <div class="sub">Day 35 · #60DayClaudeChallenge</div>
+      </div>
+    </div>
+    <div class="hudGroup">
+      <div class="hud">Score <b id="hudScore">0</b></div>
+      <div class="hud">Time <b id="hudTime">0s</b></div>
+      <div class="hud">Hints <b id="hudHints">3</b></div>
+      <div class="themePicker">
+        <span class="lbl">Theme</span>
+        <div class="swatch claude active" data-swatch="claude" title="Claude Orange"></div>
+        <div class="swatch electric" data-swatch="electric" title="Electric"></div>
+        <div class="swatch neon" data-swatch="neon" title="Neon"></div>
+        <div class="swatch rose" data-swatch="rose" title="Rose"></div>
+        <div class="swatch gold" data-swatch="gold" title="Gold"></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============ STEPPER ============ -->
+  <div class="steps" id="stepper"></div>
+
+  <!-- ============ STAGE ============ -->
+  <div id="stage"></div>
+
+  <p class="footer">
+    Domain: <b>Product & Business Strategy</b> · Difficulty: <b>Intermediate</b> · Single HTML file · Vanilla CSS + JS · Built for Day 35 of #60DayClaudeChallenge
+  </p>
+</div>
+
+<div class="confetti" id="confetti"></div>
+
+<script>
+/* =============================================================
+   PROMPT PUZZLE — Day 35 · Logic
+   Domain: Product & Business Strategy · Difficulty: Intermediate
+   ============================================================= */
+
+/* ---------- Theme picker ---------- */
+document.querySelectorAll(".swatch").forEach(s => {
+  s.addEventListener("click", () => {
+    document.body.setAttribute("data-theme", s.dataset.swatch);
+    document.querySelectorAll(".swatch").forEach(x => x.classList.remove("active"));
+    s.classList.add("active");
+  });
+});
+
+/* ---------- SCENARIO LIBRARY ---------- */
+const SCENARIOS = [
+  {
+    id:"s1",
+    title:"Competitive Analysis of Notion in Project Management",
+    desired:"A structured comparison table of Notion vs. 3 named competitors (Asana, ClickUp, Linear) across 4 dimensions (target user, pricing, unique moat, weakness), one paragraph per dimension.",
+    blocks:{
+      correct:[
+        { cat:"ROLE",       text:"You are a senior product strategist advising a Series B SaaS startup." },
+        { cat:"CONTEXT",    text:"We are considering entering the project management space and need a competitive read." },
+        { cat:"TASK",       text:"Compare Notion against Asana, ClickUp, and Linear." },
+        { cat:"CONSTRAINTS",text:"Use exactly 4 dimensions: target user, pricing, unique moat, weakness." },
+        { cat:"FORMAT",     text:"Return a markdown table with one paragraph per cell." },
+      ],
+      distractors:[
+        { cat:"NOISE", text:"Please be creative and add some fun analogies." },
+        { cat:"NOISE", text:"Use emojis to make it engaging." },
+        { cat:"NOISE", text:"Make it sound impressive to executives." },
+      ],
+    },
+    weak:"tell me about notion vs competitors",
+    optimized:"You are a senior product strategist. Compare Notion vs Asana, ClickUp, and Linear across target user, pricing, unique moat, and weakness. Return a markdown table with one paragraph per cell.",
+    overengineered:"You are a senior product strategist with 20 years of experience at McKinsey, BCG, and Bain, currently advising Series B SaaS startups on go-to-market. Please be extremely thorough and creative. Compare Notion against Asana, ClickUp, Linear, Monday, Trello, and Basecamp. Use these 12 dimensions: target user, pricing, unique moat, weakness, brand perception, hiring signal, enterprise readiness, mobile experience, integration ecosystem, API quality, customer support, and social media presence. Include emojis. Add analogies. Make it fun. Also predict who will win in 5 years. Also write in the voice of a startup founder.",
+    weakOutput:"Notion is a note-taking app. Asana is for tasks. ClickUp does everything. Linear is for developers. They all have different strengths.",
+    optimizedOutput:"| Dimension | Notion | Asana | ClickUp | Linear |\n|---|---|---|---|---|\n| Target user | Docs-first teams that also need light PM | PMs at 50-500 person cos | Ops leaders wanting one tool for everything | Engineering teams shipping software |\n| Pricing | $10-15/mo per user | $10.99-24.99 | $7-19 | $8-14 |\n| Unique moat | Docs+DB primitive | Enterprise workflow depth | Feature breadth | Speed + engineer taste |\n| Weakness | Weak at true PM | Feels heavy | Overwhelming | Narrow to engineering |",
+    principle:"Constraints — specific dimensions, specific competitors, specific format — produce structured output. Vague requests produce vague output."
+  },
+
+  {
+    id:"s2",
+    title:"Product Requirements Document (PRD) for a New Feature",
+    desired:"A PRD for adding SSO to a mid-market SaaS product, with problem statement, user stories, success metrics, and non-goals sections.",
+    blocks:{
+      correct:[
+        { cat:"ROLE",       text:"You are a senior product manager at a mid-market B2B SaaS company." },
+        { cat:"CONTEXT",    text:"We are adding SSO (SAML + OIDC) to unlock enterprise deals in the $50K-$500K ACV range." },
+        { cat:"TASK",       text:"Write a PRD for the SSO feature." },
+        { cat:"CONSTRAINTS",text:"Include sections: Problem, User Stories, Success Metrics, Non-Goals." },
+        { cat:"FORMAT",     text:"Use markdown headers. Keep total length under 500 words." },
+      ],
+      distractors:[
+        { cat:"NOISE", text:"Make the tone friendly and casual." },
+        { cat:"NOISE", text:"Add jokes so it's not boring." },
+        { cat:"NOISE", text:"Include a full technical spec too." },
+      ],
+    },
+    weak:"write a PRD for SSO",
+    optimized:"You are a senior PM at a mid-market B2B SaaS company. Write a PRD for adding SSO (SAML + OIDC) to unlock enterprise deals in $50K-$500K ACV. Include: Problem, User Stories, Success Metrics, Non-Goals. Use markdown headers. Under 500 words.",
+    overengineered:"You are a senior product manager who has shipped features at Stripe, Notion, Figma, and Linear, and has read every article on Lenny's Newsletter and Reforge. Please write an extremely comprehensive PRD for adding SSO (SAML + OIDC + SCIM + JIT + IdP-initiated + SP-initiated + all edge cases) to unlock all possible enterprise deals across all ACV bands. Include: Executive Summary, Problem, Background, User Stories, Technical Architecture, Data Model, API Design, Security Considerations, Legal Review, Success Metrics, Non-Goals, Risks, Dependencies, Rollout Plan, Marketing Plan, Sales Enablement, Support Docs, and Post-Launch Analysis. Use casual tone. Add jokes.",
+    weakOutput:"# SSO PRD\n\nWe should add SSO. It's important for enterprise. Users want it. Success will be more revenue.",
+    optimizedOutput:"# SSO PRD\n\n## Problem\nEnterprise buyers ($50K-$500K ACV) cannot complete procurement without SSO. We lose 40% of deals at this bar.\n\n## User Stories\n- IT admin: 'I can configure SSO in under 30 min without a support ticket.'\n- End user: 'I click my company button and I'm in — no separate password.'\n\n## Success Metrics\n- 60% of new enterprise deals have SSO configured within 14 days\n- Support tickets for SSO under 5% of setup volume\n\n## Non-Goals\n- SCIM provisioning (Phase 2)\n- Custom IdPs beyond Okta/Azure AD/Google",
+    principle:"Explicit sections force structure. Word limits force clarity. Both eliminate vague filler."
+  },
+
+  {
+    id:"s3",
+    title:"Market Sizing for an AI Analytics Tool",
+    desired:"TAM/SAM/SOM sizing for an AI analytics tool targeting mid-market SaaS PMs, with assumptions shown and sources cited.",
+    blocks:{
+      correct:[
+        { cat:"ROLE",       text:"You are a strategy consultant experienced in bottoms-up TAM/SAM/SOM modeling." },
+        { cat:"CONTEXT",    text:"The product is an AI-powered product analytics tool for PMs at mid-market SaaS companies (50-500 employees) in North America." },
+        { cat:"TASK",       text:"Size the TAM, SAM, and SOM." },
+        { cat:"CONSTRAINTS",text:"Show every assumption as a labeled variable. If you estimate a number, name what it is based on." },
+        { cat:"FORMAT",     text:"Return three sections (TAM/SAM/SOM), each with a numeric answer and the calculation shown." },
+      ],
+      distractors:[
+        { cat:"NOISE", text:"Make it optimistic — investors are reading." },
+        { cat:"NOISE", text:"Feel free to guess if you don't know." },
+        { cat:"NOISE", text:"Add a slide layout." },
+      ],
+    },
+    weak:"how big is the market for an AI product analytics tool",
+    optimized:"You are a strategy consultant doing bottoms-up market sizing. For an AI product analytics tool aimed at PMs at mid-market SaaS companies (50-500 employees) in North America, size TAM, SAM, and SOM. Show every assumption as a labeled variable and cite what each estimate is based on. Return three sections with the calculation shown.",
+    overengineered:"You are a McKinsey partner with 30 years of experience in market sizing, having led engagements for Salesforce, HubSpot, Atlassian, and every major SaaS company. You have written 47 whitepapers on TAM analysis. Please provide the most rigorous possible market sizing for an AI-powered, cloud-native, real-time, multi-tenant, event-driven product analytics tool with generative AI features for PMs, analysts, engineers, designers, and marketers at every company size from solo founders to Fortune 10 across every geography. Include TAM, SAM, SOM, PAM, WAM, plus sensitivity analysis with 5 scenarios (bull, base, bear, wild bull, wild bear). Also predict the market size in 2030, 2040, and 2050.",
+    weakOutput:"The market is very large. There are millions of PMs. So probably a billion dollar market.",
+    optimizedOutput:"**TAM.** Assumptions: 15,000 mid-market SaaS cos in NA × avg 4 PMs each = 60,000 PMs. At $600/mo per seat: TAM = $432M/yr.\n\n**SAM.** Assumption: 60% of mid-market SaaS uses PLG and needs analytics tooling → 36,000 addressable PMs. SAM = $259M/yr.\n\n**SOM.** Assumption: capture 5% in 3 years → 1,800 PMs. SOM Year 3 = $13M ARR.\n\nSources of assumptions: NA SaaS company count from Crunchbase; PM ratios from company job postings; seat pricing from public competitor pages.",
+    principle:"Asking for the reasoning — 'show every assumption' — beats asking for the answer. It's the difference between an estimate you can defend and one you can't."
+  },
+
+  {
+    id:"s4",
+    title:"Positioning Statement for a New Analytics Product",
+    desired:"A one-sentence positioning statement for a self-serve analytics tool aimed at operations leaders, following the classic For/Who/Unlike template.",
+    blocks:{
+      correct:[
+        { cat:"ROLE",       text:"You are a product marketing lead who has written positioning for 3+ B2B SaaS launches." },
+        { cat:"CONTEXT",    text:"The product is a self-serve analytics platform for operations leaders at mid-market e-commerce companies." },
+        { cat:"TASK",       text:"Write a positioning statement." },
+        { cat:"CONSTRAINTS",text:"Use the format: For [customer], who [need], [product] is a [category] that [benefit]. Unlike [competitor], we [differentiator]. Name at least one real competitor." },
+        { cat:"FORMAT",     text:"Return exactly one sentence." },
+      ],
+      distractors:[
+        { cat:"NOISE", text:"Make it poetic and memorable." },
+        { cat:"NOISE", text:"Add a 3-word tagline too." },
+        { cat:"NOISE", text:"Make it sound bold." },
+      ],
+    },
+    weak:"write a positioning statement for our analytics tool",
+    optimized:"You are a product marketing lead. For a self-serve analytics platform aimed at operations leaders at mid-market e-commerce companies, write a positioning statement using: For [customer], who [need], [product] is a [category] that [benefit]. Unlike [competitor], we [differentiator]. Name at least one real competitor. One sentence.",
+    overengineered:"You are a Fortune 500 CMO who has led brand positioning for 40+ companies. Write a positioning statement that will win the Cannes Lions. Use every positioning framework: April Dunford's Obviously Awesome, Geoffrey Moore's Crossing the Chasm, Al Ries's Positioning, Marty Neumeier's Zag, and the Blue Ocean Strategy canvas. Also include a mission statement, vision statement, values, brand personality, tone of voice guide, and 3 tagline options. Make it inspirational and legendary.",
+    weakOutput:"Our analytics tool is the best. It helps you understand your data. Try it today.",
+    optimizedOutput:"For operations leaders at mid-market e-commerce companies, who need to answer a business question without waiting on data teams, [Product] is a self-serve analytics platform that turns natural-language questions into charts in under 30 seconds. Unlike Looker, we require zero SQL knowledge to get to a first insight.",
+    principle:"A great structural template beats creativity. The For/Who/Unlike frame forces you to name every part of the positioning — customer, need, category, benefit, competitor, differentiator."
+  },
+
+  {
+    id:"s5",
+    title:"Go-to-Market Plan for a New B2B Feature",
+    desired:"A 90-day GTM plan for a new API product launch, with weekly milestones, channel assumptions, and success metrics.",
+    blocks:{
+      correct:[
+        { cat:"ROLE",       text:"You are a go-to-market strategist for developer-facing B2B products." },
+        { cat:"CONTEXT",    text:"We are launching a new API product for backend engineers at mid-market SaaS companies." },
+        { cat:"TASK",       text:"Write a 90-day launch plan." },
+        { cat:"CONSTRAINTS",text:"Break into weekly milestones. Include target channels, target metric per phase, and launch-day list." },
+        { cat:"FORMAT",     text:"Return a table with columns: Week, Milestone, Channel, Target Metric." },
+      ],
+      distractors:[
+        { cat:"NOISE", text:"Make it inspirational." },
+        { cat:"NOISE", text:"Add a paragraph about company culture." },
+        { cat:"NOISE", text:"Also cover the next 5 years." },
+      ],
+    },
+    weak:"how should we launch our API product",
+    optimized:"You are a GTM strategist for developer-facing B2B. For an API product launching to backend engineers at mid-market SaaS cos, write a 90-day launch plan. Break into weekly milestones. Include target channels, target metric per phase, and launch-day list. Return a table: Week | Milestone | Channel | Target Metric.",
+    overengineered:"You are a legendary GTM operator who has launched 100+ B2B products including Stripe, Twilio, Segment, and every YC company you can imagine. Please write the most comprehensive launch plan ever. Cover the pre-launch (90 days before), launch (90 days), post-launch (90 days after), then Year 1, Year 2, Year 3, Year 5. Include every possible channel: Twitter, LinkedIn, Reddit, Hacker News, Product Hunt, IndieHackers, Stack Overflow, GitHub, dev.to, Hashnode, Medium, Substack, YouTube, TikTok, Instagram, Facebook, TV, radio, billboards, direct mail, cold email, cold call, trade shows, conferences, meetups, hackathons, podcasts, and word of mouth. For each week give me 10 tasks per person and 5 KPIs.",
+    weakOutput:"Launch on Product Hunt. Post on Twitter. Get some customers.",
+    optimizedOutput:"| Week | Milestone | Channel | Target Metric |\n|---|---|---|---|\n| 1-2 | Design partner recruitment | LinkedIn DM + warm intros | 8 signed design partners |\n| 3-6 | Design partner integration | Slack + weekly office hours | 4 in production |\n| 7-8 | Launch day prep | Docs, sample repo, launch post | Docs live |\n| 9 | Launch | Product Hunt + HN + Twitter thread | 500 signups |\n| 10-12 | Nurture + case studies | Blog + newsletter | 3 published case studies |",
+    principle:"Weekly milestones + explicit metric per phase turns 'launch plan' from a wish into an executable spec."
+  },
+
+  {
+    id:"s6",
+    title:"Executive Summary of a Strategy Memo",
+    desired:"A 3-paragraph exec summary of a longer strategy memo, written for a C-suite audience with the decision requested at the top.",
+    blocks:{
+      correct:[
+        { cat:"ROLE",       text:"You are a strategy chief of staff writing for a C-suite audience." },
+        { cat:"CONTEXT",    text:"The memo is a proposal to sunset our free plan and move to a 14-day trial model, based on 6 months of retention analysis." },
+        { cat:"TASK",       text:"Write a 3-paragraph executive summary." },
+        { cat:"CONSTRAINTS",text:"Paragraph 1: the decision requested. Paragraph 2: the two most important supporting data points. Paragraph 3: risks and how we would mitigate them." },
+        { cat:"FORMAT",     text:"Maximum 200 words. No bullet points." },
+      ],
+      distractors:[
+        { cat:"NOISE", text:"Add background history of the free plan." },
+        { cat:"NOISE", text:"Include all supporting data." },
+        { cat:"NOISE", text:"Add a call to action at the end." },
+      ],
+    },
+    weak:"summarize this memo for executives",
+    optimized:"You are a strategy chief of staff writing for a C-suite audience. Write a 3-paragraph executive summary of a memo proposing to sunset our free plan and move to a 14-day trial. Paragraph 1: the decision requested. Paragraph 2: the two most important supporting data points. Paragraph 3: risks and how we would mitigate. Max 200 words. No bullets.",
+    overengineered:"You are Jeff Bezos writing a 6-pager for the S-team, combined with Steve Jobs's keynote instincts, combined with a McKinsey partner's executive summary craft. Please write the most compelling executive summary ever written. Cover the full history of our free plan going back to founding, every retention cohort analysis, the segmentation by channel, the CAC/LTV over 8 quarters, competitor benchmarks against Notion, Airtable, Figma, Slack, and Zoom, and every possible risk with mitigations, contingencies, and second-order effects. Also write a companion FAQ.",
+    weakOutput:"We should end the free plan. It's costing us money. Retention is bad on free users. We should try a 14-day trial instead. This will help our business.",
+    optimizedOutput:"We recommend sunsetting the free plan and moving to a 14-day trial by Q3, with grandfathered access for existing free users for 12 months. Retention analysis shows two decisive data points: free-user conversion to paid has fallen to 1.4% (from 3.1% two years ago), and paid-user retention is 3.2× higher when users start in trial vs free. Primary risks are backlash from the community and a spike in support volume during the transition. We would mitigate by grandfathering all current free users through 2026, launching alongside two new paid onboarding flows, and staffing support for a 6-week transition window.",
+    principle:"The most senior audience needs the decision first. Executive summaries are read top-down and often abandoned before the second paragraph — front-load the ask."
+  },
+];
+
+/* ---------- Session state ---------- */
+const session = {
+  stage:"welcome", // welcome, ch1, ch2, ch3, report
+  scenarios:[],   // 3 selected scenarios
+  currentIdx:0,
+  hintsLeft:3,
+  startTime:null,
+  totalScore:0,
+  scores:{ ch1:0, ch2:0, ch3:0 },
+  history:[],
+  // per-challenge tracking
+  moves:0, wrongPlacements:0,
+  finalPromptOptimized:""
+};
+
+const STAGE_ORDER = ["welcome","ch1","ch2","ch3","report"];
+
+/* ---------- Utils ---------- */
+function rand(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+function shuffle(a){ const arr=a.slice(); for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; }
+function escapeHtml(s){ return String(s||"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function pickN(arr, n){ return shuffle(arr).slice(0, n); }
+
+function toast(msg, kind="") {
+  const t = document.createElement("div");
+  t.className = "toast" + (kind ? " " + kind : "");
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2100);
+}
+
+/* ---------- HUD ---------- */
+let timerInterval = null;
+function startTimer() {
+  session.startTime = Date.now();
+  if (timerInterval) clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    const s = Math.floor((Date.now() - session.startTime)/1000);
+    document.getElementById("hudTime").textContent = s + "s";
+  }, 500);
+}
+function stopTimer() { if (timerInterval) clearInterval(timerInterval); }
+function updateHud() {
+  document.getElementById("hudScore").textContent = session.totalScore;
+  document.getElementById("hudHints").textContent = session.hintsLeft;
+}
+
+/* ---------- Stepper ---------- */
+function renderStepper() {
+  const el = document.getElementById("stepper");
+  const idx = STAGE_ORDER.indexOf(session.stage);
+  el.innerHTML = STAGE_ORDER.map((_, i) => {
+    let cls = "step";
+    if (i < idx) cls += " done";
+    else if (i === idx) cls += " current";
+    return `<div class="${cls}"></div>`;
+  }).join("");
+}
+
+/* ---------- WELCOME ---------- */
+function renderWelcome() {
+  document.getElementById("stage").innerHTML = `
+    <div class="card welcome">
+      <div class="pillRow">
+        <span class="pill">Domain · <b>Product & Business Strategy</b></span>
+        <span class="pill">Difficulty · <b>Intermediate</b></span>
+      </div>
+      <div class="title-big" style="margin-top:16px;">Master AI Prompting Through Play</div>
+      <p class="tag-big">Three challenges. Six real product & strategy scenarios. Every one built to teach a specific principle about writing prompts that produce useful output — instead of vague ones.</p>
+
+      <div class="rules">
+        <div class="rule"><div class="n">01</div><div class="t">Build the Prompt</div><div class="d">Drag the right blocks into the prompt slot. Avoid the distractors.</div></div>
+        <div class="rule"><div class="n">02</div><div class="t">Clean the Prompt</div><div class="d">A messy prompt appears. Click every chunk that's noise or redundant.</div></div>
+        <div class="rule"><div class="n">03</div><div class="t">Choose the Best</div><div class="d">Weak, Optimized, and Over-Engineered. Pick the one that will produce the best output.</div></div>
+      </div>
+
+      <div class="pillRow" style="margin-top:20px;">
+        <span class="pill">Live scoring</span>
+        <span class="pill">3 hints available</span>
+        <span class="pill">Prompt DNA report at the end</span>
+      </div>
+
+      <button class="btn primary" style="margin-top:22px; padding:14px 28px; font-size:14px;" id="startBtn">Start Challenge 1 →</button>
+    </div>
+  `;
+  document.getElementById("startBtn").addEventListener("click", () => {
+    // Choose 3 scenarios — one per challenge
+    session.scenarios = pickN(SCENARIOS, 3);
+    session.hintsLeft = 3;
+    session.totalScore = 0;
+    session.scores = { ch1:0, ch2:0, ch3:0 };
+    session.history = [];
+    updateHud();
+    startTimer();
+    goto("ch1");
+  });
+}
+
+/* ================================================================
+   CHALLENGE 1 — BUILD THE PROMPT (drag-and-drop)
+   ================================================================ */
+function renderCh1() {
+  const scen = session.scenarios[0];
+  const allBlocks = shuffle([
+    ...scen.blocks.correct.map(b => ({ ...b, isCorrect:true })),
+    ...scen.blocks.distractors.map(b => ({ ...b, isCorrect:false, distractor:true }))
+  ]);
+
+  const trayBlocks = allBlocks.map((b, i) => `
+    <div class="block ${b.distractor ? "distractor" : ""}" draggable="true" data-i="${i}" data-correct="${b.isCorrect?1:0}">
+      <span class="cat">${escapeHtml(b.cat)}</span>${escapeHtml(b.text)}
+    </div>
+  `).join("");
+
+  document.getElementById("stage").innerHTML = `
+    <div class="card">
+      <div class="chHead">
+        <div>
+          <div class="k">Challenge 01 · Build the Prompt</div>
+          <h3>${escapeHtml(scen.title)}</h3>
+          <div class="goal">Drag the blocks you need into the prompt slot on the right. Leave the distractors in the tray. Every correct block adds points. Every wrong placement costs points.</div>
+        </div>
+        <div><span class="badge hot">DRAG · DROP</span></div>
+      </div>
+
+      <div class="desiredBox">
+        <div class="k">Desired Output</div>
+        <div class="v">${escapeHtml(scen.desired)}</div>
+      </div>
+
+      <div class="buildLayout">
+        <div>
+          <div class="trayLabel">📦 Block Tray <span>${allBlocks.length} blocks</span></div>
+          <div class="tray dropzone" id="tray">${trayBlocks}</div>
+        </div>
+        <div>
+          <div class="slotLabel">🎯 Your Prompt <b id="slotCount">0 / ${scen.blocks.correct.length}</b></div>
+          <div class="slotBox dropzone" id="slot">
+            <div class="slotHint" id="slotHint">Drag blocks here to build your prompt</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn ghost leftActions" id="hintBtn">💡 Use Hint (<span id="hintsLeftInline">${session.hintsLeft}</span> left)</button>
+        <button class="btn primary" id="checkCh1">Check My Prompt →</button>
+      </div>
+    </div>
+  `;
+
+  setupDnDCh1(scen);
+}
+
+function setupDnDCh1(scen) {
+  const blocks = document.querySelectorAll(".block");
+  const tray = document.getElementById("tray");
+  const slot = document.getElementById("slot");
+  const slotHint = document.getElementById("slotHint");
+  const slotCountEl = document.getElementById("slotCount");
+
+  blocks.forEach(el => {
+    el.addEventListener("dragstart", e => {
+      el.classList.add("dragging");
+      e.dataTransfer.setData("text/plain", el.dataset.i);
+      e.dataTransfer.effectAllowed = "move";
+    });
+    el.addEventListener("dragend", () => el.classList.remove("dragging"));
+  });
+
+  [tray, slot].forEach(zone => {
+    zone.addEventListener("dragover", e => { e.preventDefault(); zone.classList.add("hover"); });
+    zone.addEventListener("dragleave", () => zone.classList.remove("hover"));
+    zone.addEventListener("drop", e => {
+      e.preventDefault(); zone.classList.remove("hover");
+      const el = document.querySelector(".block.dragging");
+      if (!el) return;
+      session.moves++;
+      if (slotHint && slotHint.parentNode) slotHint.remove();
+      zone.appendChild(el);
+      const inSlot = slot.querySelectorAll(".block").length;
+      slotCountEl.textContent = `${inSlot} / ${scen.blocks.correct.length}`;
+    });
+  });
+
+  document.getElementById("hintBtn").addEventListener("click", () => {
+    if (session.hintsLeft <= 0) return toast("No hints left", "bad");
+    session.hintsLeft--;
+    updateHud();
+    document.getElementById("hintsLeftInline").textContent = session.hintsLeft;
+    // Highlight one correct block that's still in tray
+    const stillInTray = Array.from(tray.querySelectorAll(".block")).filter(b => b.dataset.correct === "1");
+    if (stillInTray.length) {
+      stillInTray[0].style.boxShadow = "0 0 20px var(--accent)";
+      setTimeout(() => stillInTray[0].style.boxShadow = "", 1400);
+      toast("Hint: highlighted block belongs in your prompt", "good");
+    } else {
+      toast("All correct blocks are already placed", "good");
+    }
+  });
+
+  document.getElementById("checkCh1").addEventListener("click", () => {
+    const placed = Array.from(slot.querySelectorAll(".block"));
+    let correct = 0, wrong = 0;
+    placed.forEach(el => {
+      if (el.dataset.correct === "1") { correct++; el.classList.add("correct"); }
+      else { wrong++; el.classList.add("wrong"); session.wrongPlacements++; }
+    });
+    // Missed correct blocks in tray
+    const missed = Array.from(tray.querySelectorAll(".block")).filter(b => b.dataset.correct === "1").length;
+
+    const total = scen.blocks.correct.length;
+    const acc = Math.round((correct / total) * 100);
+    const optBonus = wrong === 0 && missed === 0 ? 15 : 0;
+    const score = Math.max(0, acc - (wrong * 12) - (missed * 8) + optBonus);
+    session.scores.ch1 = score;
+    session.totalScore += score;
+    updateHud();
+
+    // Render explainer
+    const box = document.querySelector(".card .actions");
+    const expClass = score >= 85 ? "good" : score >= 60 ? "" : "warn";
+    const expHtml = `
+      <div class="explainer ${expClass}" style="width:100%;">
+        <b>Score: ${score}/100</b> — ${correct}/${total} correct blocks · ${wrong} wrong · ${missed} missed
+        ${optBonus ? "· <b style='color:var(--good)'>+15 Optimization Bonus</b>" : ""}
+        <br/><br/>
+        The strong version of this prompt:
+        <div class="mono" style="background:rgba(0,0,0,.3); padding:10px; border-radius:8px; margin-top:8px; font-size:12.5px; line-height:1.55; color:var(--text-dim);">${escapeHtml(scen.optimized)}</div>
+      </div>
+      <div class="principle" style="width:100%;">
+        <b>Prompt Principle</b>
+        ${escapeHtml(scen.principle)}
+      </div>
+    `;
+    box.insertAdjacentHTML("beforebegin", expHtml);
+    box.innerHTML = `<button class="btn primary" id="nextCh2">Next: Clean the Prompt →</button>`;
+    document.getElementById("nextCh2").addEventListener("click", () => goto("ch2"));
+    toast(`Challenge 1: ${score}/100`, score >= 75 ? "good" : "bad");
+    session.history.push({ ch:1, scen:scen.title, score });
+  });
+}
+
+/* ================================================================
+   CHALLENGE 2 — CLEAN THE PROMPT (click chunks to remove)
+   ================================================================ */
+function renderCh2() {
+  const scen = session.scenarios[1];
+  // Build a "messy" prompt from correct + distractor blocks + one redundant chunk
+  const chunks = shuffle([
+    ...scen.blocks.correct.map(b => ({ text:b.text, keep:true, cat:b.cat })),
+    ...scen.blocks.distractors.map(b => ({ text:b.text, keep:false, cat:"NOISE" })),
+    { text:"Please try your very best on this.", keep:false, cat:"NOISE" },
+    { text:"Really really think hard about it.", keep:false, cat:"NOISE" },
+  ]);
+  const totalRemovable = chunks.filter(c => !c.keep).length;
+
+  const chunksHtml = chunks.map((c, i) =>
+    `<span class="chunk" data-i="${i}" data-keep="${c.keep?1:0}">${escapeHtml(c.text)}</span>`
+  ).join(" ");
+
+  document.getElementById("stage").innerHTML = `
+    <div class="card">
+      <div class="chHead">
+        <div>
+          <div class="k">Challenge 02 · Clean the Prompt</div>
+          <h3>${escapeHtml(scen.title)}</h3>
+          <div class="goal">Below is a messy prompt with useful blocks AND noise. Click every chunk that is redundant, vague, or unnecessary. Miss noise → penalty. Remove a useful chunk → bigger penalty.</div>
+        </div>
+        <div><span class="badge hot">CLICK · REMOVE</span></div>
+      </div>
+
+      <div class="desiredBox">
+        <div class="k">Desired Output</div>
+        <div class="v">${escapeHtml(scen.desired)}</div>
+      </div>
+
+      <div class="promptBlock" id="promptBlock">${chunksHtml}</div>
+
+      <div class="actions">
+        <button class="btn ghost leftActions" id="hintBtnCh2">💡 Use Hint (<span id="hintsLeftInline2">${session.hintsLeft}</span> left)</button>
+        <button class="btn primary" id="checkCh2">Check My Cleanup →</button>
+      </div>
+    </div>
+  `;
+
+  const chunkEls = document.querySelectorAll(".chunk");
+  chunkEls.forEach(el => {
+    el.addEventListener("click", () => {
+      el.classList.toggle("removed");
+      session.moves++;
+    });
+  });
+
+  document.getElementById("hintBtnCh2").addEventListener("click", () => {
+    if (session.hintsLeft <= 0) return toast("No hints left", "bad");
+    session.hintsLeft--;
+    updateHud();
+    document.getElementById("hintsLeftInline2").textContent = session.hintsLeft;
+    // Show one noise chunk temporarily
+    const noiseChunks = Array.from(chunkEls).filter(c => c.dataset.keep === "0" && !c.classList.contains("removed"));
+    if (noiseChunks.length) {
+      noiseChunks[0].style.background = "var(--accent-soft)";
+      noiseChunks[0].style.color = "var(--accent)";
+      setTimeout(() => { noiseChunks[0].style.background = ""; noiseChunks[0].style.color = ""; }, 1400);
+      toast("Hint: highlighted chunk is noise", "good");
+    }
+  });
+
+  document.getElementById("checkCh2").addEventListener("click", () => {
+    let correctRemoves = 0, wrongRemoves = 0, missed = 0;
+    chunkEls.forEach(c => {
+      const shouldRemove = c.dataset.keep === "0";
+      const didRemove = c.classList.contains("removed");
+      if (shouldRemove && didRemove) { correctRemoves++; c.classList.remove("removed"); c.classList.add("correctRemove"); }
+      else if (!shouldRemove && didRemove) { wrongRemoves++; c.classList.remove("removed"); c.classList.add("wrongRemove"); session.wrongPlacements++; }
+      else if (shouldRemove && !didRemove) { missed++; c.classList.add("missed"); }
+    });
+
+    const acc = totalRemovable ? Math.round((correctRemoves / totalRemovable) * 100) : 100;
+    const optBonus = wrongRemoves === 0 && missed === 0 ? 15 : 0;
+    const score = Math.max(0, acc - (wrongRemoves * 15) - (missed * 8) + optBonus);
+    session.scores.ch2 = score;
+    session.totalScore += score;
+    updateHud();
+
+    const box = document.querySelector(".card .actions");
+    const expClass = score >= 85 ? "good" : score >= 60 ? "" : "warn";
+    box.insertAdjacentHTML("beforebegin", `
+      <div class="explainer ${expClass}" style="width:100%;">
+        <b>Score: ${score}/100</b> — Correctly removed: ${correctRemoves}/${totalRemovable} · Wrongly removed: ${wrongRemoves} · Missed noise: ${missed}
+        ${optBonus ? "· <b style='color:var(--good)'>+15 Optimization Bonus</b>" : ""}
+      </div>
+      <div class="principle" style="width:100%;">
+        <b>Prompt Principle</b>
+        ${escapeHtml(scen.principle)}
+      </div>
+    `);
+    box.innerHTML = `<button class="btn primary" id="nextCh3">Next: Choose the Best →</button>`;
+    document.getElementById("nextCh3").addEventListener("click", () => goto("ch3"));
+    toast(`Challenge 2: ${score}/100`, score >= 75 ? "good" : "bad");
+    session.history.push({ ch:2, scen:scen.title, score });
+  });
+}
+
+/* ================================================================
+   CHALLENGE 3 — CHOOSE THE BEST PROMPT
+   ================================================================ */
+function renderCh3() {
+  const scen = session.scenarios[2];
+  const choices = shuffle([
+    { kind:"WEAK",           text:scen.weak,           correct:false,
+      why:"Too vague — no role, no context, no constraints, no format. The model has no way to know what 'good' looks like." },
+    { kind:"OPTIMIZED",      text:scen.optimized,      correct:true,
+      why:"Names the role, context, task, constraints, and format. Each element is doing work — nothing is filler." },
+    { kind:"OVER-ENGINEERED",text:scen.overengineered, correct:false,
+      why:"Piled on constraints, meta-instructions, and framework name-drops. Each additional constraint that doesn't matter dilutes the ones that do." },
+  ]);
+
+  document.getElementById("stage").innerHTML = `
+    <div class="card">
+      <div class="chHead">
+        <div>
+          <div class="k">Challenge 03 · Choose the Best Prompt</div>
+          <h3>${escapeHtml(scen.title)}</h3>
+          <div class="goal">Three prompts. Same goal. Which one will produce the most useful output? Click to pick — then submit.</div>
+        </div>
+        <div><span class="badge hot">MULTIPLE CHOICE</span></div>
+      </div>
+
+      <div class="desiredBox">
+        <div class="k">Desired Output</div>
+        <div class="v">${escapeHtml(scen.desired)}</div>
+      </div>
+
+      <div class="chooseGrid" id="chooseGrid">
+        ${choices.map((c, i) => `
+          <div class="chooseCard" data-i="${i}" data-correct="${c.correct?1:0}">
+            <div class="kind">Option ${String.fromCharCode(65+i)}</div>
+            <div class="body">${escapeHtml(c.text)}</div>
+          </div>
+        `).join("")}
+      </div>
+
+      <div class="actions">
+        <button class="btn primary" id="checkCh3" disabled>Submit Verdict →</button>
+      </div>
+    </div>
+  `;
+
+  let selectedIdx = null;
+  document.querySelectorAll(".chooseCard").forEach(el => {
+    el.addEventListener("click", () => {
+      document.querySelectorAll(".chooseCard").forEach(x => x.classList.remove("selected"));
+      el.classList.add("selected");
+      selectedIdx = parseInt(el.dataset.i, 10);
+      document.getElementById("checkCh3").disabled = false;
+    });
+  });
+
+  document.getElementById("checkCh3").addEventListener("click", () => {
+    document.querySelectorAll(".chooseCard").forEach(el => {
+      const correct = el.dataset.correct === "1";
+      if (correct) el.classList.add("correct");
+      else if (parseInt(el.dataset.i, 10) === selectedIdx) el.classList.add("wrong");
+    });
+    const isCorrect = choices[selectedIdx].correct;
+    const score = isCorrect ? 100 : 40;
+    session.scores.ch3 = score;
+    session.totalScore += score;
+    session.finalPromptOptimized = scen.optimized;
+    updateHud();
+
+    const chosen = choices[selectedIdx];
+    const rightAnswer = choices.find(c => c.correct);
+    const box = document.querySelector(".card .actions");
+    box.insertAdjacentHTML("beforebegin", `
+      <div class="explainer ${isCorrect ? "good" : "warn"}" style="width:100%;">
+        <b>${isCorrect ? "Correct." : "Not quite."}</b> The best pick was <b style="color:var(--good);">${rightAnswer.kind}</b>.<br/><br/>
+        <b>Why the OPTIMIZED wins:</b> ${escapeHtml(rightAnswer.why)}<br/><br/>
+        ${!isCorrect ? `<b>Why your pick (${chosen.kind}) doesn't:</b> ${escapeHtml(chosen.why)}<br/><br/>` : ""}
+      </div>
+      <div class="explainer" style="width:100%;">
+        <b>Weak output would look like:</b>
+        <div class="mono" style="background:rgba(0,0,0,.3); padding:10px; border-radius:8px; margin-top:6px; font-size:12.5px; line-height:1.55; color:var(--text-dim); white-space:pre-wrap;">${escapeHtml(scen.weakOutput)}</div>
+        <br/>
+        <b>Optimized output would look like:</b>
+        <div class="mono" style="background:rgba(0,0,0,.3); padding:10px; border-radius:8px; margin-top:6px; font-size:12.5px; line-height:1.55; color:var(--text-dim); white-space:pre-wrap;">${escapeHtml(scen.optimizedOutput)}</div>
+      </div>
+      <div class="principle" style="width:100%;">
+        <b>Prompt Principle</b>
+        ${escapeHtml(scen.principle)}
+      </div>
+    `);
+    box.innerHTML = `<button class="btn primary" id="toReport">See My Prompt Performance Report →</button>`;
+    document.getElementById("toReport").addEventListener("click", () => goto("report"));
+    toast(`Challenge 3: ${score}/100`, isCorrect ? "good" : "bad");
+    session.history.push({ ch:3, scen:scen.title, score });
+  });
+}
+
+/* ================================================================
+   REPORT
+   ================================================================ */
+function renderReport() {
+  stopTimer();
+  const timeSec = Math.floor((Date.now() - session.startTime)/1000);
+
+  // Composite Score (0-100) — average of 3 challenges + time bonus - hint penalty
+  const avg = Math.round((session.scores.ch1 + session.scores.ch2 + session.scores.ch3) / 3);
+  const timeBonus = timeSec < 180 ? 5 : 0;
+  const hintPenalty = (3 - session.hintsLeft) * 3;
+  const promptScore = Math.max(0, Math.min(100, avg + timeBonus - hintPenalty));
+
+  // Rating band
+  let rating = "Sharp Practitioner", rank = "S-TIER PROMPT ENGINEER";
+  if (promptScore >= 92)      { rating = "Elite Prompt Craftsperson"; rank = "S+ TIER"; }
+  else if (promptScore >= 80) { rating = "Sharp Practitioner";        rank = "A TIER"; }
+  else if (promptScore >= 65) { rating = "Solid Foundation";          rank = "B TIER"; }
+  else if (promptScore >= 45) { rating = "Developing Fast";           rank = "C TIER"; }
+  else                        { rating = "Just Starting";             rank = "D TIER"; }
+
+  // Prompt DNA — Clarity / Specificity / Constraints / Format
+  const dna = {
+    clarity:      Math.min(100, Math.round((session.scores.ch1 * .6) + (session.scores.ch3 * .4))),
+    specificity:  Math.min(100, Math.round((session.scores.ch1 * .7) + (session.scores.ch2 * .3))),
+    constraints:  Math.min(100, Math.round((session.scores.ch2 * .5) + (session.scores.ch3 * .5))),
+    format:       Math.min(100, Math.round((session.scores.ch1 * .5) + (session.scores.ch2 * .5))),
+  };
+
+  // Feedback — personalized
+  const feedback = [];
+  const weakest = Object.entries(dna).sort((a,b) => a[1] - b[1])[0];
+  const strongest = Object.entries(dna).sort((a,b) => b[1] - a[1])[0];
+  feedback.push(`Your strongest dimension is <b>${strongest[0]}</b> at ${strongest[1]}. That's the part of your prompting instinct to lean on.`);
+  feedback.push(`Your weakest is <b>${weakest[0]}</b> at ${weakest[1]}. Next 3 prompts you write, focus specifically on ${weakest[0]}.`);
+  if (session.wrongPlacements > 3) feedback.push(`You made ${session.wrongPlacements} wrong placements — practice distinguishing distractors ('be creative', 'add emojis') from real constraints.`);
+  if (session.hintsLeft === 3) feedback.push(`You used zero hints — that shows real independent judgment.`);
+  if (promptScore >= 80) feedback.push(`At this level, the next milestone is writing prompts that produce the desired output in one shot instead of after iteration.`);
+
+  // Next milestone
+  let milestone = "";
+  if (promptScore < 60) milestone = "Get consistent at putting Role + Context + Task + Format into every prompt you write for the next week.";
+  else if (promptScore < 80) milestone = "Start naming specific constraints — dimensions, word limits, section headers — in every prompt.";
+  else milestone = "Practice prompting where the user explicitly asks for the reasoning behind an answer, not just the answer.";
+
+  document.getElementById("stage").innerHTML = `
+    <div class="card">
+      <div class="chHead">
+        <div>
+          <div class="k">Final Report</div>
+          <h3>Prompt Performance Report</h3>
+          <div class="goal">Domain: Product & Business Strategy · Difficulty: Intermediate · Time: ${timeSec}s</div>
+        </div>
+        <div><span class="badge ok">${rank}</span></div>
+      </div>
+
+      <div class="scoreHero">
+        <div class="num" id="scoreNum">0</div>
+        <div class="lbl">Prompt Score</div>
+        <div class="rating">${escapeHtml(rating)}</div>
+        <div class="rank">${escapeHtml(rank)}</div>
+      </div>
+
+      <div class="reportGrid">
+        <div class="reportTile full">
+          <h4>Prompt DNA</h4>
+          <div class="dna" id="dna">
+            <div class="strand" style="height:0%;" data-h="${dna.clarity}"></div>
+            <div class="strand" style="height:0%;" data-h="${dna.specificity}"></div>
+            <div class="strand" style="height:0%;" data-h="${dna.constraints}"></div>
+            <div class="strand" style="height:0%;" data-h="${dna.format}"></div>
+          </div>
+          <div class="dnaLabels">
+            <div>Clarity ${dna.clarity}</div>
+            <div>Specificity ${dna.specificity}</div>
+            <div>Constraints ${dna.constraints}</div>
+            <div>Format ${dna.format}</div>
+          </div>
+        </div>
+
+        <div class="reportTile">
+          <h4>Challenge Breakdown</h4>
+          <div class="metricBars">
+            <div class="metricRow"><div class="lbl">Build</div><div class="bar"><i style="width:${session.scores.ch1}%"></i></div><div class="v">${session.scores.ch1}</div></div>
+            <div class="metricRow"><div class="lbl">Clean</div><div class="bar"><i style="width:${session.scores.ch2}%"></i></div><div class="v">${session.scores.ch2}</div></div>
+            <div class="metricRow"><div class="lbl">Choose</div><div class="bar"><i style="width:${session.scores.ch3}%"></i></div><div class="v">${session.scores.ch3}</div></div>
+          </div>
+        </div>
+
+        <div class="reportTile">
+          <h4>Session Metrics</h4>
+          <div class="body">
+            <b>Time:</b> ${timeSec}s<br/>
+            <b>Total moves:</b> ${session.moves}<br/>
+            <b>Wrong placements:</b> ${session.wrongPlacements}<br/>
+            <b>Hints used:</b> ${3 - session.hintsLeft}/3<br/>
+            <b>Optimization bonus:</b> ${timeBonus > 0 ? "+5 (fast finish)" : "0"}
+          </div>
+        </div>
+
+        <div class="reportTile full">
+          <h4>Personalized Feedback</h4>
+          <div class="body">
+            <ul>${feedback.map(f => `<li>${f}</li>`).join("")}</ul>
+          </div>
+        </div>
+
+        <div class="reportTile full">
+          <h4>Next Milestone</h4>
+          <div class="body">${escapeHtml(milestone)}</div>
+        </div>
+
+        <div class="reportTile full">
+          <h4>Final Optimized Prompt from your last challenge</h4>
+          <div class="body mono" style="background:rgba(0,0,0,.3); padding:12px; border-radius:8px; font-size:12.5px; line-height:1.6; white-space:pre-wrap;">${escapeHtml(session.finalPromptOptimized)}</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn ghost leftActions" id="replayBtn">↻ Replay with new scenarios</button>
+        <button class="btn primary" id="restartBtn">← Back to Home</button>
+      </div>
+    </div>
+  `;
+
+  // Animate the score
+  const target = promptScore;
+  const numEl = document.getElementById("scoreNum");
+  let n = 0;
+  const interval = setInterval(() => {
+    n = Math.min(target, n + Math.max(1, Math.round(target/40)));
+    numEl.textContent = n;
+    if (n >= target) clearInterval(interval);
+  }, 30);
+
+  // Animate DNA
+  setTimeout(() => {
+    document.querySelectorAll(".dna .strand").forEach(el => { el.style.height = el.dataset.h + "%"; });
+  }, 100);
+
+  if (promptScore >= 80) burstConfetti();
+
+  document.getElementById("replayBtn").addEventListener("click", () => {
+    // Reset session
+    session.scenarios = pickN(SCENARIOS, 3);
+    session.hintsLeft = 3;
+    session.totalScore = 0;
+    session.scores = { ch1:0, ch2:0, ch3:0 };
+    session.history = [];
+    session.moves = 0; session.wrongPlacements = 0;
+    updateHud(); startTimer();
+    goto("ch1");
+  });
+
+  document.getElementById("restartBtn").addEventListener("click", () => {
+    session.hintsLeft = 3; session.totalScore = 0;
+    session.scores = { ch1:0, ch2:0, ch3:0 };
+    session.moves = 0; session.wrongPlacements = 0;
+    updateHud();
+    goto("welcome");
+  });
+}
+
+/* ---------- CONFETTI ---------- */
+function burstConfetti() {
+  const c = document.getElementById("confetti");
+  c.innerHTML = "";
+  const colors = ["#e46c2b","#f2a24a","#63d095","#ffd166","#7aa6ff","#ff6b95"];
+  for (let i = 0; i < 100; i++) {
+    const p = document.createElement("i");
+    p.style.left = Math.random() * 100 + "vw";
+    p.style.background = colors[i % colors.length];
+    p.style.animationDuration = (1.7 + Math.random() * 1.8) + "s";
+    p.style.transform = `rotate(${Math.random()*360}deg)`;
+    c.appendChild(p);
+  }
+  c.classList.add("show");
+  setTimeout(() => c.classList.remove("show"), 3500);
+}
+
+/* ---------- NAV ---------- */
+function goto(next) {
+  session.stage = next;
+  renderStepper();
+  if (next === "welcome")  renderWelcome();
+  else if (next === "ch1") renderCh1();
+  else if (next === "ch2") renderCh2();
+  else if (next === "ch3") renderCh3();
+  else if (next === "report") renderReport();
+  window.scrollTo({ top:0, behavior:"smooth" });
+}
+
+/* ---------- INIT ---------- */
+renderStepper();
+renderWelcome();
+</script>
+</body>
+</html>
