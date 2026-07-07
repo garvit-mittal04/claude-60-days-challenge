@@ -1,0 +1,1275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>⌨️ Typing Speed Studio — Day 38 · #60DayClaudeChallenge</title>
+<style>
+/* =============================================================
+   TYPING SPEED STUDIO — Day 38
+   Single HTML file · Vanilla CSS + JavaScript · No frameworks
+   Adaptive (7 categories · 8 modes) · Full analytics dashboard
+   ============================================================= */
+
+:root {
+  --bg:        #0d1014;
+  --bg-2:      #10141a;
+  --panel:     #161c25;
+  --panel-2:   #1e252f;
+  --line:      #262d38;
+  --line-2:    #333c48;
+  --text:      #e6e6e6;
+  --text-dim:  #a8adb4;
+  --text-mute: #646669;
+
+  --accent:    #e2b714;
+  --accent-2:  #f4cd41;
+  --accent-soft: rgba(226,183,20,.18);
+
+  --good:      #4ade80;
+  --bad:       #f56565;
+  --warn:      #fbbf24;
+  --extra:     #d97757;
+  --sky:       #7aa6ff;
+
+  --shadow:    0 20px 60px rgba(0,0,0,.55);
+  --radius:    14px;
+  --easing:    cubic-bezier(.2,.8,.2,1);
+  --mono:      "JetBrains Mono", "Fira Code", "Cascadia Code", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --typeFont: 22px;
+}
+
+/* Themes */
+[data-theme="gold"]   { --accent:#e2b714; --accent-2:#f4cd41; --accent-soft:rgba(226,183,20,.18); }
+[data-theme="claude"] { --accent:#e46c2b; --accent-2:#f2a24a; --accent-soft:rgba(228,108,43,.18); }
+[data-theme="mint"]   { --accent:#4ade80; --accent-2:#86efac; --accent-soft:rgba(74,222,128,.16); }
+[data-theme="sky"]    { --accent:#7aa6ff; --accent-2:#a9c3ff; --accent-soft:rgba(122,166,255,.16); }
+[data-theme="rose"]   { --accent:#ff6b95; --accent-2:#ff97b6; --accent-soft:rgba(255,107,149,.16); }
+
+/* Focus / Zen classes */
+body.focusMode .nonTyping { opacity:.15; transition: opacity .3s ease; }
+body.zenMode .nonTyping   { opacity:.10; transition: opacity .3s ease; }
+body.zenMode .liveStats   { display:none !important; }
+
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body {
+  margin:0; padding:0; min-height:100%;
+  background:
+    radial-gradient(1000px 700px at 10% -10%, var(--accent-soft), transparent 60%),
+    radial-gradient(800px 500px at 100% 100%, rgba(122,166,255,.06), transparent 60%),
+    var(--bg);
+  color:var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.mono { font-family: var(--mono); }
+.app { max-width:1180px; margin:0 auto; padding:22px 24px 60px; }
+
+/* ========== HEADER ========== */
+header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 0 14px; margin-bottom:14px; flex-wrap:wrap; gap:12px;
+  border-bottom:1px solid var(--line);
+}
+.brand { display:flex; align-items:center; gap:12px; }
+.logo {
+  width:44px; height:44px; border-radius:12px;
+  background:linear-gradient(135deg, var(--accent), var(--accent-2));
+  display:flex; align-items:center; justify-content:center; font-size:22px;
+}
+.brand h1 { margin:0; font-size:20px; font-weight:800; letter-spacing:-.3px; }
+.brand .sub { font-size:10px; color:var(--text-mute); letter-spacing:2px; text-transform:uppercase; font-weight:700; }
+
+.headActions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.iconBtn {
+  background:var(--panel); border:1px solid var(--line);
+  color:var(--text-dim); padding:6px 10px; border-radius:8px; cursor:pointer;
+  font-size:13px; font-weight:700; letter-spacing:.3px;
+  transition:border-color .12s, background .15s, color .12s;
+  display:inline-flex; align-items:center; gap:6px;
+}
+.iconBtn:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
+.iconBtn.active { border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
+
+.themeDots { display:flex; gap:5px; margin-left:6px; }
+.themeDot {
+  width:20px; height:20px; border-radius:8px; cursor:pointer;
+  border:2px solid transparent;
+  transition:transform .12s var(--easing), border-color .15s;
+}
+.themeDot:hover { transform:scale(1.1); }
+.themeDot.active { border-color:var(--text); }
+
+/* ========== SETTINGS BAR ========== */
+.settingsBar {
+  background:var(--panel); border:1px solid var(--line); border-radius:12px;
+  padding:10px 14px; margin-bottom:16px;
+  display:flex; flex-wrap:wrap; align-items:center; gap:8px;
+  font-size:12px; font-weight:700;
+}
+.settingsBar .group { display:flex; gap:4px; align-items:center; padding:0 8px; border-right:1px solid var(--line-2); }
+.settingsBar .group:last-child { border-right:none; }
+.settingsBar .lbl { color:var(--text-mute); font-size:10px; letter-spacing:1.5px; text-transform:uppercase; margin-right:6px; font-weight:800; }
+.settingsBar .opt {
+  background:transparent; border:none; color:var(--text-mute); cursor:pointer;
+  padding:4px 8px; border-radius:6px; font-family:inherit; font-size:12px; font-weight:700;
+  transition: color .12s, background .15s;
+}
+.settingsBar .opt:hover { color:var(--text-dim); background:var(--panel-2); }
+.settingsBar .opt.active { color:var(--accent); background:var(--accent-soft); }
+.settingsBar .opt.big { font-family: var(--mono); }
+
+/* ========== LIVE STATS BAR ========== */
+.liveStats {
+  display:flex; flex-wrap:wrap; gap:20px; justify-content:center;
+  margin: 12px 0 20px; padding:10px 14px;
+  color:var(--accent); font-family:var(--mono); font-size:16px; font-weight:800;
+  min-height:40px;
+}
+.liveStats .stat { display:flex; align-items:center; gap:6px; }
+.liveStats .stat .val { font-size:24px; color:var(--accent); }
+.liveStats .stat .k { font-size:10px; color:var(--text-mute); letter-spacing:1.5px; text-transform:uppercase; font-weight:800; }
+
+.progressBar {
+  height:3px; background:var(--panel-2); border-radius:2px; overflow:hidden;
+  margin:0 auto 16px; max-width:900px;
+}
+.progressBar i { display:block; height:100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); transition: width .1s linear; }
+
+/* ========== TYPING AREA ========== */
+.typingCard {
+  background:linear-gradient(180deg, var(--panel), var(--bg-2));
+  border:1px solid var(--line); border-radius:var(--radius);
+  padding:36px 40px 30px; box-shadow:var(--shadow);
+  animation: fadeIn .3s var(--easing) both;
+}
+@keyframes fadeIn { from { opacity:0; transform:translateY(6px);} to { opacity:1; transform:translateY(0);} }
+
+.typingWrap {
+  font-family: var(--mono);
+  font-size: var(--typeFont);
+  line-height:1.7;
+  letter-spacing: 0.02em;
+  color: var(--text-mute);
+  min-height: 120px;
+  outline: none;
+  user-select:none;
+  position:relative;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+.typingWrap.blurred { filter: blur(4px); }
+.typingWrap .char { position:relative; }
+.typingWrap .char.correct   { color: var(--text); }
+.typingWrap .char.wrong     { color: var(--bad); text-decoration: underline wavy var(--bad); text-underline-offset:4px; }
+.typingWrap .char.extra     { color: var(--extra); }
+.typingWrap .char.current::before {
+  content:""; position:absolute; left:0; top:-4%; bottom:-4%; width:2px;
+  background:var(--accent); animation: blink 1s steps(2, jump-none) infinite;
+  z-index:1;
+}
+body.finished .typingWrap .char.current::before { animation:none; opacity:0; }
+@keyframes blink { 50% { opacity:0; } }
+
+.typingWrap .word { display:inline-block; }
+.typingWrap .word .space { display:inline-block; }
+.typingWrap .word.done { opacity:.9; }
+
+.hiddenInput {
+  position: fixed; top:-100px; left:0; width:1px; height:1px; opacity:0; pointer-events:none;
+}
+
+.clickToFocus {
+  text-align:center; color:var(--text-mute); font-size:13px; letter-spacing:1.5px; text-transform:uppercase; font-weight:800;
+  margin-top:14px;
+}
+.clickToFocus b { color: var(--accent); }
+
+/* ========== ACTION BAR ========== */
+.actionBar {
+  display:flex; gap:10px; justify-content:center; align-items:center; flex-wrap:wrap;
+  margin-top:22px;
+}
+.btn {
+  appearance:none; border:1px solid var(--line);
+  background:var(--panel); color:var(--text-dim); font-weight:700;
+  padding:10px 18px; border-radius:10px; cursor:pointer;
+  font-size:13px; letter-spacing:.3px;
+  transition:transform .1s var(--easing), border-color .12s, background .15s, color .12s;
+}
+.btn:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
+.btn:active { transform:translateY(1px); }
+.btn.primary {
+  background:linear-gradient(180deg, var(--accent), var(--accent-2));
+  color:#1a0e00; border:none; font-weight:800;
+  box-shadow:0 8px 20px rgba(226,183,20,.24);
+}
+.btn.primary:hover { transform: translateY(-1px); color:#1a0e00; }
+.btn.compact { padding:6px 12px; font-size:12px; }
+
+.actionHint {
+  margin-top:10px; text-align:center; color:var(--text-mute); font-size:11px; letter-spacing:1.5px; font-weight:700;
+}
+.actionHint kbd {
+  display:inline-block; padding:2px 6px; border-radius:5px; background:var(--panel);
+  border:1px solid var(--line-2); color:var(--text-dim); font-family:var(--mono); font-size:11px; margin:0 2px;
+}
+
+/* ========== ANALYTICS DASHBOARD ========== */
+.dashCard { padding:26px 28px; }
+.dashHead {
+  display:flex; justify-content:space-between; align-items:flex-start;
+  padding-bottom:16px; margin-bottom:18px; border-bottom:1px solid var(--line);
+  flex-wrap:wrap; gap:12px;
+}
+.dashHead .k { font-size:10px; letter-spacing:2px; color:var(--accent); font-weight:800; text-transform:uppercase; }
+.dashHead h3 { margin:4px 0 0; font-size:22px; font-weight:800; }
+.dashHead .goal { color:var(--text-dim); font-size:13px; margin-top:4px; }
+
+.dashGrid { display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; margin-bottom:14px; }
+@media(max-width:760px){ .dashGrid { grid-template-columns:repeat(2, 1fr); } }
+.dashStat {
+  background:linear-gradient(180deg, var(--panel-2), var(--bg-2));
+  border:1px solid var(--line); border-radius:12px; padding:16px 18px;
+  text-align:center;
+}
+.dashStat .k { font-size:10px; color:var(--text-mute); letter-spacing:2px; font-weight:800; text-transform:uppercase; }
+.dashStat .v { font-family:var(--mono); font-size:34px; color:var(--accent); font-weight:800; line-height:1.1; margin:6px 0 2px; }
+.dashStat .sm { font-size:11px; color:var(--text-dim); }
+.dashStat.pb .v { color:var(--good); }
+
+.dashSect { margin-top:16px; }
+.dashSect h4 {
+  margin:0 0 8px; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--accent); font-weight:800;
+}
+.chartCard {
+  background:linear-gradient(180deg, var(--panel-2), var(--bg-2));
+  border:1px solid var(--line); border-radius:12px; padding:16px 18px;
+}
+.twoCol { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+@media(max-width:760px){ .twoCol { grid-template-columns:1fr; } }
+
+/* Bars (chars breakdown) */
+.charBars { display:grid; gap:8px; }
+.charRow {
+  display:grid; grid-template-columns:120px 1fr 60px; gap:10px; align-items:center;
+  font-size:12px; color:var(--text);
+}
+.charRow .lbl { color:var(--text-dim); letter-spacing:1.5px; text-transform:uppercase; font-weight:800; font-size:11px; }
+.charRow .bar { height:10px; background:rgba(255,255,255,.06); border-radius:5px; overflow:hidden; }
+.charRow .bar i { display:block; height:100%; transition: width 1s var(--easing); border-radius:5px; }
+.charRow.correct .bar i { background:var(--good); }
+.charRow.wrong .bar i   { background:var(--bad); }
+.charRow.extra .bar i   { background:var(--extra); }
+.charRow.missed .bar i  { background:var(--warn); }
+.charRow .v { text-align:right; font-family:var(--mono); font-weight:700; color:var(--text); }
+
+/* Heatmap */
+.heatmap {
+  display:grid; grid-template-columns:repeat(10, 1fr); gap:6px;
+}
+.heatCell {
+  background:var(--panel-2); border:1px solid var(--line); border-radius:8px;
+  padding:8px 4px; text-align:center;
+  font-family:var(--mono); font-size:13px; font-weight:700; color:var(--text);
+  position:relative;
+}
+.heatCell.hot { background: rgba(245,101,101,.25); border-color: var(--bad); color: var(--bad); }
+.heatCell.mid { background: rgba(226,183,20,.16); border-color: var(--accent); color: var(--accent); }
+.heatCell .cnt { display:block; font-size:9px; color:var(--text-mute); margin-top:2px; }
+
+.badges { display:flex; gap:8px; flex-wrap:wrap; margin-top:6px; }
+.badge {
+  background:var(--panel-2); border:1px solid var(--line); border-radius:999px; padding:6px 12px;
+  font-size:11px; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; color:var(--text-dim);
+}
+.badge.earned { background: var(--accent-soft); border-color:var(--accent); color:var(--accent); }
+
+.summary {
+  color:var(--text-dim); font-size:13.5px; line-height:1.65;
+}
+.summary b { color:var(--text); }
+.summary ul { margin:6px 0 0; padding-left:20px; }
+
+/* History */
+.historyList { display:grid; gap:8px; margin-top:8px; }
+.historyItem {
+  display:grid; grid-template-columns: 80px 100px 90px 80px 1fr; gap:10px; align-items:center;
+  background:var(--panel-2); border:1px solid var(--line); border-radius:10px;
+  padding:8px 12px; font-family:var(--mono); font-size:12px; color:var(--text-dim);
+}
+.historyItem .wpm { color:var(--accent); font-weight:800; font-size:14px; }
+.historyItem .pb { color:var(--good); font-weight:800; }
+
+/* SVG charts */
+.chartWrap { width:100%; overflow-x:auto; }
+.chartSvg { min-width:420px; width:100%; height:180px; display:block; }
+
+.footer { color:var(--text-mute); font-size:11px; text-align:center; margin-top:22px; letter-spacing:1px; line-height:1.6; }
+
+.hidden { display:none !important; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * { animation:none !important; transition:none !important; }
+}
+
+/* Font size classes */
+body.fs-small  { --typeFont: 18px; }
+body.fs-medium { --typeFont: 22px; }
+body.fs-large  { --typeFont: 28px; }
+body.fs-xl     { --typeFont: 34px; }
+</style>
+</head>
+<body data-theme="gold" class="fs-medium">
+
+<div class="app">
+
+  <!-- ============ HEADER ============ -->
+  <header class="nonTyping">
+    <div class="brand">
+      <div class="logo">⌨️</div>
+      <div>
+        <h1>Typing Speed Studio</h1>
+        <div class="sub">Day 38 · #60DayClaudeChallenge</div>
+      </div>
+    </div>
+    <div class="headActions">
+      <button class="iconBtn" id="soundToggle" title="Toggle sound (S)">🔊 Sound</button>
+      <button class="iconBtn" id="historyBtn" title="Session history (H)">📊 History</button>
+      <span class="themeDots" title="Theme">
+        <span class="themeDot active" data-theme="gold"   style="background:linear-gradient(135deg,#e2b714,#f4cd41);"></span>
+        <span class="themeDot"        data-theme="claude" style="background:linear-gradient(135deg,#e46c2b,#f2a24a);"></span>
+        <span class="themeDot"        data-theme="mint"   style="background:linear-gradient(135deg,#4ade80,#86efac);"></span>
+        <span class="themeDot"        data-theme="sky"    style="background:linear-gradient(135deg,#7aa6ff,#a9c3ff);"></span>
+        <span class="themeDot"        data-theme="rose"   style="background:linear-gradient(135deg,#ff6b95,#ff97b6);"></span>
+      </span>
+    </div>
+  </header>
+
+  <!-- ============ SETTINGS BAR ============ -->
+  <div class="settingsBar nonTyping" id="settingsBar">
+    <div class="group">
+      <span class="lbl">Mode</span>
+      <button class="opt" data-mode="time">Time</button>
+      <button class="opt" data-mode="words">Words</button>
+      <button class="opt" data-mode="quote">Quote</button>
+      <button class="opt" data-mode="programming">Code</button>
+      <button class="opt" data-mode="custom">Custom</button>
+      <button class="opt" data-mode="focus">Focus</button>
+      <button class="opt" data-mode="zen">Zen</button>
+    </div>
+    <div class="group" id="subGroup">
+      <span class="lbl" id="subLbl">Seconds</span>
+      <span id="subOpts"></span>
+    </div>
+    <div class="group">
+      <span class="lbl">Category</span>
+      <select class="opt" id="categorySel">
+        <option value="general">General</option>
+        <option value="programming">Programming</option>
+        <option value="business">Business</option>
+        <option value="academic">Academic</option>
+        <option value="medical">Medical</option>
+        <option value="legal">Legal</option>
+        <option value="creative">Creative</option>
+      </select>
+    </div>
+    <div class="group">
+      <span class="lbl">Font</span>
+      <button class="opt" data-fs="small">S</button>
+      <button class="opt active" data-fs="medium">M</button>
+      <button class="opt" data-fs="large">L</button>
+      <button class="opt" data-fs="xl">XL</button>
+    </div>
+  </div>
+
+  <!-- ============ STAGE ============ -->
+  <div id="stage"></div>
+
+  <p class="footer nonTyping">
+    Adaptive typing across 7 categories · 8 modes · Full analytics with WPM/consistency/heatmap/history<br/>
+    Single HTML file · Vanilla CSS + JS · No frameworks · Built for Day 38 of #60DayClaudeChallenge
+  </p>
+</div>
+
+<input class="hiddenInput" id="hiddenInput" autocomplete="off" autocorrect="off" spellcheck="false" />
+
+<script>
+/* =============================================================
+   TYPING SPEED STUDIO — Day 38 · Logic
+   ============================================================= */
+
+/* ============================================================
+   CONTENT LIBRARY
+   ============================================================ */
+const WORDS_COMMON = ("the of and to in a is that for it as be by on not with he as you do at this but his from they we say her she or an will my one all would there their what so up out if about who get which go me when make can like time no just him know take people into year your good some could them see other than then now look only come its over think also back after use two how our work first well way even new want because any these give day most us are was were have has been being had").split(" ");
+
+const QUOTES = [
+  "The only way to do great work is to love what you do. If you haven't found it yet, keep looking. Don't settle.",
+  "Simplicity is the ultimate sophistication. What you do speaks so loudly that no one can hear what you say.",
+  "In the middle of every difficulty lies opportunity. It always seems impossible until it's done.",
+  "The future belongs to those who believe in the beauty of their dreams. Do not go where the path may lead.",
+  "Whether you think you can, or you think you can't — you're right. The best time to plant a tree was twenty years ago. The second best time is now.",
+  "Success is not final, failure is not fatal: it is the courage to continue that counts.",
+  "The only impossible journey is the one you never begin. Life is what happens when you're busy making other plans.",
+  "Do what you can, with what you have, where you are. Small deeds done are better than great deeds planned.",
+];
+
+const CONTENT = {
+  general: [
+    "The quick brown fox jumps over the lazy dog near the riverbank. This sentence contains every letter of the English alphabet and is often used to test typewriters and keyboards.",
+    "A steady rhythm matters more than raw speed. If your fingers know the layout well enough that you never look down, your accuracy will lead your words per minute upward on its own.",
+    "Reading widely gives your hands a preview of every common bigram, trigram, and word ending. That preview is what turns novice typists into fluent ones without any special drill.",
+    "There is a strange peace in typing that comes when the letters stop being individual keys and start becoming shapes your hand already knows before your eyes even reach them.",
+    "Small daily practice always beats large weekly sessions. Twenty minutes today teaches your fingers more than three hours on a saturday afternoon ever will.",
+    "The best typists rarely think about the keyboard at all. They think about the sentence. The keys have become the medium through which their thoughts pass, invisible and instant.",
+    "Consistency is the shape of expertise. When your fastest words and slowest words start pulling closer to each other, that is when your real speed has actually moved.",
+  ],
+  business: [
+    "Please find attached the third quarter performance report. Key findings show a twelve percent lift in average deal size and a small decline in customer acquisition cost, driven primarily by improvements to our onboarding flow and a shift toward mid-market segments.",
+    "Following our conversation this morning, I wanted to summarize the three action items we agreed on. First, the marketing team will finalize the campaign brief by Friday. Second, engineering will scope the API changes required. Third, we will reconvene next Thursday to align on the launch date.",
+    "The board meeting agenda for next Tuesday is attached. Please review the financial packet, the product roadmap update, and the proposed compensation adjustments before we meet. Come prepared with any questions on the fourth quarter forecast.",
+    "Thank you for taking the time to speak with our team last week. Based on your feedback, we have refined the proposal to include a phased rollout, quarterly business reviews, and dedicated onboarding support during the first ninety days.",
+    "We are pleased to announce that revenue for the fiscal year exceeded expectations by roughly nine percent. This performance reflects strong execution across all business units and validates the strategic pivot we made eighteen months ago.",
+    "The strategy for the next twelve months centers on three priorities: expanding into two adjacent verticals, deepening product functionality for enterprise customers, and improving unit economics by shifting more of our growth to organic and referral channels.",
+  ],
+  programming: [
+    { lang:"JavaScript", text:"function debounce(fn, wait) {\n  let timeout;\n  return function(...args) {\n    clearTimeout(timeout);\n    timeout = setTimeout(() => fn.apply(this, args), wait);\n  };\n}" },
+    { lang:"JavaScript", text:"const users = [{ name: 'Ada', age: 28 }, { name: 'Grace', age: 40 }];\nconst adults = users.filter(u => u.age >= 21).map(u => u.name);\nconsole.log(adults);" },
+    { lang:"Python", text:"def fibonacci(n):\n    if n < 2:\n        return n\n    a, b = 0, 1\n    for _ in range(2, n + 1):\n        a, b = b, a + b\n    return b" },
+    { lang:"Python", text:"import pandas as pd\n\ndf = pd.read_csv('sales.csv')\nmonthly = df.groupby(pd.Grouper(key='date', freq='M'))['revenue'].sum()\nprint(monthly.head())" },
+    { lang:"HTML", text:"<div class=\"card\">\n  <h2>Welcome</h2>\n  <p>This is a simple card component.</p>\n  <button type=\"button\">Learn more</button>\n</div>" },
+    { lang:"CSS", text:".card {\n  background: #1a1f2b;\n  border: 1px solid #2a3345;\n  border-radius: 12px;\n  padding: 24px;\n  transition: transform 0.15s ease;\n}" },
+    { lang:"SQL", text:"SELECT customer_id, COUNT(*) AS orders, SUM(total) AS revenue\nFROM orders\nWHERE created_at >= '2025-01-01'\nGROUP BY customer_id\nHAVING SUM(total) > 1000\nORDER BY revenue DESC;" },
+    { lang:"Java", text:"public class HelloWorld {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, world!\");\n    }\n}" },
+    { lang:"C++", text:"#include <iostream>\n#include <vector>\n\nint main() {\n    std::vector<int> nums = {1, 2, 3, 4, 5};\n    int sum = 0;\n    for (int n : nums) sum += n;\n    std::cout << sum << std::endl;\n    return 0;\n}" },
+  ],
+  academic: [
+    "The methodology employed in this study followed a mixed-methods approach, integrating quantitative analysis of survey responses with qualitative coding of semi-structured interviews. This design was chosen to triangulate findings across two independent sources of evidence and to strengthen the validity of the resulting claims.",
+    "Recent scholarship in the field has increasingly emphasized the role of institutional context in shaping the outcomes previously attributed solely to individual behavior. This shift represents a meaningful reorientation of the research agenda over the past decade.",
+    "The literature review identified three consistent gaps in the existing body of work. First, longitudinal studies remain rare. Second, most samples are drawn from a narrow demographic. Third, the theoretical frameworks used are rarely tested against contexts outside their original construction.",
+    "In evaluating the hypothesis, we relied on the standard framework proposed in the seminal 1998 paper by Chen and Ortega, extending it to accommodate the multi-year panel data available in our current dataset.",
+    "The findings of this paper contribute to the ongoing debate in three ways. They provide empirical support for the previously theoretical claim, they identify boundary conditions under which the effect attenuates, and they open a promising avenue for further inquiry.",
+  ],
+  medical: [
+    "The patient presented to the emergency department with a two-day history of substernal chest pain, radiating to the left arm, associated with diaphoresis and mild shortness of breath. Vital signs on arrival were within normal limits. Initial troponin was pending.",
+    "Following completion of the diagnostic workup, the patient was diagnosed with community-acquired pneumonia. Treatment was initiated with oral amoxicillin-clavulanate for a planned seven day course, with follow-up scheduled in the outpatient clinic in one week.",
+    "The medication reconciliation confirmed that the patient is currently taking metformin for type 2 diabetes, atorvastatin for hyperlipidemia, and lisinopril for hypertension. No known drug allergies were reported.",
+    "Postoperative recovery was uncomplicated. The patient tolerated a regular diet on postoperative day one, ambulated without assistance on day two, and was discharged home on day three with outpatient physical therapy scheduled twice weekly for six weeks.",
+    "The physical examination revealed mild bilateral crackles at the lung bases, a regular cardiac rhythm without murmurs, a soft and non-tender abdomen, and no lower extremity edema. Neurological examination was grossly intact.",
+  ],
+  legal: [
+    "This Agreement is entered into as of the Effective Date by and between the parties identified below. Each party represents and warrants that it has the full legal authority to enter into this Agreement and to perform its obligations hereunder.",
+    "In the event of a dispute arising out of or relating to this Agreement, the parties agree to first engage in good faith negotiations for a period of at least thirty days before initiating any formal proceedings.",
+    "The Confidential Information shall include, but not be limited to, technical data, trade secrets, business plans, customer lists, financial information, and any other information marked as confidential or that a reasonable person would understand to be confidential.",
+    "Either party may terminate this Agreement upon thirty days written notice for convenience, or immediately for cause in the event of a material breach that remains uncured after fifteen days written notice specifying the nature of the breach.",
+    "This Agreement shall be governed by and construed in accordance with the laws of the State of Delaware, without regard to its conflict of laws principles. Any legal action shall be brought exclusively in the state or federal courts located in Delaware.",
+  ],
+  creative: [
+    "The old lighthouse still stood at the edge of the cliff, its white paint peeling into strips that caught the wind like the last leaves of a stubborn tree. No ship had asked for its light in thirty years, but it kept turning anyway, night after night, out of a habit older than the men who built it.",
+    "She learned to walk in the rain before she learned to run in the sun. Later, when she tried to explain this to her children, they only laughed and asked why anyone would prefer such a thing. She never answered, because the answer was already the shape of her life.",
+    "The town had a river that was always slightly too fast, a bakery that opened before dawn, and a mayor who kept a canary in his office. It was, in every measurable way, an ordinary town, and it was, in every unmeasurable way, exactly the kind of ordinary you couldn't find anywhere else.",
+    "He wrote the letter three times before folding it into the envelope. The first draft was too honest. The second, too kind. The third, he decided, was almost neither, which meant it was probably the closest thing to the truth he was going to manage that afternoon.",
+    "There is a particular quality of silence that only exists in libraries after ten in the evening, when the fluorescent lights hum a note lower than they do in the daytime, and the books seem to lean toward each other on the shelves.",
+  ],
+};
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = {
+  category: "general",
+  mode: "time",          // time, words, quote, programming, custom, focus, zen
+  subValue: 30,          // seconds or word count
+  text: "",              // the target text
+  input: "",             // user input
+  running:false, finished:false, paused:false,
+  startedAt:null, elapsed:0, timerInterval:null,
+  progressInterval:null,
+  perCharTimes:[],       // ms per char for consistency
+  errorChars:{},         // key -> count
+  correctChars:0, wrongChars:0, extraChars:0, missedChars:0,
+  currentStreak:0, maxStreak:0,
+  wpmSamples:[],         // for WPM chart
+  accSamples:[],         // for accuracy chart
+  soundOn:false,
+  customText:"",
+  history: [],           // loaded from localStorage
+};
+
+/* Utils */
+function esc(s){ return String(s||"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function shuffle(a){ const r=a.slice(); for(let i=r.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [r[i],r[j]]=[r[j],r[i]]; } return r; }
+function rand(a){ return a[Math.floor(Math.random()*a.length)]; }
+function fmt(n, d=0) { return Number.isFinite(n) ? n.toFixed(d) : "0"; }
+
+/* Storage */
+function loadHistory() {
+  try {
+    const raw = localStorage.getItem("tss.history");
+    state.history = raw ? JSON.parse(raw) : [];
+  } catch { state.history = []; }
+}
+function saveHistoryEntry(entry) {
+  state.history.unshift(entry);
+  state.history = state.history.slice(0, 50);
+  try { localStorage.setItem("tss.history", JSON.stringify(state.history)); } catch {}
+}
+function personalBest() {
+  if (!state.history.length) return null;
+  return state.history.reduce((max, h) => h.wpm > (max?.wpm||0) ? h : max, null);
+}
+
+/* ============================================================
+   TEXT GENERATION
+   ============================================================ */
+function generateText() {
+  const mode = state.mode;
+  const cat = state.category;
+
+  if (mode === "custom" && state.customText.trim()) {
+    return state.customText.trim();
+  }
+  if (mode === "quote") {
+    return rand(QUOTES);
+  }
+  if (mode === "programming" || cat === "programming") {
+    const codes = CONTENT.programming;
+    return rand(codes).text;
+  }
+  if (mode === "words" || mode === "time" || mode === "focus" || mode === "zen") {
+    // For time/words modes: build a stream from the chosen category's passages
+    if (cat === "general") {
+      // Use common word bank for a proper random-word feel
+      const n = mode === "words" ? state.subValue : 60;
+      const words = [];
+      for (let i = 0; i < n; i++) words.push(rand(WORDS_COMMON));
+      return words.join(" ");
+    }
+    // Other categories — join sampled passages
+    const pool = CONTENT[cat] || CONTENT.general;
+    if (mode === "words") {
+      // Approximate word count from passages
+      let text = "";
+      while (text.split(/\s+/).length < state.subValue) text += " " + rand(pool);
+      const words = text.trim().split(/\s+/).slice(0, state.subValue);
+      return words.join(" ");
+    }
+    // time/focus/zen — just pick one passage (long enough)
+    let picked = rand(pool);
+    if (picked.length < 300) picked += " " + rand(pool);
+    return picked;
+  }
+  return rand(CONTENT.general);
+}
+
+/* ============================================================
+   RENDER TYPING TARGET
+   ============================================================ */
+function renderTypingText() {
+  const wrap = document.getElementById("typingWrap");
+  if (!wrap) return;
+  const target = state.text;
+  const input  = state.input;
+  const html = [];
+  const len = Math.max(target.length, input.length);
+  for (let i = 0; i < len; i++) {
+    const c = target[i];
+    const t = input[i];
+    let cls = "char";
+    if (i === input.length) cls += " current";
+    if (t === undefined) {
+      // untyped
+    } else if (c === undefined) {
+      cls += " extra";
+    } else if (t === c) {
+      cls += " correct";
+    } else {
+      cls += " wrong";
+    }
+    // Render space as visible dot on wrong; else as space
+    const display = c === undefined ? esc(t || "") : (c === " " ? "&nbsp;" : (c === "\n" ? "↵<br/>" : esc(c)));
+    html.push(`<span class="${cls}">${display}</span>`);
+  }
+  wrap.innerHTML = html.join("");
+  // Auto-scroll to keep current position visible if the wrap has overflow
+  const current = wrap.querySelector(".current");
+  if (current) current.scrollIntoView({ block: "nearest", inline: "nearest" });
+}
+
+/* ============================================================
+   METRICS
+   ============================================================ */
+function calcLive() {
+  const elapsedS = state.elapsed / 1000;
+  const elapsedM = elapsedS / 60;
+  const correctChars = state.correctChars;
+  const wrongChars = state.wrongChars;
+
+  // WPM (net) = (correct chars / 5) / minutes
+  const wpm = elapsedM > 0 ? (correctChars / 5) / elapsedM : 0;
+  // Raw WPM = (all typed chars / 5) / minutes
+  const totalTyped = correctChars + wrongChars + state.extraChars;
+  const rawWpm = elapsedM > 0 ? (totalTyped / 5) / elapsedM : 0;
+  const cpm = elapsedM > 0 ? correctChars / elapsedM : 0;
+  const acc = (correctChars + wrongChars) > 0 ? (correctChars / (correctChars + wrongChars)) * 100 : 100;
+  const completion = state.text.length ? Math.min(100, (state.input.length / state.text.length) * 100) : 0;
+  return {
+    wpm: Math.min(300, Math.round(wpm)),
+    rawWpm: Math.min(300, Math.round(rawWpm)),
+    cpm: Math.min(1500, Math.round(cpm)),
+    acc: Math.round(acc * 10) / 10,
+    completion,
+    mistakes: wrongChars,
+    streak: state.currentStreak,
+    remaining: computeRemaining(),
+  };
+}
+function computeRemaining() {
+  if (state.mode === "time" && !["zen","focus","words","quote","programming","custom"].includes(state.mode)) {
+    return Math.max(0, state.subValue - state.elapsed/1000);
+  }
+  if (state.mode === "words") {
+    const typedWords = state.input.trim().split(/\s+/).filter(Boolean).length;
+    return Math.max(0, state.subValue - typedWords);
+  }
+  return null;
+}
+
+function updateLiveStats() {
+  const m = calcLive();
+  const el = document.getElementById("liveStats");
+  if (!el) return;
+  const timeStr = state.mode === "time"
+    ? `${Math.ceil(m.remaining ?? state.subValue)}s`
+    : `${(state.elapsed/1000).toFixed(0)}s`;
+  const wordsStr = state.mode === "words" ? `${state.subValue - (m.remaining ?? state.subValue)}/${state.subValue}` : "";
+  el.innerHTML = `
+    <div class="stat"><span class="val">${m.wpm}</span><span class="k">WPM</span></div>
+    <div class="stat"><span class="val">${m.acc}%</span><span class="k">ACC</span></div>
+    <div class="stat"><span class="val">${m.rawWpm}</span><span class="k">RAW</span></div>
+    <div class="stat"><span class="val">${m.mistakes}</span><span class="k">ERR</span></div>
+    <div class="stat"><span class="val">${timeStr}</span><span class="k">${state.mode === "time" ? "LEFT" : "TIME"}</span></div>
+    ${wordsStr ? `<div class="stat"><span class="val">${wordsStr}</span><span class="k">W</span></div>` : ""}
+    <div class="stat"><span class="val">${state.maxStreak}</span><span class="k">STREAK</span></div>
+  `;
+  const bar = document.getElementById("progress");
+  if (bar) bar.style.width = m.completion + "%";
+}
+
+/* ============================================================
+   AUDIO — subtle click via WebAudio API
+   ============================================================ */
+let audioCtx = null;
+function playClick(kind) {
+  if (!state.soundOn) return;
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    o.type = "sine";
+    o.frequency.value = kind === "wrong" ? 220 : 660;
+    g.gain.value = 0.05;
+    o.connect(g).connect(audioCtx.destination);
+    o.start();
+    g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+    o.stop(audioCtx.currentTime + 0.06);
+  } catch {}
+}
+
+/* ============================================================
+   INPUT / GAMEPLAY
+   ============================================================ */
+function startSession() {
+  state.running = true; state.finished = false; state.paused = false;
+  state.startedAt = Date.now(); state.elapsed = 0;
+  state.correctChars = 0; state.wrongChars = 0; state.extraChars = 0; state.missedChars = 0;
+  state.currentStreak = 0; state.maxStreak = 0;
+  state.errorChars = {}; state.wpmSamples = []; state.accSamples = []; state.perCharTimes = [];
+  document.body.classList.remove("finished");
+
+  if (state.timerInterval) clearInterval(state.timerInterval);
+  state.timerInterval = setInterval(() => {
+    if (!state.paused && state.running) {
+      state.elapsed = Date.now() - state.startedAt;
+      // Sample per second
+      const s = Math.floor(state.elapsed/1000);
+      if (s > state.wpmSamples.length) {
+        const m = calcLive();
+        state.wpmSamples.push(m.wpm);
+        state.accSamples.push(m.acc);
+      }
+      // Time mode auto-finish
+      if (state.mode === "time" && state.elapsed >= state.subValue * 1000) {
+        finishSession();
+      }
+      updateLiveStats();
+    }
+  }, 100);
+}
+
+function finishSession() {
+  if (!state.running) return;
+  state.running = false; state.finished = true;
+  if (state.timerInterval) clearInterval(state.timerInterval);
+  document.body.classList.add("finished");
+  updateLiveStats();
+
+  const m = calcLive();
+  // Save history unless zen (no scoring) or empty
+  if (state.mode !== "zen" && (state.correctChars + state.wrongChars) > 5) {
+    saveHistoryEntry({
+      date: new Date().toISOString(),
+      mode: state.mode,
+      category: state.category,
+      sub: state.subValue,
+      wpm: m.wpm, rawWpm: m.rawWpm, acc: m.acc,
+      correct: state.correctChars, wrong: state.wrongChars, extra: state.extraChars,
+      mistakes: state.wrongChars,
+      elapsed: Math.round(state.elapsed/1000),
+    });
+  }
+  renderDashboard();
+}
+
+function handleTyping(char) {
+  if (!state.running || state.finished || state.paused) {
+    if (!state.running && !state.finished) startSession();
+    else return;
+  }
+  const idx = state.input.length;
+  const target = state.text[idx];
+  if (char === "\b") {
+    // Backspace
+    if (state.input.length > 0) {
+      const removed = state.input[state.input.length-1];
+      const targetRemoved = state.text[state.input.length-1];
+      if (removed === targetRemoved) state.correctChars = Math.max(0, state.correctChars - 1);
+      else state.wrongChars = Math.max(0, state.wrongChars - 1);
+      state.input = state.input.slice(0, -1);
+      renderTypingText();
+      updateLiveStats();
+    }
+    return;
+  }
+  state.input += char;
+
+  if (target === undefined) {
+    state.extraChars++;
+    playClick("wrong");
+  } else if (char === target) {
+    state.correctChars++;
+    state.currentStreak++;
+    state.maxStreak = Math.max(state.maxStreak, state.currentStreak);
+    playClick("good");
+  } else {
+    state.wrongChars++;
+    state.currentStreak = 0;
+    state.errorChars[target] = (state.errorChars[target] || 0) + 1;
+    playClick("wrong");
+  }
+
+  renderTypingText();
+  updateLiveStats();
+
+  // Finish conditions
+  if (state.mode === "words") {
+    const typedWords = state.input.trim().split(/\s+/).filter(Boolean).length;
+    if (typedWords >= state.subValue) finishSession();
+  } else if (state.mode === "quote" || state.mode === "programming" || state.mode === "custom") {
+    if (state.input.length >= state.text.length) finishSession();
+  } else if (state.mode === "focus" || state.mode === "zen") {
+    if (state.input.length >= state.text.length) finishSession();
+  }
+}
+
+/* ============================================================
+   RENDER STAGE
+   ============================================================ */
+function renderStage() {
+  const isZen = state.mode === "zen";
+  document.body.classList.toggle("focusMode", state.mode === "focus");
+  document.body.classList.toggle("zenMode", isZen);
+
+  document.getElementById("stage").innerHTML = `
+    <div class="progressBar liveStats-container ${isZen ? "hidden" : ""}"><i id="progress" style="width:0%"></i></div>
+    <div class="liveStats" id="liveStats"></div>
+    <div class="typingCard">
+      <div class="typingWrap ${state.text ? "" : "blurred"}" id="typingWrap"></div>
+      <div class="clickToFocus" id="clickToFocus"><b>Click here</b> and start typing · <kbd>Tab</kbd> restart · <kbd>Esc</kbd> new text</div>
+      <div class="actionBar nonTyping">
+        <button class="btn" id="restartBtn">↻ Restart</button>
+        <button class="btn" id="newTextBtn">🎲 New Text</button>
+        <button class="btn" id="pauseBtn">⏸ Pause</button>
+        ${state.mode === "custom" ? `<button class="btn" id="editCustomBtn">✏️ Edit Custom Text</button>` : ""}
+      </div>
+      <div class="actionHint nonTyping">
+        <kbd>Tab</kbd> restart same text · <kbd>Esc</kbd> new text · <kbd>Space</kbd> pause/resume
+      </div>
+    </div>
+  `;
+
+  // Set up new text and reset state
+  state.text = generateText();
+  state.input = ""; state.running = false; state.finished = false;
+  state.correctChars = 0; state.wrongChars = 0; state.extraChars = 0;
+  state.elapsed = 0; state.currentStreak = 0; state.maxStreak = 0;
+  state.errorChars = {}; state.wpmSamples = []; state.accSamples = [];
+  document.body.classList.remove("finished");
+  renderTypingText();
+  updateLiveStats();
+
+  // Bind buttons
+  document.getElementById("restartBtn").addEventListener("click", () => restart(false));
+  document.getElementById("newTextBtn").addEventListener("click", () => restart(true));
+  document.getElementById("pauseBtn").addEventListener("click", togglePause);
+  const editBtn = document.getElementById("editCustomBtn");
+  if (editBtn) editBtn.addEventListener("click", promptCustomText);
+
+  // Focus the hidden input
+  const hi = document.getElementById("hiddenInput");
+  document.getElementById("typingWrap").addEventListener("click", () => hi.focus());
+  document.getElementById("clickToFocus").addEventListener("click", () => hi.focus());
+  setTimeout(() => hi.focus(), 50);
+}
+
+function restart(newText) {
+  if (newText) state.text = generateText();
+  state.input = ""; state.running = false; state.finished = false;
+  state.correctChars = 0; state.wrongChars = 0; state.extraChars = 0;
+  state.elapsed = 0; state.currentStreak = 0; state.maxStreak = 0;
+  state.errorChars = {}; state.wpmSamples = []; state.accSamples = [];
+  if (state.timerInterval) clearInterval(state.timerInterval);
+  document.body.classList.remove("finished");
+  renderTypingText();
+  updateLiveStats();
+  document.getElementById("hiddenInput").focus();
+}
+
+function togglePause() {
+  if (!state.running) return;
+  state.paused = !state.paused;
+  const btn = document.getElementById("pauseBtn");
+  if (btn) btn.textContent = state.paused ? "▶ Resume" : "⏸ Pause";
+  if (state.paused) { state.pauseStart = Date.now(); }
+  else if (state.pauseStart) { state.startedAt += (Date.now() - state.pauseStart); state.pauseStart = null; }
+}
+
+function promptCustomText() {
+  const t = prompt("Paste your custom text below:", state.customText || "");
+  if (t !== null) {
+    state.customText = t;
+    restart(true);
+  }
+}
+
+/* ============================================================
+   ANALYTICS DASHBOARD
+   ============================================================ */
+function renderDashboard() {
+  const stage = document.getElementById("stage");
+  const m = calcLive();
+  const pb = personalBest();
+  const isPB = pb && pb.wpm === m.wpm && Date.now() - new Date(pb.date).getTime() < 5000;
+
+  // Consistency = 100 - (stdev of wpmSamples / mean * 100)
+  const samples = state.wpmSamples.filter(x => Number.isFinite(x) && x > 0);
+  let consistency = 100;
+  if (samples.length > 3) {
+    const mean = samples.reduce((a,b)=>a+b,0)/samples.length;
+    const variance = samples.reduce((a,b)=>a+(b-mean)*(b-mean),0)/samples.length;
+    const stdev = Math.sqrt(variance);
+    consistency = Math.max(0, Math.min(100, Math.round(100 - (stdev / (mean||1)) * 100)));
+  }
+
+  // Percentile estimate (very rough): map WPM to a curve
+  let percentile = 50;
+  if (m.wpm >= 100) percentile = 95;
+  else if (m.wpm >= 80) percentile = 90;
+  else if (m.wpm >= 70) percentile = 80;
+  else if (m.wpm >= 60) percentile = 70;
+  else if (m.wpm >= 50) percentile = 55;
+  else if (m.wpm >= 40) percentile = 40;
+  else if (m.wpm >= 30) percentile = 25;
+  else percentile = 10;
+
+  // Achievement badges
+  const badges = computeBadges(m, consistency);
+
+  // Top mistyped keys
+  const topErrors = Object.entries(state.errorChars).sort((a,b) => b[1] - a[1]).slice(0, 10);
+
+  // Chart SVGs
+  const wpmChart = renderLineChart(state.wpmSamples, "#e2b714", "WPM over time");
+  const accChart = renderLineChart(state.accSamples, "#4ade80", "Accuracy over time", 100);
+
+  // Summary text
+  const summary = generateSummary(m, consistency, topErrors);
+
+  stage.innerHTML = `
+    <div class="typingCard dashCard">
+      <div class="dashHead">
+        <div>
+          <div class="k">Session Complete · ${state.mode.toUpperCase()} / ${state.category.toUpperCase()}</div>
+          <h3>Analytics Dashboard ${isPB ? '<span class="badge earned" style="margin-left:8px;">🏆 New Personal Best</span>' : ""}</h3>
+          <div class="goal">Session duration: ${(state.elapsed/1000).toFixed(1)}s · ${state.correctChars + state.wrongChars + state.extraChars} chars typed</div>
+        </div>
+      </div>
+
+      <div class="dashGrid">
+        <div class="dashStat">
+          <div class="k">WPM</div>
+          <div class="v">${m.wpm}</div>
+          <div class="sm">Raw ${m.rawWpm}</div>
+        </div>
+        <div class="dashStat">
+          <div class="k">Accuracy</div>
+          <div class="v">${m.acc}%</div>
+          <div class="sm">${m.mistakes} mistakes</div>
+        </div>
+        <div class="dashStat">
+          <div class="k">Consistency</div>
+          <div class="v">${consistency}%</div>
+          <div class="sm">${state.maxStreak} char streak</div>
+        </div>
+        <div class="dashStat pb">
+          <div class="k">Percentile est.</div>
+          <div class="v">${percentile}%</div>
+          <div class="sm">${pb ? `PB ${pb.wpm} WPM` : "no history yet"}</div>
+        </div>
+      </div>
+
+      <div class="dashSect">
+        <h4>WPM & Accuracy over time</h4>
+        <div class="twoCol">
+          <div class="chartCard">
+            <div style="font-size:11px; color:var(--text-mute); letter-spacing:1.5px; text-transform:uppercase; font-weight:800; margin-bottom:6px;">WPM</div>
+            <div class="chartWrap">${wpmChart}</div>
+          </div>
+          <div class="chartCard">
+            <div style="font-size:11px; color:var(--text-mute); letter-spacing:1.5px; text-transform:uppercase; font-weight:800; margin-bottom:6px;">Accuracy</div>
+            <div class="chartWrap">${accChart}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dashSect twoCol">
+        <div class="chartCard">
+          <h4 style="margin-top:0;">Characters Typed</h4>
+          <div class="charBars">
+            <div class="charRow correct"><div class="lbl">Correct</div><div class="bar"><i style="width:${pct(state.correctChars, totalChars())}%"></i></div><div class="v">${state.correctChars}</div></div>
+            <div class="charRow wrong"><div class="lbl">Incorrect</div><div class="bar"><i style="width:${pct(state.wrongChars, totalChars())}%"></i></div><div class="v">${state.wrongChars}</div></div>
+            <div class="charRow extra"><div class="lbl">Extra</div><div class="bar"><i style="width:${pct(state.extraChars, totalChars())}%"></i></div><div class="v">${state.extraChars}</div></div>
+            <div class="charRow missed"><div class="lbl">Missed</div><div class="bar"><i style="width:${pct(missedCount(), state.text.length)}%"></i></div><div class="v">${missedCount()}</div></div>
+          </div>
+        </div>
+        <div class="chartCard">
+          <h4 style="margin-top:0;">Error Heatmap (top mistyped keys)</h4>
+          ${topErrors.length ? `
+            <div class="heatmap">${topErrors.map(([k,v]) => {
+              const cls = v > 4 ? "hot" : v > 2 ? "mid" : "";
+              return `<div class="heatCell ${cls}">${esc(k === " " ? "␣" : k)}<span class="cnt">${v}</span></div>`;
+            }).join("")}</div>
+          ` : `<div style="color:var(--text-mute); font-size:13px;">No errors recorded — clean run.</div>`}
+        </div>
+      </div>
+
+      <div class="dashSect">
+        <h4>Achievements</h4>
+        <div class="badges">${badges.map(b => `<div class="badge earned">${b}</div>`).join("") || `<div class="badge">Keep practicing to unlock badges</div>`}</div>
+      </div>
+
+      <div class="dashSect chartCard">
+        <h4 style="margin-top:0;">Performance Summary</h4>
+        <div class="summary">${summary}</div>
+      </div>
+
+      <div class="actionBar">
+        <button class="btn primary" id="againBtn">↻ Try Again (Tab)</button>
+        <button class="btn" id="newTextBtn2">🎲 New Text (Esc)</button>
+        <button class="btn" id="historyBtn2">📊 View History</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById("againBtn").addEventListener("click", () => { renderStage(); });
+  document.getElementById("newTextBtn2").addEventListener("click", () => { renderStage(); });
+  document.getElementById("historyBtn2").addEventListener("click", renderHistory);
+}
+
+function totalChars() {
+  return Math.max(1, state.correctChars + state.wrongChars + state.extraChars);
+}
+function missedCount() {
+  return Math.max(0, state.text.length - state.correctChars - state.wrongChars);
+}
+function pct(n, d) { return d > 0 ? Math.round((n/d)*100) : 0; }
+
+function computeBadges(m, consistency) {
+  const badges = [];
+  if (m.wpm >= 40) badges.push("⚡ 40+ WPM");
+  if (m.wpm >= 60) badges.push("🚀 60+ WPM");
+  if (m.wpm >= 80) badges.push("💨 80+ WPM");
+  if (m.wpm >= 100) badges.push("🔥 Century Club");
+  if (m.acc >= 95) badges.push("🎯 Sharp — 95%+ accuracy");
+  if (m.acc === 100) badges.push("💎 Perfect Run");
+  if (consistency >= 80) badges.push("📏 Consistent");
+  if (state.maxStreak >= 100) badges.push("⛓️ 100-char streak");
+  if (state.mode === "programming" || state.category === "programming") badges.push("👩‍💻 Code Sprint");
+  return badges;
+}
+
+function generateSummary(m, consistency, topErrors) {
+  const parts = [];
+  parts.push(`<b>Strengths.</b> `);
+  if (m.acc >= 95) parts.push(`Your accuracy at ${m.acc}% shows disciplined typing — you're not sacrificing correctness for speed. `);
+  else if (m.wpm >= 60) parts.push(`Your ${m.wpm} WPM is above average — the speed engine is there. `);
+  else parts.push(`You typed at ${m.wpm} WPM with ${m.acc}% accuracy. A solid baseline to build from. `);
+  if (state.maxStreak >= 50) parts.push(`Your longest streak of ${state.maxStreak} correct characters shows real flow. `);
+  parts.push(`<br/><br/><b>Weaknesses.</b> `);
+  if (m.acc < 90) parts.push(`Accuracy at ${m.acc}% is below the sharp threshold. Errors typically cost more WPM than slow typing does. `);
+  if (consistency < 70) parts.push(`Consistency at ${consistency}% suggests your speed spikes and drops throughout the session — smoothing that curve is where the next 10 WPM comes from. `);
+  if (topErrors.length > 3) parts.push(`You had ${topErrors.length}+ distinct problem keys — the top three were <b>${topErrors.slice(0,3).map(([k])=> k === " " ? "space" : k).join(", ")}</b>. `);
+  parts.push(`<br/><br/><b>Suggestion.</b> `);
+  if (m.acc < 90) parts.push(`Slow down deliberately for the next three sessions. Target 95% accuracy first — speed will follow. `);
+  else if (m.wpm < 40) parts.push(`Practice common word bigrams and trigrams. Speed comes from finger patterns, not from individual keys. `);
+  else if (consistency < 70) parts.push(`Try focus mode or word-count mode with a fixed length — same-length sessions build rhythm faster than time-mode does. `);
+  else parts.push(`Progress from here comes from more time on task. 20 minutes daily beats 3 hours weekly. `);
+  return parts.join("");
+}
+
+/* Line chart SVG */
+function renderLineChart(samples, color, title, maxCap) {
+  const w = 480, h = 160, pad = 20;
+  if (!samples.length) {
+    return `<svg class="chartSvg" viewBox="0 0 ${w} ${h}"><text x="${w/2}" y="${h/2}" text-anchor="middle" font-family="system-ui" font-size="12" fill="#646669">No data</text></svg>`;
+  }
+  const max = maxCap || Math.max(...samples, 20);
+  const min = 0;
+  const stepX = (w - 2*pad) / Math.max(1, samples.length - 1);
+  const pts = samples.map((v, i) => {
+    const x = pad + i * stepX;
+    const y = h - pad - ((v - min) / (max - min || 1)) * (h - 2*pad);
+    return `${x},${y}`;
+  });
+  const area = `M ${pad},${h-pad} L ${pts.join(" L ")} L ${pad + (samples.length-1)*stepX},${h-pad} Z`;
+  const line = `M ${pts.join(" L ")}`;
+  return `
+    <svg class="chartSvg" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g${color.replace('#','')}" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="${color}" stop-opacity="0.4"/>
+          <stop offset="100%" stop-color="${color}" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <path d="${area}" fill="url(#g${color.replace('#','')})"/>
+      <path d="${line}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+      ${samples.map((v, i) => {
+        const x = pad + i * stepX;
+        const y = h - pad - ((v - min) / (max - min || 1)) * (h - 2*pad);
+        return `<circle cx="${x}" cy="${y}" r="2.5" fill="${color}"/>`;
+      }).join("")}
+      <text x="${w-pad}" y="${pad+4}" text-anchor="end" font-family="system-ui" font-size="11" font-weight="800" fill="#a8adb4">${Math.round(Math.max(...samples))}</text>
+      <text x="${pad}" y="${h-4}" font-family="system-ui" font-size="10" fill="#646669">0s</text>
+      <text x="${w-pad}" y="${h-4}" text-anchor="end" font-family="system-ui" font-size="10" fill="#646669">${samples.length}s</text>
+    </svg>
+  `;
+}
+
+/* ============================================================
+   HISTORY VIEW
+   ============================================================ */
+function renderHistory() {
+  const stage = document.getElementById("stage");
+  const rows = state.history.map((h, i) => {
+    const d = new Date(h.date);
+    const isPB = h.wpm === Math.max(...state.history.map(x => x.wpm));
+    return `
+      <div class="historyItem">
+        <span class="wpm">${h.wpm} WPM</span>
+        <span>${h.acc}% acc</span>
+        <span>${h.mode}</span>
+        <span>${h.category}</span>
+        <span>${d.toLocaleDateString()} · ${d.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} ${isPB ? '<span class="pb">🏆 PB</span>' : ""}</span>
+      </div>
+    `;
+  }).join("");
+
+  const pb = personalBest();
+  const avgWpm = state.history.length ? Math.round(state.history.reduce((a,b) => a+b.wpm, 0) / state.history.length) : 0;
+  const avgAcc = state.history.length ? Math.round(state.history.reduce((a,b) => a+b.acc, 0) / state.history.length) : 0;
+
+  stage.innerHTML = `
+    <div class="typingCard dashCard">
+      <div class="dashHead">
+        <div>
+          <div class="k">Session History</div>
+          <h3>${state.history.length} recorded sessions</h3>
+          <div class="goal">Stored locally in your browser. Nothing leaves your device.</div>
+        </div>
+      </div>
+
+      ${state.history.length ? `
+        <div class="dashGrid">
+          <div class="dashStat"><div class="k">Personal Best</div><div class="v">${pb.wpm}</div><div class="sm">WPM</div></div>
+          <div class="dashStat"><div class="k">Average WPM</div><div class="v">${avgWpm}</div><div class="sm">across sessions</div></div>
+          <div class="dashStat"><div class="k">Average Acc</div><div class="v">${avgAcc}%</div><div class="sm">across sessions</div></div>
+          <div class="dashStat"><div class="k">Sessions</div><div class="v">${state.history.length}</div><div class="sm">total</div></div>
+        </div>
+
+        <div class="dashSect">
+          <h4>Recent sessions</h4>
+          <div class="historyList">${rows}</div>
+        </div>
+
+        <div class="actionBar">
+          <button class="btn primary" id="backBtn">← Back to Practice</button>
+          <button class="btn" id="clearBtn">🗑 Clear History</button>
+        </div>
+      ` : `
+        <div style="text-align:center; padding:40px 20px; color:var(--text-mute);">
+          <div style="font-size:48px; opacity:.4;">📊</div>
+          <div style="margin-top:12px;">No sessions recorded yet. Complete a practice session to start tracking progress.</div>
+          <div class="actionBar">
+            <button class="btn primary" id="backBtn">← Start Typing</button>
+          </div>
+        </div>
+      `}
+    </div>
+  `;
+
+  document.getElementById("backBtn").addEventListener("click", () => renderStage());
+  const clr = document.getElementById("clearBtn");
+  if (clr) clr.addEventListener("click", () => {
+    if (confirm("Clear all history? This can't be undone.")) {
+      state.history = [];
+      try { localStorage.removeItem("tss.history"); } catch {}
+      renderHistory();
+    }
+  });
+}
+
+/* ============================================================
+   SETTINGS BAR BEHAVIOR
+   ============================================================ */
+const SUB_OPTIONS = {
+  time:        { lbl:"Seconds", values:[15,30,60,120], default:30 },
+  words:       { lbl:"Words",   values:[25,50,100,250], default:50 },
+  quote:       { lbl:"Quote",   values:[], default:null },
+  programming: { lbl:"Language", values:["JavaScript","Python","HTML","CSS","SQL","Java","C++"], default:"JavaScript" },
+  custom:      { lbl:"Custom",  values:[], default:null },
+  focus:       { lbl:"Focus",   values:[], default:null },
+  zen:         { lbl:"Zen",     values:[], default:null },
+};
+
+function renderSubOptions() {
+  const wrap = document.getElementById("subOpts");
+  const lbl = document.getElementById("subLbl");
+  const cfg = SUB_OPTIONS[state.mode];
+  lbl.textContent = cfg.lbl;
+  if (!cfg.values.length) {
+    wrap.innerHTML = `<span style="color:var(--text-mute); font-size:11px; padding:0 4px;">—</span>`;
+    return;
+  }
+  wrap.innerHTML = cfg.values.map(v => `<button class="opt big ${v === state.subValue ? "active" : ""}" data-sub="${v}">${v}</button>`).join("");
+  wrap.querySelectorAll(".opt").forEach(b => b.addEventListener("click", () => {
+    const val = isNaN(parseInt(b.dataset.sub)) ? b.dataset.sub : parseInt(b.dataset.sub);
+    state.subValue = val;
+    if (state.mode === "programming") {
+      // Filter code samples by language
+    }
+    renderSubOptions();
+    renderStage();
+  }));
+}
+
+function bindSettingsBar() {
+  document.querySelectorAll(".settingsBar .opt[data-mode]").forEach(b => {
+    b.addEventListener("click", () => {
+      state.mode = b.dataset.mode;
+      const def = SUB_OPTIONS[state.mode].default;
+      if (def !== null && def !== undefined) state.subValue = def;
+      document.querySelectorAll(".settingsBar .opt[data-mode]").forEach(x => x.classList.toggle("active", x === b));
+      renderSubOptions();
+      renderStage();
+    });
+  });
+  document.getElementById("categorySel").addEventListener("change", e => {
+    state.category = e.target.value;
+    renderStage();
+  });
+  document.querySelectorAll(".settingsBar .opt[data-fs]").forEach(b => {
+    b.addEventListener("click", () => {
+      const fs = b.dataset.fs;
+      document.body.classList.remove("fs-small","fs-medium","fs-large","fs-xl");
+      document.body.classList.add("fs-" + fs);
+      document.querySelectorAll(".settingsBar .opt[data-fs]").forEach(x => x.classList.toggle("active", x === b));
+    });
+  });
+
+  // Set default active mode
+  document.querySelector('.settingsBar .opt[data-mode="time"]').classList.add("active");
+  renderSubOptions();
+}
+
+/* ============================================================
+   HEADER ACTIONS
+   ============================================================ */
+document.getElementById("soundToggle").addEventListener("click", (e) => {
+  state.soundOn = !state.soundOn;
+  e.currentTarget.textContent = state.soundOn ? "🔊 Sound" : "🔇 Muted";
+  e.currentTarget.classList.toggle("active", state.soundOn);
+});
+document.getElementById("historyBtn").addEventListener("click", renderHistory);
+document.querySelectorAll(".themeDot").forEach(d => {
+  d.addEventListener("click", () => {
+    document.body.setAttribute("data-theme", d.dataset.theme);
+    document.querySelectorAll(".themeDot").forEach(x => x.classList.remove("active"));
+    d.classList.add("active");
+  });
+});
+
+/* ============================================================
+   KEYBOARD INPUT
+   ============================================================ */
+document.addEventListener("keydown", (e) => {
+  // Global shortcuts
+  if (e.key === "Tab") { e.preventDefault(); renderStage(); return; }
+  if (e.key === "Escape") { e.preventDefault(); renderStage(); return; }
+  if (e.key === " " && !state.running && document.getElementById("typingWrap")) {
+    // pass through — starts session
+  }
+  // Focus hidden input on any key when on typing card
+  const wrap = document.getElementById("typingWrap");
+  if (wrap && document.activeElement !== document.getElementById("hiddenInput")) {
+    document.getElementById("hiddenInput").focus();
+  }
+});
+
+/* Capture keystrokes via hidden input */
+document.getElementById("hiddenInput").addEventListener("keydown", (e) => {
+  const wrap = document.getElementById("typingWrap");
+  if (!wrap) return;
+  if (e.key === "Tab") { e.preventDefault(); renderStage(); return; }
+  if (e.key === "Escape") { e.preventDefault(); renderStage(); return; }
+  if (e.key === "Backspace") { e.preventDefault(); handleTyping("\b"); return; }
+  if (e.key.length === 1) {
+    e.preventDefault();
+    handleTyping(e.key);
+  } else if (e.key === "Enter" && (state.mode === "programming" || state.text.includes("\n"))) {
+    e.preventDefault();
+    handleTyping("\n");
+  }
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+loadHistory();
+bindSettingsBar();
+renderStage();
+</script>
+</body>
+</html>
