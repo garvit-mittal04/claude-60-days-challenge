@@ -1,0 +1,1789 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>🎓 Interactive Learning Studio — SQL Window Functions · Day 41</title>
+<style>
+/* =============================================================
+   INTERACTIVE LEARNING STUDIO — Day 41
+   Topic: SQL Window Functions
+   Single HTML file · Vanilla CSS + JS · No frameworks
+   ============================================================= */
+
+:root {
+  --bg:        #0b1220;
+  --bg-2:      #0f1729;
+  --panel:     #141c30;
+  --panel-2:   #1c2540;
+  --line:      #263148;
+  --line-2:    #364260;
+  --text:      #e2e8f0;
+  --text-dim:  #b4c0d4;
+  --text-mute: #7c8aa5;
+
+  --accent:    #38bdf8;
+  --accent-2:  #7dd3fc;
+  --accent-soft: rgba(56,189,248,.16);
+
+  --good:      #4ade80;
+  --bad:       #f56565;
+  --warn:      #fbbf24;
+  --gold:      #ffd166;
+  --purple:    #a687ff;
+  --pink:      #ff7bb5;
+
+  --shadow:    0 20px 60px rgba(0,0,0,.55);
+  --radius:    14px;
+  --easing:    cubic-bezier(.2,.8,.2,1);
+  --mono:      "JetBrains Mono", "Fira Code", ui-monospace, Menlo, monospace;
+}
+
+body.lightMode {
+  --bg:#f6f8fb; --bg-2:#fff; --panel:#fff; --panel-2:#f0f4fa;
+  --line:#e2e8f0; --line-2:#cbd5e1;
+  --text:#0f172a; --text-dim:#475569; --text-mute:#94a3b8;
+  --shadow: 0 12px 40px rgba(15,23,42,.08);
+}
+
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body {
+  margin:0; padding:0; min-height:100%;
+  background:
+    radial-gradient(1000px 700px at 10% -10%, var(--accent-soft), transparent 60%),
+    radial-gradient(800px 500px at 100% 100%, rgba(166,135,255,.08), transparent 60%),
+    var(--bg);
+  color:var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+  -webkit-font-smoothing:antialiased;
+  line-height:1.6;
+}
+.mono { font-family: var(--mono); }
+.app { max-width:1180px; margin:0 auto; padding:22px 24px 60px; }
+
+/* ========== HEADER ========== */
+header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 0 16px; margin-bottom:16px; flex-wrap:wrap; gap:12px;
+  border-bottom:1px solid var(--line);
+}
+.brand { display:flex; align-items:center; gap:14px; }
+.logo {
+  width:52px; height:52px; border-radius:14px;
+  background:linear-gradient(135deg, var(--accent), var(--purple));
+  display:flex; align-items:center; justify-content:center; font-size:26px;
+  box-shadow: 0 12px 30px rgba(0,0,0,.4);
+}
+.brand h1 { margin:0; font-size:22px; font-weight:800; letter-spacing:-.3px; }
+.brand .sub { font-size:11px; color:var(--text-mute); letter-spacing:2px; text-transform:uppercase; font-weight:700; }
+
+.headActions { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.hud {
+  padding:6px 12px; border-radius:999px; font-size:11px; letter-spacing:1.5px; text-transform:uppercase;
+  font-weight:800; background:var(--panel); border:1px solid var(--line); color:var(--text-dim);
+}
+.hud.gold { border-color:var(--gold); color:var(--gold); background:rgba(255,209,102,.08); }
+.hud b { color:var(--text); font-family:var(--mono); }
+.iconBtn {
+  background:var(--panel); border:1px solid var(--line);
+  color:var(--text-dim); padding:8px 14px; border-radius:10px; cursor:pointer;
+  font-size:13px; font-weight:700;
+  transition:border-color .12s, background .15s, color .12s;
+}
+.iconBtn:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
+
+/* ========== PROGRESS ========== */
+.progressBar { height:6px; background:var(--panel-2); border-radius:3px; overflow:hidden; margin-bottom:20px; }
+.progressBar i { display:block; height:100%; background: linear-gradient(90deg, var(--accent), var(--purple)); transition: width .6s var(--easing); border-radius:3px; }
+
+/* ========== SIDEBAR TAB NAV ========== */
+.tabRow {
+  display:flex; gap:6px; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:5px; margin-bottom:18px; overflow-x:auto;
+}
+.tab {
+  flex:1; min-width:130px; padding:10px 14px; border:none; background:transparent; color:var(--text-dim); cursor:pointer;
+  border-radius:8px; font-size:12.5px; font-weight:700; letter-spacing:.3px;
+  transition:background .15s, color .12s;
+  font-family:inherit;
+  display:flex; align-items:center; gap:6px; justify-content:center;
+  white-space:nowrap;
+}
+.tab:hover { color:var(--text); background:var(--panel-2); }
+.tab.active { background:linear-gradient(135deg, var(--accent), var(--purple)); color:#0a0e18; font-weight:800; }
+.tab.locked { opacity:.45; cursor:not-allowed; }
+.tab .num { display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background:rgba(255,255,255,.1); font-size:10px; font-weight:900; }
+.tab.active .num { background:rgba(0,0,0,.15); }
+.tab.done .num { background:var(--good); color:#0a0e18; }
+.tab.done .num::before { content:"✓"; }
+.tab.done .num > * { display:none; }
+
+/* ========== CARDS ========== */
+.card {
+  background:linear-gradient(180deg, var(--panel), var(--bg-2));
+  border:1px solid var(--line); border-radius:var(--radius);
+  padding:26px 30px; box-shadow:var(--shadow); margin-bottom:16px;
+  animation: fadeIn .3s var(--easing) both;
+}
+@keyframes fadeIn { from { opacity:0; transform:translateY(6px);} to { opacity:1; transform:translateY(0);} }
+
+.card h2 { margin:0 0 8px; font-size:26px; font-weight:800; letter-spacing:-.4px; }
+.card h3 { margin:24px 0 10px; font-size:20px; font-weight:800; letter-spacing:-.2px; color:var(--text); }
+.card h4 { margin:18px 0 6px; font-size:14px; font-weight:800; letter-spacing:1.2px; text-transform:uppercase; color:var(--accent); }
+.card p { color:var(--text-dim); font-size:15px; line-height:1.75; margin:8px 0; }
+.card p b, .card p strong { color:var(--text); font-weight:800; }
+.card ul, .card ol { color:var(--text-dim); font-size:15px; line-height:1.75; padding-left:22px; margin:8px 0; }
+.card ul li, .card ol li { margin:4px 0; }
+.card ul li::marker { color:var(--accent); }
+.card code {
+  font-family:var(--mono); background:var(--panel-2); border:1px solid var(--line);
+  padding:1px 6px; border-radius:5px; font-size:13px; color:var(--accent);
+}
+
+.tag { display:inline-block; font-size:10px; padding:3px 10px; border-radius:999px; background:var(--accent-soft); color:var(--accent); border:1px solid var(--accent); font-weight:800; letter-spacing:1.5px; }
+
+/* ========== WELCOME CARD ========== */
+.welcome { text-align:center; padding:26px 20px; }
+.welcome .title-big {
+  font-size:44px; font-weight:900; letter-spacing:-1.2px; line-height:1.1;
+  background: linear-gradient(135deg, #fff, var(--accent-2), var(--purple));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.welcome .tag-big { color:var(--text-dim); font-size:16px; margin:12px auto 0; max-width:620px; line-height:1.7; }
+.factGrid { display:grid; grid-template-columns:repeat(4, 1fr); gap:12px; margin:20px 0 8px; text-align:center; }
+@media(max-width:720px){ .factGrid { grid-template-columns:repeat(2, 1fr); } }
+.factTile { background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+.factTile .k { font-size:10px; color:var(--text-mute); letter-spacing:2px; font-weight:800; text-transform:uppercase; }
+.factTile .v { font-family:var(--mono); font-size:22px; color:var(--accent); font-weight:800; margin-top:4px; }
+
+.checkList { text-align:left; max-width:520px; margin:22px auto 0; }
+.checkList li { list-style:none; padding:8px 0 8px 30px; position:relative; color:var(--text-dim); font-size:14px; }
+.checkList li::before {
+  content:"✓"; position:absolute; left:0; top:8px;
+  width:20px; height:20px; border-radius:50%;
+  background:var(--good); color:#0a0e18; display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:900;
+}
+
+/* ========== CODE BLOCK / SQL ========== */
+.codeBlock {
+  background:#0a0f1c; border:1px solid var(--line); border-radius:10px;
+  padding:14px 16px; overflow-x:auto;
+  font-family:var(--mono); font-size:13.5px; line-height:1.7;
+  color:var(--text); margin:12px 0;
+  white-space:pre;
+  position:relative;
+}
+.codeBlock .copy {
+  position:absolute; top:8px; right:8px;
+  padding:4px 10px; font-size:10px; border-radius:6px;
+  background:var(--panel); border:1px solid var(--line); color:var(--text-mute);
+  cursor:pointer; letter-spacing:1.5px; font-weight:800; text-transform:uppercase;
+  transition: border-color .12s, color .12s;
+  font-family:inherit;
+}
+.codeBlock .copy:hover { border-color:var(--accent); color:var(--accent); }
+.sqlKw { color:#f472b6; font-weight:700; }
+.sqlFn { color:#38bdf8; }
+.sqlStr { color:#4ade80; }
+.sqlNum { color:#fbbf24; }
+.sqlCom { color:var(--text-mute); font-style:italic; }
+
+/* ========== DATA TABLE ========== */
+.dtWrap { overflow-x:auto; margin:12px 0; }
+.dt {
+  width:100%; border-collapse:collapse; font-family:var(--mono); font-size:13px;
+  background:var(--panel-2); border-radius:10px; overflow:hidden;
+  border:1px solid var(--line);
+}
+.dt th, .dt td { text-align:left; padding:8px 12px; border-bottom:1px solid var(--line); }
+.dt th { background:#0a0f1c; color:var(--accent); font-weight:800; font-size:11px; letter-spacing:1.5px; text-transform:uppercase; }
+.dt tr:last-child td { border-bottom:none; }
+.dt tr.highlight { background: var(--accent-soft); }
+.dt tr.partitionA { background: rgba(167, 139, 250, 0.09); }
+.dt tr.partitionB { background: rgba(74, 222, 128, 0.09); }
+.dt tr.partitionC { background: rgba(251, 191, 36, 0.09); }
+.dt td.newCol { background: var(--accent-soft); color: var(--accent); font-weight:800; }
+
+/* ========== CALLOUT ========== */
+.callout {
+  background:var(--panel-2); border-left:4px solid var(--accent);
+  padding:14px 18px; border-radius:8px; margin:14px 0;
+}
+.callout h4 { margin:0 0 6px; color:var(--accent); }
+.callout p { margin:4px 0; color:var(--text-dim); font-size:14px; }
+.callout.warn { border-left-color:var(--warn); }
+.callout.warn h4 { color:var(--warn); }
+.callout.good { border-left-color:var(--good); }
+.callout.good h4 { color:var(--good); }
+.callout.bad { border-left-color:var(--bad); }
+.callout.bad h4 { color:var(--bad); }
+
+/* ========== COMPARISON GRID ========== */
+.compareGrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:14px 0; }
+@media(max-width:700px){ .compareGrid { grid-template-columns:1fr; } }
+.compareTile {
+  background:var(--panel-2); border:1px solid var(--line); border-radius:10px; padding:14px 16px;
+}
+.compareTile h5 { margin:0 0 8px; font-size:11px; letter-spacing:2px; color:var(--accent); font-weight:800; text-transform:uppercase; }
+.compareTile.wrong { border-color:var(--bad); }
+.compareTile.wrong h5 { color:var(--bad); }
+.compareTile.right { border-color:var(--good); }
+.compareTile.right h5 { color:var(--good); }
+
+/* ========== QUIZ ========== */
+.quizGrid { display:grid; gap:10px; margin-top:14px; }
+.quizChoice {
+  background:var(--panel-2); border:1.5px solid var(--line); border-radius:10px;
+  padding:12px 14px; cursor:pointer; text-align:left;
+  transition:border-color .12s, background .15s;
+  font-family:inherit; color:var(--text); font-size:14px; font-weight:600;
+  display:flex; align-items:flex-start; gap:10px;
+}
+.quizChoice:hover { border-color:var(--accent); background:var(--accent-soft); }
+.quizChoice .letter {
+  width:26px; height:26px; border-radius:50%; background:var(--panel);
+  display:flex; align-items:center; justify-content:center;
+  font-weight:900; font-size:12px; flex-shrink:0; color:var(--text-dim);
+  border:1px solid var(--line);
+}
+.quizChoice.selected { border-color:var(--accent); background:var(--accent-soft); }
+.quizChoice.selected .letter { background:var(--accent); color:#0a0e18; }
+.quizChoice.correct { border-color:var(--good); background:rgba(74,222,128,.10); }
+.quizChoice.correct .letter { background:var(--good); color:#0a0e18; }
+.quizChoice.wrong { border-color:var(--bad); background:rgba(245,101,101,.10); }
+.quizChoice.wrong .letter { background:var(--bad); color:#0a0e18; }
+
+.quizExplain {
+  background:var(--panel-2); border:1px solid var(--line); border-radius:10px;
+  padding:12px 16px; margin-top:10px; font-size:13.5px; line-height:1.65;
+  color:var(--text-dim);
+}
+.quizExplain b { color:var(--text); }
+.quizExplain.correct { border-left:4px solid var(--good); }
+.quizExplain.wrong   { border-left:4px solid var(--bad); }
+
+/* ========== BUTTONS ========== */
+.btn {
+  appearance:none; border:1px solid var(--line);
+  background:var(--panel); color:var(--text); font-weight:700;
+  padding:12px 22px; border-radius:10px; cursor:pointer;
+  font-size:13.5px; letter-spacing:.3px;
+  transition:transform .1s var(--easing), border-color .12s, background .15s;
+  font-family:inherit;
+}
+.btn:hover { border-color:var(--accent); background:var(--accent-soft); }
+.btn:active { transform:translateY(1px); }
+.btn.primary {
+  background:linear-gradient(135deg, var(--accent), var(--purple));
+  color:#0a0e18; border:none; font-weight:800; padding:14px 26px;
+  box-shadow:0 12px 30px rgba(56,189,248,.28);
+}
+.btn.primary:hover { transform:translateY(-1px); color:#0a0e18; }
+.btn:disabled { opacity:.45; cursor:not-allowed; }
+.btn.compact { padding:6px 14px; font-size:12px; }
+
+.actionBar { display:flex; flex-wrap:wrap; gap:10px; justify-content:flex-end; margin-top:20px; align-items:center; }
+.actionBar .leftActions { margin-right:auto; }
+
+/* ========== SVG DIAGRAM CONTAINER ========== */
+.diagram { background:var(--panel-2); border:1px solid var(--line); border-radius:10px; padding:16px; margin:12px 0; text-align:center; }
+.diagram svg { max-width:100%; height:auto; }
+
+/* ========== SCORE SUMMARY ========== */
+.scoreCard {
+  background: radial-gradient(circle at 50% 30%, var(--accent-soft), transparent 60%), var(--panel-2);
+  border:1px solid var(--accent); border-radius:12px;
+  padding:22px; text-align:center; margin-top:14px;
+}
+.scoreCard .lbl { font-size:11px; color:var(--text-mute); letter-spacing:2px; font-weight:800; text-transform:uppercase; }
+.scoreCard .val { font-family:var(--mono); font-size:56px; font-weight:900; margin:6px 0;
+  background:linear-gradient(135deg, #fff, var(--accent-2)); -webkit-background-clip:text; background-clip:text; color:transparent; line-height:1; }
+.scoreCard .msg { color:var(--text-dim); font-size:14px; }
+
+/* ========== TAKEAWAYS ========== */
+.takeaways {
+  background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:16px 20px; margin-top:14px;
+}
+.takeaways h4 { margin-top:0; }
+.takeaways ul { margin:0; padding-left:22px; }
+
+/* ========== CHEAT SHEET ========== */
+.cheatGrid { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:10px; margin-top:14px; }
+.cheatCard { background:var(--panel-2); border:1px solid var(--line); border-radius:10px; padding:12px 14px; }
+.cheatCard h5 { margin:0 0 4px; font-size:12px; color:var(--accent); font-weight:800; letter-spacing:1.2px; text-transform:uppercase; }
+.cheatCard code { display:block; margin-top:6px; background:#0a0f1c; padding:8px 10px; border-radius:6px; font-size:12px; color:var(--text); font-family:var(--mono); white-space:pre-wrap; word-break:break-word; }
+
+/* ========== RESOURCES GRID ========== */
+.resGrid { display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:12px; margin-top:12px; }
+.resTile {
+  background:var(--panel-2); border:1px solid var(--line); border-radius:10px; padding:14px 16px;
+}
+.resTile h5 { margin:0 0 6px; font-size:12px; color:var(--accent); font-weight:800; letter-spacing:1.5px; text-transform:uppercase; }
+.resTile p { margin:0; color:var(--text-dim); font-size:13px; line-height:1.6; }
+
+/* ========== TOAST ========== */
+.toast {
+  position:fixed; top:20px; right:20px; z-index:100;
+  background:var(--panel-2); border:1px solid var(--accent);
+  color:var(--text); padding:12px 18px; border-radius:10px;
+  font-size:13.5px; font-weight:700; box-shadow:var(--shadow);
+  animation: toastIn .3s ease-out, toastOut .3s ease-in 2.2s forwards;
+}
+.toast.good { border-color:var(--good); color:var(--good); }
+.toast.bad  { border-color:var(--bad);  color:var(--bad); }
+@keyframes toastIn { from { opacity:0; transform:translateX(20px);} to { opacity:1; transform:translateX(0);} }
+@keyframes toastOut { to { opacity:0; transform:translateX(20px); } }
+
+.confetti { position:fixed; pointer-events:none; inset:0; overflow:hidden; z-index:80; display:none; }
+.confetti.show { display:block; }
+.confetti i { position:absolute; top:-10px; width:8px; height:14px; opacity:.9; animation:fall linear forwards; }
+@keyframes fall { to { transform:translateY(110vh) rotate(720deg); opacity:.4; } }
+
+.footer { color:var(--text-mute); font-size:11px; text-align:center; margin-top:22px; letter-spacing:1px; line-height:1.6; }
+
+@media (prefers-reduced-motion: reduce) { * { animation:none !important; transition:none !important; } }
+
+@media print {
+  header, .tabRow, .progressBar, .actionBar, .footer { display:none !important; }
+  .card { box-shadow:none; page-break-inside: avoid; }
+  body { background:#fff; color:#000; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ============ HEADER ============ -->
+  <header>
+    <div class="brand">
+      <div class="logo">🎓</div>
+      <div>
+        <h1>Interactive Learning Studio</h1>
+        <div class="sub">Day 41 · #60DayClaudeChallenge</div>
+      </div>
+    </div>
+    <div class="headActions">
+      <div class="hud">🎯 XP <b id="hudXp">0</b></div>
+      <div class="hud gold">🏆 <b id="hudBadges">0</b>/4</div>
+      <button class="iconBtn" id="printBtn" title="Print notes">🖨️ Notes</button>
+      <button class="iconBtn" id="themeBtn">🌙 Dark</button>
+    </div>
+  </header>
+
+  <!-- ============ PROGRESS BAR ============ -->
+  <div class="progressBar"><i id="progressBar" style="width:0%"></i></div>
+
+  <!-- ============ TAB NAV ============ -->
+  <div class="tabRow" id="tabRow"></div>
+
+  <!-- ============ STAGE ============ -->
+  <div id="stage"></div>
+
+  <p class="footer">
+    Topic: <b>SQL Window Functions</b> · Standard SQL syntax works in PostgreSQL, MySQL 8+, SQL Server, BigQuery, Snowflake<br/>
+    Single HTML file · Vanilla CSS + JS · Built for Day 41 of #60DayClaudeChallenge
+  </p>
+</div>
+
+<div class="confetti" id="confetti"></div>
+
+<script>
+/* =============================================================
+   INTERACTIVE LEARNING STUDIO — Day 41 · Logic
+   Topic: SQL Window Functions
+   ============================================================= */
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const STAGES = [
+  { id:"welcome",  label:"Intro",             short:"Intro" },
+  { id:"m1",       label:"Module 1 · Basics", short:"M1" },
+  { id:"q1",       label:"Quiz 1",            short:"Q1" },
+  { id:"m2",       label:"Module 2 · Ranking", short:"M2" },
+  { id:"q2",       label:"Quiz 2",            short:"Q2" },
+  { id:"m3",       label:"Module 3 · Lead/Lag", short:"M3" },
+  { id:"q3",       label:"Quiz 3",            short:"Q3" },
+  { id:"m4",       label:"Module 4 · Frames",  short:"M4" },
+  { id:"q4",       label:"Quiz 4",            short:"Q4" },
+  { id:"challenge",label:"Final Challenge",    short:"Final" },
+  { id:"resources",label:"Resources",          short:"Resources" },
+];
+
+const state = {
+  stage:"welcome",
+  xp:0,
+  badges:0,
+  moduleUnlocked:{ welcome:true, m1:true, q1:false, m2:false, q2:false, m3:false, q3:false, m4:false, q4:false, challenge:false, resources:true },
+  quizAnswers:{},
+  quizScores:{},
+  moduleDone:{}
+};
+
+/* Utils */
+const el = (id) => document.getElementById(id);
+function esc(s){ return String(s||"").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function toast(msg, kind="") {
+  const t = document.createElement("div");
+  t.className = "toast" + (kind ? " " + kind : "");
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2600);
+}
+function addXp(n) {
+  state.xp += n;
+  el("hudXp").textContent = state.xp;
+}
+function burstConfetti() {
+  const c = el("confetti");
+  c.innerHTML = "";
+  const colors = ["#38bdf8","#a687ff","#4ade80","#ffd166","#ff7bb5"];
+  for (let i = 0; i < 80; i++) {
+    const p = document.createElement("i");
+    p.style.left = Math.random() * 100 + "vw";
+    p.style.background = colors[i % colors.length];
+    p.style.animationDuration = (1.6 + Math.random() * 1.8) + "s";
+    p.style.transform = `rotate(${Math.random()*360}deg)`;
+    c.appendChild(p);
+  }
+  c.classList.add("show");
+  setTimeout(() => c.classList.remove("show"), 3500);
+}
+
+/* SQL syntax highlighter (minimal) */
+function highlightSQL(sql) {
+  const KW = /\b(SELECT|FROM|WHERE|GROUP BY|ORDER BY|PARTITION BY|OVER|WINDOW|AS|WITH|OVER\s*\(|BETWEEN|AND|OR|NOT|IN|IS|NULL|CASE|WHEN|THEN|ELSE|END|JOIN|LEFT|RIGHT|INNER|OUTER|ON|LIMIT|OFFSET|UNBOUNDED|PRECEDING|FOLLOWING|CURRENT|ROW|ROWS|RANGE|DISTINCT|HAVING|EXISTS|UNION|INTERSECT|EXCEPT|CREATE|TABLE|VIEW|INSERT|UPDATE|DELETE|VALUES|SET)\b/gi;
+  const FN = /\b(ROW_NUMBER|RANK|DENSE_RANK|LEAD|LAG|FIRST_VALUE|LAST_VALUE|NTH_VALUE|NTILE|SUM|AVG|COUNT|MIN|MAX|CUME_DIST|PERCENT_RANK|COALESCE|NULLIF|CAST|EXTRACT)\b/g;
+  return esc(sql)
+    .replace(/(--[^\n]*)/g, '<span class="sqlCom">$1</span>')
+    .replace(/(&#39;[^&]*?&#39;)/g, '<span class="sqlStr">$1</span>')
+    .replace(FN, '<span class="sqlFn">$1</span>')
+    .replace(KW, '<span class="sqlKw">$1</span>')
+    .replace(/\b(\d+(?:\.\d+)?)\b/g, '<span class="sqlNum">$1</span>');
+}
+function codeBlock(sql) {
+  return `<div class="codeBlock"><button class="copy" onclick="copyCode(this)">Copy</button>${highlightSQL(sql)}</div>`;
+}
+function copyCode(btn) {
+  const code = btn.parentElement.innerText.replace(/^Copy\n?/, "").trim();
+  navigator.clipboard.writeText(code).then(() => { btn.textContent = "✓ Copied"; setTimeout(() => btn.textContent = "Copy", 1600); });
+}
+window.copyCode = copyCode;
+
+/* Data table renderer */
+function tableHtml(headers, rows, rowClasses=[]) {
+  const th = headers.map(h => `<th>${esc(h)}</th>`).join("");
+  const tr = rows.map((row, i) => {
+    const cls = rowClasses[i] || "";
+    return `<tr class="${cls}">${row.map(c => `<td>${c}</td>`).join("")}</tr>`;
+  }).join("");
+  return `<div class="dtWrap"><table class="dt"><thead><tr>${th}</tr></thead><tbody>${tr}</tbody></table></div>`;
+}
+
+/* ============================================================
+   RENDER TAB NAV
+   ============================================================ */
+function renderTabs() {
+  const html = STAGES.map((s, i) => {
+    const locked = !state.moduleUnlocked[s.id];
+    const active = state.stage === s.id;
+    const done = state.moduleDone[s.id];
+    let cls = "tab";
+    if (active) cls += " active";
+    if (locked && !done) cls += " locked";
+    if (done) cls += " done";
+    return `<button class="${cls}" data-id="${s.id}"><span class="num">${done ? "" : (i)}</span>${esc(s.short)}</button>`;
+  }).join("");
+  el("tabRow").innerHTML = html;
+  el("tabRow").querySelectorAll(".tab").forEach(b => {
+    b.addEventListener("click", () => {
+      if (!state.moduleUnlocked[b.dataset.id]) {
+        toast("Complete previous module first", "bad"); return;
+      }
+      goto(b.dataset.id);
+    });
+  });
+  const doneCount = STAGES.filter(s => state.moduleDone[s.id]).length;
+  el("progressBar").style.width = (doneCount / (STAGES.length - 1) * 100) + "%";
+}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+function goto(next) {
+  state.stage = next;
+  renderTabs();
+  if (next === "welcome") renderWelcome();
+  else if (next.startsWith("m")) renderModule(next);
+  else if (next.startsWith("q")) renderQuiz(next);
+  else if (next === "challenge") renderChallenge();
+  else if (next === "resources") renderResources();
+  window.scrollTo({ top:0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+}
+
+/* ============================================================
+   WELCOME
+   ============================================================ */
+function renderWelcome() {
+  el("stage").innerHTML = `
+    <div class="card welcome">
+      <span class="tag">SQL · INTERMEDIATE · 45 MIN</span>
+      <div class="title-big" style="margin-top:16px;">SQL Window Functions</div>
+      <p class="tag-big">
+        Learn the single most powerful SQL feature that separates analysts from beginners.
+        By the end of this tutorial you'll write ranking, running totals, moving averages,
+        and comparisons across rows — the queries every data interview asks about.
+      </p>
+
+      <div class="factGrid">
+        <div class="factTile"><div class="k">Modules</div><div class="v">4</div></div>
+        <div class="factTile"><div class="k">Quizzes</div><div class="v">4</div></div>
+        <div class="factTile"><div class="k">Est. Time</div><div class="v">45m</div></div>
+        <div class="factTile"><div class="k">XP Available</div><div class="v">400</div></div>
+      </div>
+
+      <h3 style="margin-top:22px;">Learning objectives</h3>
+      <ul class="checkList">
+        <li>Understand what a window function is and why it exists</li>
+        <li>Use PARTITION BY and ORDER BY inside OVER() clauses</li>
+        <li>Master ranking functions (ROW_NUMBER, RANK, DENSE_RANK)</li>
+        <li>Compare rows with LEAD, LAG, FIRST_VALUE, LAST_VALUE</li>
+        <li>Compute running totals and moving averages with frame clauses</li>
+        <li>Recognize when NOT to use a window function (common misconceptions)</li>
+      </ul>
+
+      <div class="callout">
+        <h4>Prerequisites</h4>
+        <p>Basic SQL: SELECT, FROM, WHERE, GROUP BY, JOIN. If you can write a query with GROUP BY, you're ready.</p>
+      </div>
+
+      <div class="callout good">
+        <h4>Reward System</h4>
+        <p>+10 XP per correct quiz answer. +50 XP bonus for a perfect quiz. 🏆 Badge for each module completed. Full run: 400 XP + 4 badges.</p>
+      </div>
+
+      <div class="actionBar">
+        <button class="btn primary" id="startBtn">Start Module 1 →</button>
+      </div>
+    </div>
+  `;
+  el("startBtn").addEventListener("click", () => goto("m1"));
+}
+
+/* ============================================================
+   MODULE 1 · BASICS
+   ============================================================ */
+const MODULES = {
+  m1: {
+    title:"Module 1 · The Basics",
+    kicker:"WHY WINDOW FUNCTIONS EXIST",
+    render: () => `
+      <h2>Why window functions exist</h2>
+      <p><b>The problem.</b> You have a table of employee salaries. You want to see each employee's salary AND the average salary of their department, side by side, in the same row. GROUP BY collapses the rows — you lose the per-employee detail. Without windows, this needed a self-join or a subquery.</p>
+
+      <p><b>The idea.</b> A window function computes an aggregate <em>alongside</em> a row without collapsing it. The row stays. The aggregate travels with it.</p>
+
+      <h3>The syntax skeleton</h3>
+      ${codeBlock(`SELECT
+  name,
+  department,
+  salary,
+  AVG(salary) OVER (PARTITION BY department) AS dept_avg
+FROM employees;`)}
+
+      <p>The keyword <code>OVER</code> is what turns <code>AVG(salary)</code> into a window function. <code>PARTITION BY department</code> tells it "compute the average within each department." Without <code>OVER</code>, you'd have a normal aggregate that needs GROUP BY.</p>
+
+      <h3>Analogy: a spreadsheet with a helper column</h3>
+      <div class="diagram">
+        ${svgAnalogy()}
+      </div>
+      <p>Think of a window function like adding a formula column in Excel that references a range of other rows. The row stays where it is; a computed value gets appended.</p>
+
+      <h3>Example on real data</h3>
+      <p>Employees table:</p>
+      ${tableHtml(
+        ["id","name","department","salary"],
+        [
+          ["1","Ada","Engineering","120000"],
+          ["2","Grace","Engineering","135000"],
+          ["3","Linus","Engineering","110000"],
+          ["4","Marie","Sales","95000"],
+          ["5","Rosa","Sales","105000"],
+          ["6","Kai","Marketing","90000"],
+        ],
+        ["partitionA","partitionA","partitionA","partitionB","partitionB","partitionC"]
+      )}
+      <p>With this window query:</p>
+      ${codeBlock(`SELECT
+  name,
+  department,
+  salary,
+  AVG(salary) OVER (PARTITION BY department) AS dept_avg,
+  salary - AVG(salary) OVER (PARTITION BY department) AS diff_from_avg
+FROM employees;`)}
+      <p>Result:</p>
+      ${tableHtml(
+        ["name","department","salary","dept_avg","diff_from_avg"],
+        [
+          ["Ada","Engineering","120000","<b style='color:#38bdf8;'>121667</b>","-1667"],
+          ["Grace","Engineering","135000","<b style='color:#38bdf8;'>121667</b>","+13333"],
+          ["Linus","Engineering","110000","<b style='color:#38bdf8;'>121667</b>","-11667"],
+          ["Marie","Sales","95000","<b style='color:#38bdf8;'>100000</b>","-5000"],
+          ["Rosa","Sales","105000","<b style='color:#38bdf8;'>100000</b>","+5000"],
+          ["Kai","Marketing","90000","<b style='color:#38bdf8;'>90000</b>","0"],
+        ]
+      )}
+      <p>Every original row survives. A new column (<code>dept_avg</code>) is added, calculated <em>within each department</em>.</p>
+
+      <h3>Window function vs. GROUP BY</h3>
+      <div class="compareGrid">
+        <div class="compareTile wrong">
+          <h5>GROUP BY — collapses rows</h5>
+          ${codeBlock(`SELECT
+  department,
+  AVG(salary) AS dept_avg
+FROM employees
+GROUP BY department;`)}
+          <p style="margin:6px 0 0; color:var(--text-mute); font-size:12px;">Returns 3 rows (one per department). Per-employee detail is gone.</p>
+        </div>
+        <div class="compareTile right">
+          <h5>Window — preserves rows</h5>
+          ${codeBlock(`SELECT
+  name,
+  department,
+  salary,
+  AVG(salary) OVER
+    (PARTITION BY department) AS dept_avg
+FROM employees;`)}
+          <p style="margin:6px 0 0; color:var(--text-mute); font-size:12px;">Returns 6 rows. Every employee kept. New column carries the department average.</p>
+        </div>
+      </div>
+
+      <h3>Interactive: predict the output</h3>
+      <p>Look at this query. Before scrolling, predict what happens to Kai's row (the only Marketing employee):</p>
+      ${codeBlock(`SELECT
+  name,
+  department,
+  MAX(salary) OVER (PARTITION BY department) AS dept_max
+FROM employees;`)}
+      <details style="margin:10px 0;">
+        <summary style="cursor:pointer; color:var(--accent); font-weight:800; font-size:13px; letter-spacing:1.5px; text-transform:uppercase;">▸ Reveal answer</summary>
+        <div style="margin-top:10px;">
+          <p>Kai is the only Marketing employee. The department partition contains one row. MAX(90000) over one row is 90000. So <code>dept_max</code> for Kai = 90000. A single-row partition still works.</p>
+        </div>
+      </details>
+
+      <h3>Common misconceptions</h3>
+      <div class="callout warn">
+        <h4>"OVER () with no PARTITION BY is invalid."</h4>
+        <p>It's actually valid — an empty OVER() clause treats the entire table as one partition. Useful for "each row's value vs. the overall average" queries.</p>
+      </div>
+      <div class="callout warn">
+        <h4>"Window functions replace GROUP BY."</h4>
+        <p>They don't. GROUP BY collapses to summary rows. Windows preserve rows. Use GROUP BY when you want summary output; use windows when you want per-row context.</p>
+      </div>
+
+      <div class="takeaways">
+        <h4>KEY TAKEAWAYS</h4>
+        <ul>
+          <li><b>OVER()</b> is what turns an aggregate into a window function.</li>
+          <li><b>PARTITION BY</b> is like GROUP BY, but the rows stay.</li>
+          <li>Window functions add <b>columns</b>. GROUP BY reduces <b>rows</b>.</li>
+          <li>An empty OVER() treats the whole table as one partition.</li>
+        </ul>
+      </div>
+    `,
+    quiz:"q1"
+  },
+
+  m2: {
+    title:"Module 2 · Ranking Functions",
+    kicker:"ROW_NUMBER · RANK · DENSE_RANK",
+    render: () => `
+      <h2>Ranking functions</h2>
+      <p>Ranking functions assign a number to every row based on an ORDER BY inside the window. Three flavors — each handles ties differently.</p>
+
+      <h3>ROW_NUMBER — always unique</h3>
+      <p>Every row gets a unique consecutive integer, no matter what. Ties are broken arbitrarily (by whatever secondary order the engine picks).</p>
+      ${codeBlock(`SELECT
+  name,
+  department,
+  salary,
+  ROW_NUMBER() OVER (
+    PARTITION BY department
+    ORDER BY salary DESC
+  ) AS rn
+FROM employees;`)}
+
+      ${tableHtml(
+        ["name","department","salary","rn"],
+        [
+          ["Grace","Engineering","135000","<b style='color:#38bdf8;'>1</b>"],
+          ["Ada","Engineering","120000","<b style='color:#38bdf8;'>2</b>"],
+          ["Linus","Engineering","110000","<b style='color:#38bdf8;'>3</b>"],
+          ["Rosa","Sales","105000","<b style='color:#38bdf8;'>1</b>"],
+          ["Marie","Sales","95000","<b style='color:#38bdf8;'>2</b>"],
+          ["Kai","Marketing","90000","<b style='color:#38bdf8;'>1</b>"],
+        ],
+        ["partitionA","partitionA","partitionA","partitionB","partitionB","partitionC"]
+      )}
+
+      <h3>RANK vs. DENSE_RANK — tie handling</h3>
+      <p>Both give tied rows the same rank. The difference is what happens to the <em>next</em> rank.</p>
+      <div class="compareGrid">
+        <div class="compareTile">
+          <h5>RANK — skips numbers after ties</h5>
+          <p style="margin:6px 0;">If two rows tie at rank 1, the next is rank 3.</p>
+          ${codeBlock(`Salaries: 100, 100, 90
+RANK: 1, 1, 3`)}
+        </div>
+        <div class="compareTile">
+          <h5>DENSE_RANK — no gaps</h5>
+          <p style="margin:6px 0;">If two rows tie at rank 1, the next is rank 2.</p>
+          ${codeBlock(`Salaries: 100, 100, 90
+DENSE_RANK: 1, 1, 2`)}
+        </div>
+      </div>
+
+      <h3>The classic "top N per group" pattern</h3>
+      <p>Question: <em>"For each department, find the top 2 highest-paid employees."</em></p>
+      <p>Wrong instinct: <code>LIMIT 2</code> at the end of the query. That only limits to 2 rows total, not per department.</p>
+      <p>Right pattern: rank inside each department, then filter.</p>
+      ${codeBlock(`WITH ranked AS (
+  SELECT
+    name,
+    department,
+    salary,
+    ROW_NUMBER() OVER (
+      PARTITION BY department
+      ORDER BY salary DESC
+    ) AS rn
+  FROM employees
+)
+SELECT name, department, salary
+FROM ranked
+WHERE rn <= 2;`)}
+      <p>This is the single most common ranking pattern in analyst work. Memorize it.</p>
+
+      <h3>Which one to use when</h3>
+      <div class="callout">
+        <h4>Use ROW_NUMBER when you need <em>exactly one</em> row per group.</h4>
+        <p>Deduplication. Picking "one per customer, most recent order." Ties don't matter to you.</p>
+      </div>
+      <div class="callout">
+        <h4>Use RANK when ties matter and you want gap-based rankings.</h4>
+        <p>Olympic-style. Two silver medals means there's no bronze at rank 3.</p>
+      </div>
+      <div class="callout">
+        <h4>Use DENSE_RANK when ties matter but you don't want gaps.</h4>
+        <p>Category ranking. If two products tied for #1, the next unique product should still be #2 in your list.</p>
+      </div>
+
+      <h3>Practical exercise</h3>
+      <p><b>Task.</b> You have a <code>sales</code> table. Find the 2nd highest-selling product in each region.</p>
+      <details style="margin:10px 0;">
+        <summary style="cursor:pointer; color:var(--accent); font-weight:800; font-size:13px; letter-spacing:1.5px; text-transform:uppercase;">▸ Reveal solution</summary>
+        <div style="margin-top:10px;">
+          ${codeBlock(`WITH ranked AS (
+  SELECT
+    product,
+    region,
+    revenue,
+    DENSE_RANK() OVER (
+      PARTITION BY region
+      ORDER BY revenue DESC
+    ) AS rk
+  FROM sales
+)
+SELECT product, region, revenue
+FROM ranked
+WHERE rk = 2;`)}
+          <p>Why DENSE_RANK? If two products tied for #1 in a region, we still want the next unique revenue level to be #2 — that's what "2nd highest" typically means to a business stakeholder.</p>
+        </div>
+      </details>
+
+      <h3>Common misconceptions</h3>
+      <div class="callout warn">
+        <h4>"WHERE rn <= 2 in the same query works."</h4>
+        <p>It doesn't. WHERE is evaluated <em>before</em> the window function is computed. You need a CTE or subquery to filter on the window's output.</p>
+      </div>
+      <div class="callout warn">
+        <h4>"ORDER BY inside OVER is the same as ORDER BY at the end."</h4>
+        <p>No — ORDER BY inside OVER defines the ranking order. ORDER BY at the end defines the display order. They can differ.</p>
+      </div>
+
+      <div class="takeaways">
+        <h4>KEY TAKEAWAYS</h4>
+        <ul>
+          <li><b>ROW_NUMBER()</b> — always unique. Use for "pick one per group."</li>
+          <li><b>RANK()</b> — ties share rank, next rank skips. Olympic style.</li>
+          <li><b>DENSE_RANK()</b> — ties share rank, no gaps. Business style.</li>
+          <li>Filtering by rank needs a <b>CTE or subquery</b> — WHERE can't see window output.</li>
+        </ul>
+      </div>
+    `,
+    quiz:"q2"
+  },
+
+  m3: {
+    title:"Module 3 · LEAD, LAG, and Value Windows",
+    kicker:"COMPARING ROWS TO THEIR NEIGHBORS",
+    render: () => `
+      <h2>LEAD, LAG, and value windows</h2>
+      <p>Ranking assigns numbers. Value windows let you grab a value from another row — the row before, after, or a specific position in the partition. This is how you compute "delta from last month," "next customer's order," or "the very first score."</p>
+
+      <h3>LAG — look backward</h3>
+      <p><code>LAG(column, offset)</code> returns the value of <code>column</code> from <code>offset</code> rows earlier in the same partition. Default offset is 1.</p>
+      ${codeBlock(`SELECT
+  order_date,
+  revenue,
+  LAG(revenue, 1) OVER (ORDER BY order_date) AS prev_day_revenue,
+  revenue - LAG(revenue, 1) OVER (ORDER BY order_date) AS day_over_day_change
+FROM daily_sales;`)}
+      ${tableHtml(
+        ["order_date","revenue","prev_day_revenue","day_over_day_change"],
+        [
+          ["2025-01-01","1000","<span style='color:var(--text-mute);'>NULL</span>","<span style='color:var(--text-mute);'>NULL</span>"],
+          ["2025-01-02","1200","1000","<b style='color:#4ade80;'>+200</b>"],
+          ["2025-01-03","950","1200","<b style='color:#f56565;'>-250</b>"],
+          ["2025-01-04","1350","950","<b style='color:#4ade80;'>+400</b>"],
+        ]
+      )}
+      <p>Row 1's LAG is NULL — there's nothing before it. That's the standard behavior. You can supply a third argument for a default: <code>LAG(revenue, 1, 0)</code> returns 0 instead of NULL.</p>
+
+      <h3>LEAD — look forward</h3>
+      <p><code>LEAD(column, offset)</code> works the same way but goes forward. Useful for "did the next event happen within X days" or "what did they order right after this."</p>
+      ${codeBlock(`SELECT
+  customer_id,
+  order_date,
+  LEAD(order_date, 1) OVER (
+    PARTITION BY customer_id
+    ORDER BY order_date
+  ) AS next_order_date
+FROM orders;`)}
+
+      <h3>FIRST_VALUE and LAST_VALUE</h3>
+      <p><code>FIRST_VALUE(column)</code> returns the value of <code>column</code> from the first row in the ordered partition. <code>LAST_VALUE(column)</code> returns the last — but with a subtle gotcha we'll fix in Module 4.</p>
+      ${codeBlock(`SELECT
+  customer_id,
+  order_date,
+  amount,
+  FIRST_VALUE(amount) OVER (
+    PARTITION BY customer_id
+    ORDER BY order_date
+  ) AS first_order_amount
+FROM orders;`)}
+      <p>Every row of a customer gets that customer's first-order amount alongside it. Now you can compute "how much bigger is this order than their first."</p>
+
+      <h3>Analogy: paging through a story</h3>
+      <div class="diagram">
+        ${svgLeadLag()}
+      </div>
+      <p>Imagine each partition as a chapter and each row as a page. LAG(1) is like glancing at the previous page while you read. LEAD(1) is peeking ahead. FIRST_VALUE is remembering how the chapter opened.</p>
+
+      <h3>The DAU/MoM growth pattern</h3>
+      <p>Given a table of daily active users, compute the day-over-day and 7-day growth rate — the canonical LAG use case.</p>
+      ${codeBlock(`SELECT
+  date,
+  dau,
+  LAG(dau, 1) OVER (ORDER BY date) AS prev_day,
+  LAG(dau, 7) OVER (ORDER BY date) AS week_ago,
+  ROUND(100.0 * (dau - LAG(dau, 7) OVER (ORDER BY date))
+    / NULLIF(LAG(dau, 7) OVER (ORDER BY date), 0), 2) AS wow_growth_pct
+FROM daily_active_users
+ORDER BY date;`)}
+      <p><code>NULLIF(x, 0)</code> prevents division by zero — good hygiene when computing growth rates.</p>
+
+      <h3>Practical exercise</h3>
+      <p><b>Task.</b> For each customer, compute the number of days between their consecutive orders.</p>
+      <details style="margin:10px 0;">
+        <summary style="cursor:pointer; color:var(--accent); font-weight:800; font-size:13px; letter-spacing:1.5px; text-transform:uppercase;">▸ Reveal solution</summary>
+        <div style="margin-top:10px;">
+          ${codeBlock(`SELECT
+  customer_id,
+  order_date,
+  order_date - LAG(order_date) OVER (
+    PARTITION BY customer_id
+    ORDER BY order_date
+  ) AS days_since_last_order
+FROM orders;`)}
+          <p>The subtraction returns an INTERVAL in Postgres or an INT in other dialects. Use <code>DATEDIFF(day, LAG(...), order_date)</code> in SQL Server.</p>
+        </div>
+      </details>
+
+      <h3>Common misconceptions</h3>
+      <div class="callout warn">
+        <h4>"LAG needs GROUP BY to partition."</h4>
+        <p>No — partitioning happens inside the OVER() clause with PARTITION BY. GROUP BY collapses rows and would break the value window.</p>
+      </div>
+      <div class="callout warn">
+        <h4>"LAG and LEAD are guaranteed non-NULL if I sort correctly."</h4>
+        <p>Wrong. The first row's LAG is always NULL (nothing before it). The last row's LEAD is always NULL (nothing after). Handle explicitly with COALESCE.</p>
+      </div>
+
+      <div class="takeaways">
+        <h4>KEY TAKEAWAYS</h4>
+        <ul>
+          <li><b>LAG(col, n)</b> reads from <em>n rows before</em>. LEAD reads <em>n rows after</em>.</li>
+          <li>The first LAG value (and last LEAD value) is always NULL — plan for it.</li>
+          <li><b>FIRST_VALUE</b> returns the opening row's value; every row in the partition carries it.</li>
+          <li>Always specify PARTITION BY to avoid mixing across groups.</li>
+        </ul>
+      </div>
+    `,
+    quiz:"q3"
+  },
+
+  m4: {
+    title:"Module 4 · Frames and Running Calculations",
+    kicker:"RUNNING TOTALS · MOVING AVERAGES · FRAMES",
+    render: () => `
+      <h2>Frames and running calculations</h2>
+      <p>So far all our windows have covered an entire partition. Frame clauses let you narrow to a specific range of rows — the last 7 days, the first N rows, cumulative from the start. This is where running totals and moving averages come from.</p>
+
+      <h3>The frame clause syntax</h3>
+      ${codeBlock(`window_function() OVER (
+  PARTITION BY col
+  ORDER BY col
+  ROWS BETWEEN <lower> AND <upper>
+)`)}
+      <p>Bounds can be:</p>
+      <ul>
+        <li><code>UNBOUNDED PRECEDING</code> — start of the partition</li>
+        <li><code>N PRECEDING</code> — N rows before current</li>
+        <li><code>CURRENT ROW</code> — this row</li>
+        <li><code>N FOLLOWING</code> — N rows after current</li>
+        <li><code>UNBOUNDED FOLLOWING</code> — end of the partition</li>
+      </ul>
+
+      <h3>Running total (cumulative sum)</h3>
+      ${codeBlock(`SELECT
+  order_date,
+  revenue,
+  SUM(revenue) OVER (
+    ORDER BY order_date
+    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+  ) AS running_total
+FROM daily_sales;`)}
+      ${tableHtml(
+        ["order_date","revenue","running_total"],
+        [
+          ["2025-01-01","1000","<b style='color:#38bdf8;'>1000</b>"],
+          ["2025-01-02","1200","<b style='color:#38bdf8;'>2200</b>"],
+          ["2025-01-03","950","<b style='color:#38bdf8;'>3150</b>"],
+          ["2025-01-04","1350","<b style='color:#38bdf8;'>4500</b>"],
+        ]
+      )}
+      <p>Every row's <code>running_total</code> is the sum from the first row up to and including the current row.</p>
+
+      <h3>Shortcut: when ORDER BY is present, the default frame IS running total</h3>
+      <p>These two queries produce the same result:</p>
+      <div class="compareGrid">
+        <div class="compareTile">
+          <h5>Explicit frame</h5>
+          ${codeBlock(`SUM(revenue) OVER (
+  ORDER BY order_date
+  ROWS BETWEEN
+    UNBOUNDED PRECEDING
+    AND CURRENT ROW
+)`)}
+        </div>
+        <div class="compareTile">
+          <h5>Implicit default</h5>
+          ${codeBlock(`SUM(revenue) OVER (
+  ORDER BY order_date
+)`)}
+        </div>
+      </div>
+      <p>When you specify ORDER BY without a frame clause, the engine assumes <code>RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</code>. Every row sees the sum from the beginning to itself.</p>
+
+      <h3>7-day moving average</h3>
+      ${codeBlock(`SELECT
+  date,
+  dau,
+  AVG(dau) OVER (
+    ORDER BY date
+    ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+  ) AS ma_7day
+FROM daily_active_users;`)}
+      <p>Each row's <code>ma_7day</code> is the average of the current row and the 6 rows before it. That's 7 rows total = a 7-day moving average.</p>
+
+      <h3>Analogy: a spotlight scanning down a list</h3>
+      <div class="diagram">
+        ${svgFrame()}
+      </div>
+      <p>Imagine a spotlight moving down the rows. The frame clause controls how wide the spotlight is. UNBOUNDED PRECEDING = spotlight starts at row 1 and grows. 6 PRECEDING = spotlight is exactly 7 rows wide and slides.</p>
+
+      <h3>ROWS vs. RANGE — the subtle difference</h3>
+      <div class="callout">
+        <h4>ROWS BETWEEN — counts physical rows</h4>
+        <p>6 PRECEDING means "the 6 rows before this one" regardless of their values.</p>
+      </div>
+      <div class="callout">
+        <h4>RANGE BETWEEN — includes rows with tied ORDER BY values</h4>
+        <p>If two rows have the same date, ROWS treats them as separate; RANGE groups them into the same frame position.</p>
+      </div>
+      <p>90% of the time you want <code>ROWS BETWEEN</code>. Use RANGE only when you specifically want tied ORDER BY values grouped.</p>
+
+      <h3>The LAST_VALUE gotcha (finally explained)</h3>
+      <p>In Module 3 we mentioned LAST_VALUE has a gotcha. Here it is: the default frame is <code>RANGE UNBOUNDED PRECEDING AND CURRENT ROW</code>. So <code>LAST_VALUE(x)</code> returns the current row's value, not the last row's value.</p>
+      <p>To get the actual last value in the partition, you must specify the frame explicitly:</p>
+      ${codeBlock(`LAST_VALUE(amount) OVER (
+  PARTITION BY customer_id
+  ORDER BY order_date
+  ROWS BETWEEN UNBOUNDED PRECEDING
+       AND UNBOUNDED FOLLOWING
+) AS actual_last_order_amount`)}
+
+      <h3>Practical exercise</h3>
+      <p><b>Task.</b> For each product, compute a 3-month rolling revenue (current month + 2 prior months).</p>
+      <details style="margin:10px 0;">
+        <summary style="cursor:pointer; color:var(--accent); font-weight:800; font-size:13px; letter-spacing:1.5px; text-transform:uppercase;">▸ Reveal solution</summary>
+        <div style="margin-top:10px;">
+          ${codeBlock(`SELECT
+  product,
+  month,
+  revenue,
+  SUM(revenue) OVER (
+    PARTITION BY product
+    ORDER BY month
+    ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+  ) AS rolling_3mo_revenue
+FROM monthly_sales;`)}
+          <p>The frame is 2 preceding + current = 3 rows total. PARTITION BY product ensures we don't accidentally sum across different products.</p>
+        </div>
+      </details>
+
+      <h3>Common misconceptions</h3>
+      <div class="callout warn">
+        <h4>"I don't need to specify a frame — window functions default correctly."</h4>
+        <p>Sometimes they do. LAST_VALUE and named window frames are the exception. If the default surprises you, specify the frame explicitly.</p>
+      </div>
+      <div class="callout warn">
+        <h4>"ROWS BETWEEN 6 PRECEDING = a full 7-day window."</h4>
+        <p>Only if you have 7 or more rows before the current one. Early rows see truncated windows — the first row's "7-day average" is just itself. Handle with a MIN row-count filter if needed.</p>
+      </div>
+
+      <div class="takeaways">
+        <h4>KEY TAKEAWAYS</h4>
+        <ul>
+          <li><b>Frames</b> narrow a window to a specific range within the partition.</li>
+          <li>SUM with ORDER BY defaults to a running total (UNBOUNDED PRECEDING → CURRENT ROW).</li>
+          <li>Moving averages use <b>ROWS BETWEEN N PRECEDING AND CURRENT ROW</b>.</li>
+          <li>ROWS counts rows literally; RANGE groups by tied ORDER BY values. Prefer ROWS.</li>
+          <li>LAST_VALUE needs an explicit frame or it returns the current row.</li>
+        </ul>
+      </div>
+    `,
+    quiz:"q4"
+  }
+};
+
+function renderModule(id) {
+  const m = MODULES[id];
+  const stage = el("stage");
+  stage.innerHTML = `
+    <div class="card">
+      <span class="tag">${esc(m.kicker)}</span>
+      ${m.render()}
+      <div class="actionBar">
+        <button class="btn leftActions" id="backBtn">← Back</button>
+        <button class="btn primary" id="nextBtn">Take Quiz →</button>
+      </div>
+    </div>
+  `;
+  el("backBtn").addEventListener("click", () => {
+    const idx = STAGES.findIndex(s => s.id === id);
+    if (idx > 0) goto(STAGES[idx - 1].id);
+  });
+  el("nextBtn").addEventListener("click", () => {
+    state.moduleDone[id] = true;
+    state.moduleUnlocked[m.quiz] = true;
+    renderTabs();
+    goto(m.quiz);
+  });
+}
+
+/* ============================================================
+   QUIZZES
+   ============================================================ */
+const QUIZZES = {
+  q1: {
+    module:"m1",
+    title:"Quiz · Module 1 · The Basics",
+    nextModule:"m2",
+    questions: [
+      {
+        q:"What does OVER() (empty parentheses) mean in a window function?",
+        options:[
+          "Syntax error — you must supply PARTITION BY",
+          "Treat the whole table as one partition",
+          "Compute the aggregate on every column",
+          "Automatically PARTITION BY the primary key"
+        ],
+        correct:1,
+        explain:"An empty OVER() clause is valid. It creates a single partition containing every row — useful for 'this row's value vs. the global average' comparisons."
+      },
+      {
+        q:"Which is the KEY difference between GROUP BY and a window function?",
+        options:[
+          "GROUP BY is faster",
+          "Window functions work only on numeric columns",
+          "GROUP BY collapses rows into summaries; windows preserve rows and add columns",
+          "Windows can only be used with COUNT()"
+        ],
+        correct:2,
+        explain:"GROUP BY reduces the result set to one row per group. Window functions keep every original row and add a new column alongside — that's the whole reason they exist."
+      },
+      {
+        q:"Given a query with PARTITION BY department in the OVER() clause, what does the aggregate compute over?",
+        options:[
+          "The whole table, ignoring department",
+          "Only the current row",
+          "All rows within the same department as the current row",
+          "The first 10 rows of the table"
+        ],
+        correct:2,
+        explain:"PARTITION BY department groups rows into separate 'buckets' by department value, and the aggregate is computed independently within each bucket. Every row sees its own department's aggregate."
+      },
+      {
+        q:"You want to see each employee's salary AND their department's average salary in the same row. Which approach works?",
+        options:[
+          "SELECT name, salary, AVG(salary) FROM employees",
+          "SELECT name, salary, AVG(salary) FROM employees GROUP BY department",
+          "SELECT name, salary, AVG(salary) OVER (PARTITION BY department) FROM employees",
+          "This isn't possible in SQL"
+        ],
+        correct:2,
+        explain:"Option A is a syntax error (mixing aggregate with non-aggregate). Option B collapses to one row per department. Option C is the classic window pattern — keeps every employee row, adds the dept average alongside."
+      }
+    ]
+  },
+  q2: {
+    module:"m2",
+    title:"Quiz · Module 2 · Ranking Functions",
+    nextModule:"m3",
+    questions:[
+      {
+        q:"Three employees earn 100k, 100k, and 90k. What ranks do RANK() vs DENSE_RANK() assign, in that order?",
+        options:[
+          "RANK: 1, 1, 2 · DENSE_RANK: 1, 1, 3",
+          "RANK: 1, 1, 3 · DENSE_RANK: 1, 1, 2",
+          "Both give 1, 1, 2",
+          "Both give 1, 2, 3"
+        ],
+        correct:1,
+        explain:"RANK skips numbers after ties: 1, 1, 3. DENSE_RANK doesn't leave gaps: 1, 1, 2. Memory hook: 'dense' = no space between numbers."
+      },
+      {
+        q:"You want exactly one row per customer — their most recent order. Which function fits best?",
+        options:[
+          "RANK()",
+          "DENSE_RANK()",
+          "ROW_NUMBER()",
+          "COUNT()"
+        ],
+        correct:2,
+        explain:"ROW_NUMBER always returns unique consecutive integers, even for ties. When you filter to rn = 1 you're guaranteed exactly one row per partition, which is what you want for deduplication."
+      },
+      {
+        q:"Why doesn't this query work: SELECT name, ROW_NUMBER() OVER (ORDER BY salary DESC) rn FROM employees WHERE rn = 1?",
+        options:[
+          "ROW_NUMBER() must be inside a subquery",
+          "WHERE is evaluated before the window function is computed",
+          "You can't use WHERE with ORDER BY",
+          "You need to add GROUP BY name"
+        ],
+        correct:1,
+        explain:"SQL evaluates WHERE before SELECT, so the alias 'rn' doesn't exist yet at the WHERE step. Wrap the query in a CTE or subquery and filter on the outer level."
+      },
+      {
+        q:"To find the top 3 highest-paid employees PER department, what's the correct pattern?",
+        options:[
+          "SELECT * FROM employees ORDER BY salary DESC LIMIT 3",
+          "SELECT * FROM employees GROUP BY department LIMIT 3",
+          "Use a CTE with ROW_NUMBER() OVER (PARTITION BY department ORDER BY salary DESC), then filter WHERE rn <= 3",
+          "Use MAX(salary) three times with subqueries"
+        ],
+        correct:2,
+        explain:"'Top N per group' is the classic window pattern: rank inside each partition, then filter. LIMIT alone only limits the total rows, not per group."
+      }
+    ]
+  },
+  q3: {
+    module:"m3",
+    title:"Quiz · Module 3 · LEAD / LAG",
+    nextModule:"m4",
+    questions:[
+      {
+        q:"You compute LAG(revenue, 1) ordered by date. What's the value in the very first row?",
+        options:[
+          "0",
+          "The row's own revenue",
+          "NULL",
+          "Error"
+        ],
+        correct:2,
+        explain:"The first row has no predecessor, so LAG returns NULL. You can supply a default with LAG(revenue, 1, 0) if you want zero instead of NULL."
+      },
+      {
+        q:"You want the days between each customer's consecutive orders. Which OVER clause is correct?",
+        options:[
+          "OVER (ORDER BY order_date)",
+          "OVER (PARTITION BY customer_id ORDER BY order_date)",
+          "OVER (PARTITION BY order_date)",
+          "OVER () with no PARTITION or ORDER"
+        ],
+        correct:1,
+        explain:"Without PARTITION BY customer_id, you'd be computing gaps between rows across ALL customers mixed together. The partition isolates each customer's history so LAG only looks at their own orders."
+      },
+      {
+        q:"What does FIRST_VALUE(amount) do in an OVER clause with PARTITION BY customer_id ORDER BY order_date?",
+        options:[
+          "Returns the smallest amount in the partition",
+          "Returns the amount of that customer's earliest order — repeated on every row",
+          "Returns the amount of the current row",
+          "Returns NULL for all rows"
+        ],
+        correct:1,
+        explain:"FIRST_VALUE returns the value from the first row (by the ORDER BY) of the partition. Every row of that customer carries their first-order amount alongside — useful for 'delta from first order' calculations."
+      },
+      {
+        q:"LEAD(order_date, 1) returns NULL for a row when...",
+        options:[
+          "The row is the first in the partition",
+          "The row is the last in the partition",
+          "Never — LEAD is always non-NULL",
+          "Any time the offset is 1"
+        ],
+        correct:1,
+        explain:"LEAD looks forward. The last row has no next row, so LEAD returns NULL there. LAG has the mirror problem — NULL on the first row."
+      }
+    ]
+  },
+  q4: {
+    module:"m4",
+    title:"Quiz · Module 4 · Frames and Running Calculations",
+    nextModule:"challenge",
+    questions:[
+      {
+        q:"Which frame clause produces a running total (cumulative sum from the start)?",
+        options:[
+          "ROWS BETWEEN 1 PRECEDING AND CURRENT ROW",
+          "ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW",
+          "ROWS BETWEEN CURRENT ROW AND UNBOUNDED FOLLOWING",
+          "ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING"
+        ],
+        correct:1,
+        explain:"'From the beginning of the partition up to and including this row' = UNBOUNDED PRECEDING AND CURRENT ROW. Every row's window includes all prior rows plus itself."
+      },
+      {
+        q:"To compute a 7-day moving average, what frame clause do you use?",
+        options:[
+          "ROWS BETWEEN 7 PRECEDING AND CURRENT ROW",
+          "ROWS BETWEEN 6 PRECEDING AND CURRENT ROW",
+          "ROWS BETWEEN 7 PRECEDING AND 7 FOLLOWING",
+          "RANGE BETWEEN 7 DAYS PRECEDING AND CURRENT ROW"
+        ],
+        correct:1,
+        explain:"7 days = 6 preceding + current row = 7 rows total. Off-by-one is the most common mistake here."
+      },
+      {
+        q:"Why does LAST_VALUE(amount) OVER (ORDER BY date) not return the actual last value?",
+        options:[
+          "It's a bug in the SQL standard",
+          "The default frame is UNBOUNDED PRECEDING to CURRENT ROW — so the 'last value' seen is the current row",
+          "LAST_VALUE only works on numeric columns",
+          "You need to use FIRST_VALUE with DESC ordering instead"
+        ],
+        correct:1,
+        explain:"The default frame when ORDER BY is present is 'from the start to the current row.' So LAST_VALUE sees only up to the current row and returns that row's value. To get the actual last value in the partition, specify ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING."
+      },
+      {
+        q:"What's the practical difference between ROWS BETWEEN and RANGE BETWEEN?",
+        options:[
+          "ROWS is faster",
+          "RANGE is deprecated",
+          "ROWS counts physical rows; RANGE groups tied ORDER BY values together",
+          "There is no difference"
+        ],
+        correct:2,
+        explain:"With ROWS, two rows with the same ORDER BY value are still counted separately. With RANGE, they're treated as one frame position. In practice, 90% of the time you want ROWS."
+      }
+    ]
+  }
+};
+
+function renderQuiz(id) {
+  const quiz = QUIZZES[id];
+  const answers = state.quizAnswers[id] || {};
+  const submitted = state.quizScores[id] !== undefined;
+
+  const questionsHtml = quiz.questions.map((q, qi) => {
+    const answer = answers[qi];
+    const choices = q.options.map((opt, oi) => {
+      let cls = "quizChoice";
+      if (submitted) {
+        if (oi === q.correct) cls += " correct";
+        else if (answer === oi) cls += " wrong";
+      } else if (answer === oi) {
+        cls += " selected";
+      }
+      const letter = String.fromCharCode(65 + oi);
+      return `
+        <button class="${cls}" data-q="${qi}" data-o="${oi}" ${submitted ? "disabled" : ""}>
+          <span class="letter">${letter}</span>
+          <span>${esc(opt)}</span>
+        </button>
+      `;
+    }).join("");
+
+    const explainHtml = submitted ? `
+      <div class="quizExplain ${answer === q.correct ? "correct" : "wrong"}">
+        <b>${answer === q.correct ? "✓ Correct." : "✗ Not quite."}</b> ${esc(q.explain)}
+      </div>
+    ` : "";
+
+    return `
+      <div style="margin-bottom:22px;">
+        <h3 style="font-size:16px; margin:14px 0 8px;">Q${qi + 1}. ${esc(q.q)}</h3>
+        <div class="quizGrid">${choices}</div>
+        ${explainHtml}
+      </div>
+    `;
+  }).join("");
+
+  const answered = Object.keys(answers).length;
+  const total = quiz.questions.length;
+
+  el("stage").innerHTML = `
+    <div class="card">
+      <span class="tag">Quiz · ${answered}/${total} answered</span>
+      <h2 style="margin-top:14px;">${esc(quiz.title)}</h2>
+      <p class="lead">Answer all four questions to unlock the next module. Every question has a full explanation on submit.</p>
+      ${questionsHtml}
+      <div class="actionBar" id="quizActions">
+        <button class="btn leftActions" id="backBtn">← Back</button>
+        ${submitted ? `
+          <button class="btn" id="retryBtn">↻ Retry</button>
+          <button class="btn primary" id="nextBtn">${quiz.nextModule === "challenge" ? "Continue to Final Challenge →" : "Continue to Next Module →"}</button>
+        ` : `
+          <button class="btn primary" id="submitBtn" ${answered < total ? "disabled" : ""}>Submit Quiz</button>
+        `}
+      </div>
+      ${submitted ? `
+        <div class="scoreCard">
+          <div class="lbl">Your Score</div>
+          <div class="val">${state.quizScores[id]}<span style="font-size:24px; color:var(--text-mute);">/${total}</span></div>
+          <div class="msg">${scoreMessage(state.quizScores[id], total)}</div>
+        </div>
+      ` : ""}
+    </div>
+  `;
+
+  document.querySelectorAll(".quizChoice").forEach(b => {
+    b.addEventListener("click", () => {
+      if (submitted) return;
+      const qi = parseInt(b.dataset.q, 10);
+      const oi = parseInt(b.dataset.o, 10);
+      if (!state.quizAnswers[id]) state.quizAnswers[id] = {};
+      state.quizAnswers[id][qi] = oi;
+      renderQuiz(id);
+    });
+  });
+
+  el("backBtn").addEventListener("click", () => goto(quiz.module));
+
+  const submitBtn = el("submitBtn");
+  if (submitBtn) submitBtn.addEventListener("click", () => {
+    const answers = state.quizAnswers[id] || {};
+    let score = 0;
+    quiz.questions.forEach((q, qi) => { if (answers[qi] === q.correct) score++; });
+    state.quizScores[id] = score;
+    addXp(score * 10 + (score === total ? 50 : 0));
+    state.moduleDone[id] = true;
+    state.moduleUnlocked[quiz.nextModule] = true;
+    state.badges = Object.keys(state.moduleDone).filter(k => k.startsWith("q") && state.moduleDone[k]).length;
+    el("hudBadges").textContent = state.badges;
+    if (score === total) burstConfetti();
+    toast(`Quiz score: ${score}/${total}${score === total ? " · +50 XP bonus!" : ""}`, score >= 3 ? "good" : "bad");
+    renderTabs();
+    renderQuiz(id);
+  });
+
+  const retryBtn = el("retryBtn");
+  if (retryBtn) retryBtn.addEventListener("click", () => {
+    delete state.quizAnswers[id];
+    delete state.quizScores[id];
+    renderQuiz(id);
+  });
+
+  const nextBtn = el("nextBtn");
+  if (nextBtn) nextBtn.addEventListener("click", () => {
+    if (quiz.nextModule === "challenge") {
+      state.moduleUnlocked.challenge = true;
+      renderTabs();
+    }
+    goto(quiz.nextModule);
+  });
+}
+
+function scoreMessage(score, total) {
+  if (score === total) return "Perfect run — you've internalized the module. +50 XP bonus.";
+  if (score >= 3) return "Strong grasp. Read the explanations on any misses before continuing.";
+  if (score === 2) return "Partial — worth re-reading the module before the next quiz.";
+  return "Try again after re-reading the module. The concepts stack.";
+}
+
+/* ============================================================
+   FINAL CHALLENGE
+   ============================================================ */
+function renderChallenge() {
+  el("stage").innerHTML = `
+    <div class="card">
+      <span class="tag">FINAL PRACTICAL CHALLENGE</span>
+      <h2 style="margin-top:14px;">Combine everything you've learned</h2>
+      <p class="lead">A realistic analyst task that uses ranking, LAG, and a frame clause together. Try it yourself first; the solution and explanation are hidden below.</p>
+
+      <h3>The scenario</h3>
+      <p>You have an <code>orders</code> table with these columns:</p>
+      ${tableHtml(
+        ["customer_id","order_date","order_id","amount"],
+        [
+          ["101","2025-01-05","1001","250"],
+          ["101","2025-01-18","1002","320"],
+          ["102","2025-01-08","1003","480"],
+          ["101","2025-02-02","1004","150"],
+          ["103","2025-02-14","1005","900"],
+          ["102","2025-02-20","1006","220"],
+        ]
+      )}
+
+      <h3>Your task</h3>
+      <p>Write a single SQL query that returns, for each customer:</p>
+      <ol>
+        <li>Their <b>customer_id</b></li>
+        <li>The <b>order_date</b> of their <b>second</b> order</li>
+        <li>The <b>amount</b> of their second order</li>
+        <li>The <b>days since their first order</b> when the second was placed</li>
+        <li>Their <b>cumulative spend</b> across all orders up to and including the second order</li>
+      </ol>
+      <p>Constraint: customers with fewer than 2 orders should be excluded.</p>
+
+      <h3>Try it yourself first</h3>
+      <p>Before revealing the solution — write out the pieces mentally:</p>
+      <ul>
+        <li>Which ranking function isolates the "second order"?</li>
+        <li>Which value window gives the first order's date?</li>
+        <li>Which frame produces cumulative spend?</li>
+      </ul>
+
+      <details style="margin:20px 0;">
+        <summary style="cursor:pointer; color:var(--accent); font-weight:800; font-size:14px; letter-spacing:1.5px; text-transform:uppercase;">▸ Reveal solution and step-by-step explanation</summary>
+        <div style="margin-top:14px;">
+          <h4>The full query</h4>
+          ${codeBlock(`WITH enriched AS (
+  SELECT
+    customer_id,
+    order_date,
+    amount,
+    ROW_NUMBER() OVER (
+      PARTITION BY customer_id
+      ORDER BY order_date
+    ) AS order_num,
+    FIRST_VALUE(order_date) OVER (
+      PARTITION BY customer_id
+      ORDER BY order_date
+    ) AS first_order_date,
+    SUM(amount) OVER (
+      PARTITION BY customer_id
+      ORDER BY order_date
+      ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+    ) AS cumulative_spend
+  FROM orders
+)
+SELECT
+  customer_id,
+  order_date AS second_order_date,
+  amount     AS second_order_amount,
+  order_date - first_order_date AS days_since_first,
+  cumulative_spend
+FROM enriched
+WHERE order_num = 2;`)}
+
+          <h4>Step-by-step reasoning</h4>
+          <ul>
+            <li><b>ROW_NUMBER()</b> — assigns 1, 2, 3… to each customer's orders in date order. We filter to order_num = 2 to isolate the second order.</li>
+            <li><b>FIRST_VALUE(order_date)</b> — captures each customer's earliest order date and carries it on every row. The second-order row can then subtract to get "days since first."</li>
+            <li><b>SUM(amount) OVER (...ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)</b> — running total per customer. On the second-order row, this equals order 1 + order 2 = cumulative spend at that point.</li>
+            <li><b>Excluding customers with fewer than 2 orders</b> — handled automatically. If a customer only has 1 order, no row exists with order_num = 2, so they're filtered out.</li>
+          </ul>
+
+          <h4>Expected output</h4>
+          ${tableHtml(
+            ["customer_id","second_order_date","second_order_amount","days_since_first","cumulative_spend"],
+            [
+              ["101","2025-01-18","320","13","570"],
+              ["102","2025-02-20","220","43","700"],
+            ]
+          )}
+          <p>Customer 103 is excluded — they only have one order.</p>
+        </div>
+      </details>
+
+      <div class="callout good" style="margin-top:22px;">
+        <h4>You've completed the tutorial</h4>
+        <p>If you can write and defend the query above, you have working knowledge of window functions. From here, practice on real datasets — most analyst interview problems combine two or three of these techniques.</p>
+      </div>
+
+      <div class="actionBar">
+        <button class="btn leftActions" id="backBtn">← Back</button>
+        <button class="btn primary" id="nextBtn">Continue to Cheat Sheet & Resources →</button>
+      </div>
+    </div>
+  `;
+  el("backBtn").addEventListener("click", () => goto("q4"));
+  el("nextBtn").addEventListener("click", () => {
+    state.moduleDone.challenge = true;
+    addXp(100);
+    burstConfetti();
+    toast("Final challenge complete! +100 XP", "good");
+    renderTabs();
+    goto("resources");
+  });
+}
+
+/* ============================================================
+   RESOURCES · CHEAT SHEET · SUMMARY · CONTINUE LEARNING
+   ============================================================ */
+function renderResources() {
+  const totalScore = Object.values(state.quizScores).reduce((a, b) => a + b, 0);
+  const maxScore = 16;
+
+  el("stage").innerHTML = `
+    <div class="card">
+      <h2>Complete — Cheat Sheet & Continue Learning</h2>
+      <p class="lead">Everything you need to reference this in the wild. Bookmark this page or print the notes.</p>
+
+      <div class="scoreCard">
+        <div class="lbl">Total Score</div>
+        <div class="val">${totalScore}<span style="font-size:24px; color:var(--text-mute);">/${maxScore}</span></div>
+        <div class="msg">${state.xp} XP earned · ${state.badges} of 4 badges</div>
+      </div>
+
+      <h3>Cheat Sheet</h3>
+      <div class="cheatGrid">
+        <div class="cheatCard">
+          <h5>Aggregate window</h5>
+          <code>AVG(x) OVER (PARTITION BY dept)</code>
+        </div>
+        <div class="cheatCard">
+          <h5>ROW_NUMBER — unique</h5>
+          <code>ROW_NUMBER() OVER (PARTITION BY g ORDER BY x DESC)</code>
+        </div>
+        <div class="cheatCard">
+          <h5>RANK — gaps after ties</h5>
+          <code>RANK() OVER (ORDER BY x DESC)</code>
+        </div>
+        <div class="cheatCard">
+          <h5>DENSE_RANK — no gaps</h5>
+          <code>DENSE_RANK() OVER (ORDER BY x DESC)</code>
+        </div>
+        <div class="cheatCard">
+          <h5>LAG — previous row</h5>
+          <code>LAG(x, 1, 0) OVER (ORDER BY date)</code>
+        </div>
+        <div class="cheatCard">
+          <h5>LEAD — next row</h5>
+          <code>LEAD(x, 1) OVER (PARTITION BY id ORDER BY date)</code>
+        </div>
+        <div class="cheatCard">
+          <h5>First value</h5>
+          <code>FIRST_VALUE(x) OVER (PARTITION BY id ORDER BY date)</code>
+        </div>
+        <div class="cheatCard">
+          <h5>Running total</h5>
+          <code>SUM(x) OVER (ORDER BY date)</code>
+        </div>
+        <div class="cheatCard">
+          <h5>7-day moving avg</h5>
+          <code>AVG(x) OVER (ORDER BY date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW)</code>
+        </div>
+        <div class="cheatCard">
+          <h5>Top N per group</h5>
+          <code>WITH r AS (SELECT *, ROW_NUMBER() OVER (PARTITION BY g ORDER BY x DESC) rn FROM t) SELECT * FROM r WHERE rn <= 3</code>
+        </div>
+      </div>
+
+      <h3>Summary Notes</h3>
+      <div class="callout">
+        <h4>The four things to remember</h4>
+        <p><b>1. Windows preserve rows.</b> GROUP BY collapses. Windows travel alongside.</p>
+        <p><b>2. Ranking has three flavors.</b> ROW_NUMBER (unique), RANK (Olympic), DENSE_RANK (business).</p>
+        <p><b>3. LAG/LEAD read from other rows.</b> First LAG is NULL. Last LEAD is NULL. Handle explicitly.</p>
+        <p><b>4. Frames narrow the window.</b> Running totals use UNBOUNDED PRECEDING. Moving averages use N PRECEDING.</p>
+      </div>
+
+      <h3>Continue Learning</h3>
+
+      <h4>Books</h4>
+      <div class="resGrid">
+        <div class="resTile"><h5>SQL Cookbook (Molinaro)</h5><p>The best analyst-focused SQL reference. Every recipe includes a window-function variant.</p></div>
+        <div class="resTile"><h5>Ace the Data Science Interview</h5><p>Actual SQL/window function problems from FAANG interviews. Solutions included.</p></div>
+        <div class="resTile"><h5>SQL Antipatterns (Karwin)</h5><p>Understanding the wrong patterns is often more useful than learning the right ones.</p></div>
+      </div>
+
+      <h4>Documentation</h4>
+      <div class="resGrid">
+        <div class="resTile"><h5>PostgreSQL Window Docs</h5><p>The gold standard for understanding frame clauses. Read the "Window Function Calls" section.</p></div>
+        <div class="resTile"><h5>MySQL 8 Window Functions</h5><p>Newer to MySQL — if your team is on MySQL 5.x you can't use windows at all, know your version.</p></div>
+        <div class="resTile"><h5>BigQuery Window Reference</h5><p>Cloud dialects support extended window syntax (NAMED WINDOWs, TIME RANGE frames). Worth knowing.</p></div>
+      </div>
+
+      <h4>Practice Platforms</h4>
+      <div class="resGrid">
+        <div class="resTile"><h5>DataLemur</h5><p>Real FAANG SQL interview problems. Windows come up in ~30% of medium/hard questions.</p></div>
+        <div class="resTile"><h5>StrataScratch</h5><p>Similar to DataLemur; slightly older but with detailed video explanations.</p></div>
+        <div class="resTile"><h5>LeetCode Database</h5><p>SQL-specific track. Sort by "Hard" to find the window function questions.</p></div>
+        <div class="resTile"><h5>SQLZoo</h5><p>Free, structured, beginner-friendly. Good for warming back up.</p></div>
+      </div>
+
+      <h4>Communities</h4>
+      <div class="resGrid">
+        <div class="resTile"><h5>r/SQL</h5><p>Weekly "help me optimize this query" threads. Real production SQL, real critiques.</p></div>
+        <div class="resTile"><h5>Stack Overflow · sql tag</h5><p>The window function tag alone has 20K+ answered questions. Search before asking.</p></div>
+        <div class="resTile"><h5>Modern Data Stack Slack</h5><p>Where analytics engineers hang out. Higher-level SQL discussion (dbt, Snowflake, BigQuery).</p></div>
+      </div>
+
+      <h4>Research papers</h4>
+      <div class="resGrid">
+        <div class="resTile"><h5>SQL:2003 Window Functions</h5><p>The original spec. Dry but definitive on frame semantics.</p></div>
+        <div class="resTile"><h5>"Efficient Processing of Window Functions in Analytical SQL Queries"</h5><p>How database engines actually implement window functions. Optional but interesting.</p></div>
+      </div>
+
+      <h4>Search keywords</h4>
+      <div class="callout">
+        <p>When stuck, search: <code>sql window function ORDER BY frame</code>, <code>row_number vs rank sql</code>, <code>lag lead sql running total</code>, <code>sql top N per group</code>, <code>last_value default frame</code>.</p>
+      </div>
+
+      <h4>Additional AI prompts for further learning</h4>
+      <div class="callout">
+        <p>Copy and paste these into Claude to keep learning:</p>
+        <ul>
+          <li><em>"Give me 5 SQL window function interview questions increasing in difficulty, and let me try each before showing the answer."</em></li>
+          <li><em>"Explain the difference between window frame RANGE and ROWS with 3 concrete examples where they give different results."</em></li>
+          <li><em>"I have this SQL query with a window function. Review it for correctness and performance."</em></li>
+          <li><em>"What's a real business analysis where LAG(3) would be the right choice over LAG(1)?"</em></li>
+          <li><em>"Design a schema and 3 questions where solving each requires a different window function."</em></li>
+        </ul>
+      </div>
+
+      <div class="actionBar">
+        <button class="btn" id="printBtn2">🖨️ Print Summary Notes</button>
+        <button class="btn primary leftActions" id="restartBtn">↻ Restart Tutorial</button>
+      </div>
+    </div>
+  `;
+
+  el("printBtn2").addEventListener("click", () => window.print());
+  el("restartBtn").addEventListener("click", () => {
+    Object.keys(state.moduleDone).forEach(k => delete state.moduleDone[k]);
+    Object.keys(state.quizScores).forEach(k => delete state.quizScores[k]);
+    Object.keys(state.quizAnswers).forEach(k => delete state.quizAnswers[k]);
+    state.xp = 0; state.badges = 0;
+    el("hudXp").textContent = "0"; el("hudBadges").textContent = "0";
+    Object.keys(state.moduleUnlocked).forEach(k => {
+      state.moduleUnlocked[k] = (k === "welcome" || k === "m1" || k === "resources");
+    });
+    goto("welcome");
+  });
+}
+
+/* ============================================================
+   SVG DIAGRAMS
+   ============================================================ */
+function svgAnalogy() {
+  return `
+    <svg viewBox="0 0 600 200" xmlns="http://www.w3.org/2000/svg">
+      <rect x="20" y="30" width="120" height="140" rx="8" fill="#1e2540" stroke="#364260"/>
+      <text x="80" y="55" text-anchor="middle" fill="#38bdf8" font-size="12" font-weight="800" font-family="system-ui">ROW</text>
+      <text x="80" y="90" text-anchor="middle" fill="#e2e8f0" font-size="14" font-family="system-ui">stays</text>
+      <text x="80" y="110" text-anchor="middle" fill="#e2e8f0" font-size="14" font-family="system-ui">exactly</text>
+      <text x="80" y="130" text-anchor="middle" fill="#e2e8f0" font-size="14" font-family="system-ui">as it was</text>
+
+      <text x="200" y="105" fill="#7c8aa5" font-size="20">+</text>
+
+      <rect x="240" y="30" width="180" height="140" rx="8" fill="#1e2540" stroke="#a687ff" stroke-dasharray="4 4"/>
+      <text x="330" y="55" text-anchor="middle" fill="#a687ff" font-size="12" font-weight="800" font-family="system-ui">WINDOW FUNCTION</text>
+      <text x="330" y="90" text-anchor="middle" fill="#e2e8f0" font-size="14" font-family="system-ui">looks at OTHER</text>
+      <text x="330" y="110" text-anchor="middle" fill="#e2e8f0" font-size="14" font-family="system-ui">rows in the partition</text>
+      <text x="330" y="130" text-anchor="middle" fill="#e2e8f0" font-size="14" font-family="system-ui">and computes a value</text>
+
+      <text x="440" y="105" fill="#7c8aa5" font-size="20">=</text>
+
+      <rect x="470" y="30" width="110" height="140" rx="8" fill="#1e2540" stroke="#4ade80"/>
+      <text x="525" y="55" text-anchor="middle" fill="#4ade80" font-size="12" font-weight="800" font-family="system-ui">NEW COLUMN</text>
+      <text x="525" y="95" text-anchor="middle" fill="#e2e8f0" font-size="14" font-family="system-ui">appended</text>
+      <text x="525" y="115" text-anchor="middle" fill="#e2e8f0" font-size="14" font-family="system-ui">to the row</text>
+    </svg>
+  `;
+}
+function svgLeadLag() {
+  return `
+    <svg viewBox="0 0 620 200" xmlns="http://www.w3.org/2000/svg">
+      <text x="20" y="30" fill="#7c8aa5" font-size="11" font-weight="800" font-family="system-ui" letter-spacing="2">PARTITION</text>
+      ${[0,1,2,3,4,5].map((i) => `
+        <rect x="${20 + i*100}" y="50" width="80" height="60" rx="6" fill="${i === 3 ? '#38bdf8' : '#1e2540'}" stroke="${i === 3 ? '#7dd3fc' : '#364260'}"/>
+        <text x="${60 + i*100}" y="85" text-anchor="middle" fill="${i === 3 ? '#0a0e18' : '#e2e8f0'}" font-size="14" font-weight="800" font-family="system-ui">Row ${i+1}</text>
+      `).join("")}
+      <text x="${60 + 3*100}" y="140" text-anchor="middle" fill="#38bdf8" font-size="11" font-weight="800" font-family="system-ui">CURRENT ROW</text>
+
+      <path d="M ${60 + 3*100} 130 Q ${60 + 3*100 - 50} 165 ${60 + 2*100 + 10} 130" fill="none" stroke="#a687ff" stroke-width="2"/>
+      <text x="${60 + 2.5*100}" y="180" text-anchor="middle" fill="#a687ff" font-size="11" font-weight="800" font-family="system-ui">LAG(1)</text>
+
+      <path d="M ${60 + 3*100} 130 Q ${60 + 3*100 + 50} 165 ${60 + 4*100 - 10} 130" fill="none" stroke="#4ade80" stroke-width="2"/>
+      <text x="${60 + 3.5*100}" y="180" text-anchor="middle" fill="#4ade80" font-size="11" font-weight="800" font-family="system-ui">LEAD(1)</text>
+    </svg>
+  `;
+}
+function svgFrame() {
+  return `
+    <svg viewBox="0 0 620 260" xmlns="http://www.w3.org/2000/svg">
+      <text x="20" y="30" fill="#7c8aa5" font-size="11" font-weight="800" font-family="system-ui" letter-spacing="2">7-DAY MOVING AVERAGE FRAME</text>
+      ${[0,1,2,3,4,5,6,7,8,9].map((i) => {
+        const inFrame = i >= 3 && i <= 9;
+        const isCurrent = i === 9;
+        return `
+          <rect x="${20 + i*60}" y="50" width="50" height="50" rx="5" fill="${isCurrent ? '#38bdf8' : inFrame ? '#1e2540' : '#141c30'}" stroke="${inFrame ? '#7dd3fc' : '#263148'}" stroke-width="${inFrame ? 2 : 1}" opacity="${inFrame ? 1 : 0.4}"/>
+          <text x="${45 + i*60}" y="80" text-anchor="middle" fill="${isCurrent ? '#0a0e18' : '#e2e8f0'}" font-size="12" font-weight="800" font-family="system-ui" opacity="${inFrame ? 1 : 0.5}">${i+1}</text>
+        `;
+      }).join("")}
+      <path d="M ${20 + 3*60} 115 L ${20 + 3*60} 130 L ${45 + 9*60} 130 L ${45 + 9*60} 115" fill="none" stroke="#38bdf8" stroke-width="2"/>
+      <text x="${(20 + 3*60 + 45 + 9*60) / 2}" y="152" text-anchor="middle" fill="#38bdf8" font-size="12" font-weight="800" font-family="system-ui">FRAME · 7 rows</text>
+      <text x="${45 + 9*60}" y="185" text-anchor="middle" fill="#38bdf8" font-size="10" font-weight="800" font-family="system-ui">CURRENT</text>
+
+      <text x="310" y="220" text-anchor="middle" fill="#b4c0d4" font-size="12" font-family="system-ui">
+        ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+      </text>
+    </svg>
+  `;
+}
+
+/* ============================================================
+   THEME + PRINT
+   ============================================================ */
+el("themeBtn").addEventListener("click", () => {
+  const isLight = document.body.classList.toggle("lightMode");
+  el("themeBtn").textContent = isLight ? "☀️ Light" : "🌙 Dark";
+});
+el("printBtn").addEventListener("click", () => window.print());
+
+/* ============================================================
+   INIT
+   ============================================================ */
+renderTabs();
+renderWelcome();
+</script>
+</body>
+</html>
