@@ -1,0 +1,1293 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>💰 Personal Financial Command Center — Day 42 · #60DayClaudeChallenge</title>
+<style>
+:root {
+  --bg:#0a0f1a; --bg-2:#0f1522; --panel:#141b2b; --panel-2:#1b2437;
+  --line:#252f45; --line-2:#37425c;
+  --text:#e6edf5; --text-dim:#a8b4c9; --text-mute:#6c7a94;
+  --accent:#4ade80; --accent-2:#7cea9f; --accent-soft:rgba(74,222,128,.15);
+  --sky:#38bdf8; --purple:#a687ff; --pink:#ff7bb5; --amber:#fbbf24;
+  --good:#4ade80; --bad:#f56565; --warn:#fbbf24; --gold:#ffd166;
+  --shadow:0 20px 60px rgba(0,0,0,.55);
+  --radius:14px; --easing:cubic-bezier(.2,.8,.2,1);
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+body.lightMode {
+  --bg:#f5f8fc; --bg-2:#fff; --panel:#fff; --panel-2:#f0f4fa;
+  --line:#e2e8f0; --line-2:#cbd5e1;
+  --text:#0f172a; --text-dim:#475569; --text-mute:#94a3b8;
+  --shadow:0 12px 40px rgba(15,23,42,.08);
+}
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body {
+  margin:0; padding:0; min-height:100%;
+  background:
+    radial-gradient(1100px 700px at 10% -10%, var(--accent-soft), transparent 60%),
+    radial-gradient(900px 600px at 100% 100%, rgba(56,189,248,.08), transparent 60%),
+    var(--bg);
+  color:var(--text);
+  font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.mono { font-family:var(--mono); }
+.app { max-width:1240px; margin:0 auto; padding:22px 24px 60px; }
+
+header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 0 16px; margin-bottom:16px; flex-wrap:wrap; gap:12px;
+  border-bottom:1px solid var(--line);
+}
+.brand { display:flex; align-items:center; gap:14px; }
+.logo {
+  width:52px; height:52px; border-radius:14px;
+  background:linear-gradient(135deg, var(--accent), var(--sky));
+  display:flex; align-items:center; justify-content:center; font-size:26px;
+  box-shadow:0 12px 30px rgba(0,0,0,.4);
+}
+.brand h1 { margin:0; font-size:22px; font-weight:800; letter-spacing:-.3px; }
+.brand .sub { font-size:11px; color:var(--text-mute); letter-spacing:2px; text-transform:uppercase; font-weight:700; }
+.headActions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.hud {
+  padding:6px 12px; border-radius:999px; font-size:11px; letter-spacing:1.5px; text-transform:uppercase;
+  font-weight:800; background:var(--panel); border:1px solid var(--line); color:var(--text-dim);
+}
+.hud b { color:var(--text); font-family:var(--mono); }
+.hud.good { border-color:var(--good); color:var(--good); background:rgba(74,222,128,.08); }
+.hud.warn { border-color:var(--warn); color:var(--warn); background:rgba(251,191,36,.08); }
+.hud.bad { border-color:var(--bad); color:var(--bad); background:rgba(245,101,101,.08); }
+.iconBtn {
+  background:var(--panel); border:1px solid var(--line); color:var(--text-dim);
+  padding:7px 12px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:700;
+  transition:border-color .12s, color .12s, background .15s; font-family:inherit;
+}
+.iconBtn:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
+
+.tabRow {
+  display:flex; gap:5px; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:5px; margin-bottom:18px; overflow-x:auto;
+}
+.tab {
+  padding:9px 14px; border:none; background:transparent; color:var(--text-dim); cursor:pointer;
+  border-radius:8px; font-size:12.5px; font-weight:700; letter-spacing:.3px;
+  transition:background .15s, color .12s; font-family:inherit;
+  white-space:nowrap; display:flex; align-items:center; gap:5px;
+}
+.tab:hover { color:var(--text); background:var(--panel-2); }
+.tab.active { background:linear-gradient(135deg, var(--accent), var(--sky)); color:#0a0e18; font-weight:800; }
+
+.card {
+  background:linear-gradient(180deg, var(--panel), var(--bg-2));
+  border:1px solid var(--line); border-radius:var(--radius);
+  padding:24px 26px; box-shadow:var(--shadow); margin-bottom:16px;
+  animation:fadeIn .3s var(--easing) both;
+}
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:translateY(0);} }
+.card h2 { margin:0 0 6px; font-size:24px; font-weight:800; letter-spacing:-.3px; }
+.card h3 { margin:22px 0 10px; font-size:18px; font-weight:800; }
+.card h4 { margin:16px 0 6px; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--accent); font-weight:800; }
+.card p { color:var(--text-dim); font-size:14px; line-height:1.65; margin:6px 0; }
+.card p b { color:var(--text); font-weight:800; }
+.tag {
+  display:inline-block; font-size:10px; padding:3px 10px; border-radius:999px;
+  background:var(--accent-soft); color:var(--accent); border:1px solid var(--accent);
+  font-weight:800; letter-spacing:1.5px;
+}
+
+/* ========== HEALTH SCORE ========== */
+.healthHero {
+  background: radial-gradient(circle at 50% 30%, var(--accent-soft), transparent 60%), var(--panel-2);
+  border:1px solid var(--line); border-radius:14px; padding:24px; margin-top:14px;
+  display:grid; grid-template-columns:1fr 2fr; gap:24px; align-items:center;
+}
+@media(max-width:760px){ .healthHero { grid-template-columns:1fr; text-align:center; } }
+.healthHero .scoreBig {
+  font-family:var(--mono); font-size:96px; font-weight:900; line-height:1;
+  background:linear-gradient(135deg, #fff, var(--accent-2), var(--accent));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.healthHero .k { font-size:11px; color:var(--text-mute); letter-spacing:2px; font-weight:800; text-transform:uppercase; }
+.healthHero .band { display:inline-block; padding:4px 12px; margin-top:8px; border:2px solid var(--good); border-radius:8px; color:var(--good); font-weight:800; letter-spacing:2px; font-size:11px; text-transform:uppercase; }
+.healthHero .band.warn { border-color:var(--warn); color:var(--warn); }
+.healthHero .band.bad { border-color:var(--bad); color:var(--bad); }
+.healthHero .breakdown { display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:10px; margin-top:14px; }
+.healthHero .brTile { background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:10px 14px; }
+.healthHero .brTile .l { font-size:10px; color:var(--text-mute); letter-spacing:1.5px; font-weight:800; text-transform:uppercase; }
+.healthHero .brTile .v { font-family:var(--mono); font-size:22px; font-weight:800; margin-top:2px; }
+.healthHero .brTile .bar { height:4px; background:rgba(255,255,255,.06); border-radius:2px; margin-top:6px; overflow:hidden; }
+.healthHero .brTile .bar i { display:block; height:100%; background:linear-gradient(90deg, var(--accent), var(--sky)); transition: width 1s var(--easing); border-radius:2px; }
+
+/* ========== STAT TILES ========== */
+.statGrid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:12px; margin-top:16px; }
+.statTile { background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+.statTile .l { font-size:10px; color:var(--text-mute); letter-spacing:1.5px; font-weight:800; text-transform:uppercase; }
+.statTile .v { font-family:var(--mono); font-size:22px; font-weight:800; margin-top:4px; color:var(--text); }
+.statTile .delta { font-size:11px; font-weight:700; margin-top:4px; }
+.statTile .delta.up { color:var(--good); }
+.statTile .delta.down { color:var(--bad); }
+.statTile.accent { border-color:var(--accent); background:var(--accent-soft); }
+.statTile.accent .v { color:var(--accent); }
+.statTile.warn { border-color:var(--warn); }
+.statTile.warn .v { color:var(--warn); }
+
+/* ========== FORM ========== */
+.formGrid { display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:12px; margin-top:12px; }
+.formField label { display:block; font-size:10px; color:var(--text-mute); letter-spacing:1.5px; font-weight:800; text-transform:uppercase; margin-bottom:4px; }
+.formField input, .formField select {
+  width:100%; background:var(--bg); border:1.5px solid var(--line); border-radius:8px;
+  padding:9px 12px; color:var(--text); font-family:var(--mono); font-size:14px; font-weight:600;
+  outline:none; transition:border-color .12s;
+}
+.formField input:focus, .formField select:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
+.formField input[type="range"] { padding:0; height:20px; background:transparent; }
+
+/* ========== LIST TABLES ========== */
+.itemList { display:grid; gap:8px; margin-top:12px; }
+.itemRow {
+  display:grid; grid-template-columns:32px 1.6fr 1fr 1fr auto; gap:12px; align-items:center;
+  background:var(--panel-2); border:1px solid var(--line); border-radius:10px; padding:10px 14px;
+  font-size:13.5px;
+}
+.itemRow .ico { font-size:18px; text-align:center; }
+.itemRow .n { font-weight:700; }
+.itemRow .sub { font-size:11px; color:var(--text-mute); }
+.itemRow .num { font-family:var(--mono); font-weight:800; text-align:right; }
+.itemRow.debt { border-left:3px solid var(--bad); }
+.itemRow.saving { border-left:3px solid var(--good); }
+.itemRow.invest { border-left:3px solid var(--purple); }
+.itemRow.sub { border-left:3px solid var(--warn); }
+@media(max-width:640px){ .itemRow { grid-template-columns:32px 1fr auto; } .itemRow .num:not(:last-child) { display:none; } }
+
+/* ========== CHARTS ========== */
+.chartWrap { background:var(--panel-2); border:1px solid var(--line); border-radius:12px; padding:16px; margin-top:12px; }
+.chartWrap h4 { margin:0 0 10px; }
+.chartWrap svg { width:100%; height:auto; display:block; }
+
+/* ========== PROGRESS BAR ========== */
+.pRow { display:grid; grid-template-columns:140px 1fr 70px; gap:10px; align-items:center; font-size:13px; margin:8px 0; }
+.pRow .l { color:var(--text-dim); font-weight:700; font-size:12px; }
+.pRow .bar { height:10px; background:rgba(255,255,255,.05); border-radius:5px; overflow:hidden; }
+.pRow .bar i { display:block; height:100%; background:linear-gradient(90deg, var(--accent), var(--sky)); border-radius:5px; transition: width 1s var(--easing); }
+.pRow.warn .bar i { background:linear-gradient(90deg, var(--warn), var(--gold)); }
+.pRow.bad .bar i { background:linear-gradient(90deg, var(--bad), var(--pink)); }
+.pRow .v { font-family:var(--mono); font-weight:800; text-align:right; font-size:12px; }
+
+/* ========== CALLOUT ========== */
+.callout { background:var(--panel-2); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:12px 0; }
+.callout h4 { margin:0 0 4px; color:var(--accent); }
+.callout p { margin:2px 0; font-size:13px; color:var(--text-dim); line-height:1.6; }
+.callout.warn { border-left-color:var(--warn); } .callout.warn h4 { color:var(--warn); }
+.callout.bad { border-left-color:var(--bad); } .callout.bad h4 { color:var(--bad); }
+.callout.good { border-left-color:var(--good); } .callout.good h4 { color:var(--good); }
+
+/* ========== BUTTONS ========== */
+.btn {
+  appearance:none; border:1px solid var(--line); background:var(--panel); color:var(--text);
+  padding:10px 18px; border-radius:10px; cursor:pointer; font-size:13px; font-weight:700;
+  transition:transform .1s var(--easing), border-color .12s, background .15s; font-family:inherit;
+}
+.btn:hover { border-color:var(--accent); background:var(--accent-soft); }
+.btn.primary {
+  background:linear-gradient(135deg, var(--accent), var(--sky)); color:#0a0e18; border:none;
+  font-weight:800; padding:12px 22px;
+  box-shadow:0 10px 26px rgba(74,222,128,.28);
+}
+.btn.primary:hover { transform:translateY(-1px); }
+.btn.compact { padding:5px 10px; font-size:11px; }
+.btn.danger { color:var(--bad); border-color:var(--bad); }
+.btn:disabled { opacity:.45; cursor:not-allowed; }
+
+.actionBar { display:flex; flex-wrap:wrap; gap:8px; justify-content:flex-end; margin-top:14px; align-items:center; }
+.actionBar .leftActions { margin-right:auto; }
+
+/* ========== TOAST ========== */
+.toast {
+  position:fixed; top:20px; right:20px; z-index:100;
+  background:var(--panel-2); border:1px solid var(--accent); color:var(--text);
+  padding:12px 18px; border-radius:10px; font-size:13px; font-weight:700;
+  box-shadow:var(--shadow); animation:toastIn .3s ease-out, toastOut .3s ease-in 2.2s forwards;
+}
+.toast.good { border-color:var(--good); color:var(--good); }
+.toast.bad { border-color:var(--bad); color:var(--bad); }
+@keyframes toastIn { from{opacity:0;transform:translateX(20px);} to{opacity:1;transform:translateX(0);} }
+@keyframes toastOut { to{opacity:0;transform:translateX(20px);} }
+
+.footer { color:var(--text-mute); font-size:11px; text-align:center; margin-top:22px; letter-spacing:1px; line-height:1.6; }
+@media (prefers-reduced-motion: reduce) { * { animation:none!important; transition:none!important; } }
+
+@media print {
+  header, .tabRow, .actionBar, .footer, .iconBtn, .btn { display:none!important; }
+  .card { box-shadow:none; page-break-inside:avoid; break-inside:avoid; }
+  body { background:#fff; color:#000; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <header>
+    <div class="brand">
+      <div class="logo">💰</div>
+      <div>
+        <h1>Personal Financial Command Center</h1>
+        <div class="sub">Day 42 · #60DayClaudeChallenge · Salaried Professional</div>
+      </div>
+    </div>
+    <div class="headActions">
+      <div class="hud" id="healthPill">Health · —</div>
+      <button class="iconBtn" id="printBtn">🖨️ Print</button>
+      <button class="iconBtn" id="resetBtn">↻ Reset</button>
+      <button class="iconBtn" id="themeBtn">🌙 Dark</button>
+    </div>
+  </header>
+
+  <div class="tabRow" id="tabRow"></div>
+
+  <div id="stage"></div>
+
+  <p class="footer">
+    All data stored in your browser's localStorage. Nothing is uploaded.<br/>
+    Educational only — not financial advice. Built for Day 42 of #60DayClaudeChallenge
+  </p>
+</div>
+
+<script>
+/* =============================================================
+   PERSONAL FINANCIAL COMMAND CENTER — Day 42
+   ============================================================= */
+
+const TABS = [
+  { id:"overview",   label:"📊 Overview" },
+  { id:"income",     label:"💵 Income" },
+  { id:"expenses",   label:"🧾 Expenses" },
+  { id:"budget",     label:"📋 Budget" },
+  { id:"savings",    label:"🏦 Savings" },
+  { id:"debt",       label:"💳 Debt" },
+  { id:"investments",label:"📈 Investments" },
+  { id:"subs",       label:"🔁 Subscriptions" },
+  { id:"goals",      label:"🎯 Goals" },
+  { id:"whatif",     label:"🔮 What-If" },
+  { id:"insights",   label:"💡 Insights" },
+  { id:"resources",  label:"📚 Resources" },
+];
+
+/* ============================================================
+   DEFAULT DATA — realistic salaried professional
+   ============================================================ */
+const DEFAULT = {
+  profile: { name:"You", age:30 },
+  income: {
+    salary: 95000,           // annual gross
+    bonus: 8000,             // annual
+    sideIncome: 3000,        // annual
+    taxRate: 25,             // effective
+  },
+  expenses: {
+    housing: 1800,           // monthly
+    food: 550,
+    transportation: 300,
+    utilities: 180,
+    healthcare: 220,
+    entertainment: 280,
+    shopping: 200,
+    other: 180,
+  },
+  savings: {
+    emergency: 8500,         // current
+    emergencyGoal: 18000,    // 6 months of essentials
+    highYield: 4200,
+    checking: 3800,
+  },
+  debts: [
+    { id:"sl", name:"Federal Student Loan", balance:24500, rate:5.5, minPayment:280, type:"loan" },
+    { id:"cc", name:"Chase Sapphire", balance:3200, rate:21.9, minPayment:95, type:"credit" },
+    { id:"car", name:"Auto Loan", balance:12800, rate:6.2, minPayment:340, type:"loan" },
+  ],
+  investments: {
+    k401: 42000,
+    ira: 11500,
+    brokerage: 6800,
+    contributionMonthly: 950,       // combined 401k + IRA + brokerage
+    allocation: { stocks:70, bonds:20, cash:5, crypto:5 },
+  },
+  subscriptions: [
+    { name:"Netflix", cost:15.49 },
+    { name:"Spotify", cost:11.99 },
+    { name:"Gym", cost:39 },
+    { name:"iCloud 200GB", cost:2.99 },
+    { name:"Amazon Prime", cost:14.99 },
+    { name:"ChatGPT Plus", cost:20 },
+  ],
+  goals: [
+    { name:"Emergency Fund (6mo)", target:18000, current:8500, deadline:"2026-06-01" },
+    { name:"House Down Payment", target:60000, current:12500, deadline:"2028-01-01" },
+    { name:"Vacation (Iceland)", target:4500, current:1200, deadline:"2026-08-01" },
+    { name:"Wedding", target:35000, current:8000, deadline:"2027-05-01" },
+  ],
+  whatif: { extraDebt: 200, extraInvest: 300, raise: 0 },
+};
+
+let data = loadData();
+
+function loadData() {
+  try {
+    const stored = localStorage.getItem("pfcc.data");
+    if (stored) return JSON.parse(stored);
+  } catch {}
+  return JSON.parse(JSON.stringify(DEFAULT));
+}
+function saveData() { try { localStorage.setItem("pfcc.data", JSON.stringify(data)); } catch {} }
+
+/* Utils */
+const el = (id) => document.getElementById(id);
+function esc(s){ return String(s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function $(n) { return "$" + Math.round(n).toLocaleString(); }
+function pct(v, d=1) { return (Number.isFinite(v) ? v : 0).toFixed(d) + "%"; }
+function toast(msg, kind="") { const t=document.createElement("div"); t.className="toast"+(kind?" "+kind:""); t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2500); }
+
+/* ============================================================
+   METRICS — computed live from data
+   ============================================================ */
+function metrics() {
+  const monthlyGross = (data.income.salary + data.income.bonus + data.income.sideIncome) / 12;
+  const monthlyNet = monthlyGross * (1 - data.income.taxRate/100);
+  const monthlyExpenses = Object.values(data.expenses).reduce((a,b)=>a+b, 0);
+  const monthlySubs = data.subscriptions.reduce((a,b)=>a+b.cost, 0);
+  const totalMonthlyOut = monthlyExpenses + monthlySubs + data.debts.reduce((a,d)=>a+d.minPayment,0) + data.investments.contributionMonthly;
+  const monthlyLeftover = monthlyNet - totalMonthlyOut;
+  const savingsRate = monthlyNet > 0 ? (data.investments.contributionMonthly + Math.max(0, monthlyLeftover)) / monthlyNet * 100 : 0;
+
+  const totalSavings = data.savings.emergency + data.savings.highYield + data.savings.checking;
+  const totalInvestments = data.investments.k401 + data.investments.ira + data.investments.brokerage;
+  const totalDebt = data.debts.reduce((a,d)=>a+d.balance, 0);
+  const netWorth = totalSavings + totalInvestments - totalDebt;
+
+  const essentials = data.expenses.housing + data.expenses.food + data.expenses.utilities + data.expenses.transportation + data.expenses.healthcare;
+  const emergencyMonths = essentials > 0 ? data.savings.emergency / essentials : 0;
+
+  const debtToIncome = monthlyGross > 0 ? (data.debts.reduce((a,d)=>a+d.minPayment,0) / monthlyGross * 100) : 0;
+
+  return {
+    monthlyGross, monthlyNet, monthlyExpenses, monthlySubs, totalMonthlyOut, monthlyLeftover,
+    savingsRate, totalSavings, totalInvestments, totalDebt, netWorth,
+    essentials, emergencyMonths, debtToIncome,
+  };
+}
+
+function healthScore() {
+  const m = metrics();
+  let score = 0;
+  // Savings rate (30 pts)
+  if (m.savingsRate >= 20) score += 30;
+  else if (m.savingsRate >= 15) score += 24;
+  else if (m.savingsRate >= 10) score += 18;
+  else if (m.savingsRate >= 5) score += 10;
+  else score += Math.max(0, m.savingsRate * 2);
+  // Emergency fund (25 pts)
+  if (m.emergencyMonths >= 6) score += 25;
+  else if (m.emergencyMonths >= 3) score += 18;
+  else if (m.emergencyMonths >= 1) score += 10;
+  else score += m.emergencyMonths * 8;
+  // Debt-to-income (20 pts)
+  if (m.debtToIncome <= 10) score += 20;
+  else if (m.debtToIncome <= 20) score += 15;
+  else if (m.debtToIncome <= 36) score += 10;
+  else score += Math.max(0, 5 - (m.debtToIncome - 36) / 5);
+  // Investment ratio to income (15 pts)
+  const investRatio = m.monthlyGross > 0 ? (data.investments.contributionMonthly / m.monthlyGross) : 0;
+  if (investRatio >= 0.15) score += 15;
+  else if (investRatio >= 0.10) score += 11;
+  else if (investRatio >= 0.05) score += 7;
+  else score += investRatio * 100;
+  // Net worth positive (10 pts)
+  if (m.netWorth > m.monthlyGross * 12) score += 10;
+  else if (m.netWorth > 0) score += 6;
+  else if (m.netWorth > -m.monthlyGross * 6) score += 3;
+  return Math.round(Math.max(0, Math.min(100, score)));
+}
+
+function healthBand(s) {
+  if (s >= 80) return { label:"Excellent", cls:"good" };
+  if (s >= 65) return { label:"Strong", cls:"good" };
+  if (s >= 50) return { label:"Fair", cls:"warn" };
+  if (s >= 35) return { label:"Building", cls:"warn" };
+  return { label:"Needs Work", cls:"bad" };
+}
+
+/* ============================================================
+   NAV
+   ============================================================ */
+let currentTab = "overview";
+function renderTabs() {
+  el("tabRow").innerHTML = TABS.map(t => `
+    <button class="tab ${t.id === currentTab ? "active" : ""}" data-id="${t.id}">${t.label}</button>
+  `).join("");
+  el("tabRow").querySelectorAll(".tab").forEach(b => b.addEventListener("click", () => goto(b.dataset.id)));
+}
+function goto(id) { currentTab = id; renderTabs(); render(); window.scrollTo({ top:0, behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); }
+
+function render() {
+  const s = healthScore(); const band = healthBand(s);
+  el("healthPill").textContent = `Health · ${s}/100 · ${band.label}`;
+  el("healthPill").className = "hud " + band.cls;
+  if (currentTab === "overview") renderOverview();
+  else if (currentTab === "income") renderIncome();
+  else if (currentTab === "expenses") renderExpenses();
+  else if (currentTab === "budget") renderBudget();
+  else if (currentTab === "savings") renderSavings();
+  else if (currentTab === "debt") renderDebt();
+  else if (currentTab === "investments") renderInvestments();
+  else if (currentTab === "subs") renderSubs();
+  else if (currentTab === "goals") renderGoals();
+  else if (currentTab === "whatif") renderWhatIf();
+  else if (currentTab === "insights") renderInsights();
+  else if (currentTab === "resources") renderResources();
+}
+
+/* ============================================================
+   OVERVIEW
+   ============================================================ */
+function renderOverview() {
+  const m = metrics();
+  const s = healthScore(); const band = healthBand(s);
+
+  const brTiles = [
+    { l:"Savings Rate",    v:pct(m.savingsRate,1), w: Math.min(100, m.savingsRate * 4) },
+    { l:"Emergency Months",v:m.emergencyMonths.toFixed(1)+"mo", w: Math.min(100, m.emergencyMonths / 6 * 100) },
+    { l:"Debt / Income",   v:pct(m.debtToIncome,1), w: Math.max(0, 100 - m.debtToIncome*2) },
+    { l:"Net Worth",       v:$(m.netWorth), w: Math.max(0, Math.min(100, (m.netWorth / (m.monthlyGross * 12)) * 30 + 40)) },
+  ];
+
+  const chart = cashFlowChart(m);
+
+  el("stage").innerHTML = `
+    <div class="card">
+      <span class="tag">FINANCIAL HEALTH</span>
+      <h2 style="margin-top:14px;">Your snapshot</h2>
+      <p>Composite view of savings rate, emergency runway, debt burden, and investment velocity — all computed from the data you enter across the other tabs.</p>
+
+      <div class="healthHero">
+        <div style="text-align:center;">
+          <div class="k">Financial Health Score</div>
+          <div class="scoreBig">${s}<span style="font-size:32px; color:var(--text-mute);">/100</span></div>
+          <div class="band ${band.cls}">${esc(band.label)}</div>
+        </div>
+        <div>
+          <div class="k" style="margin-bottom:6px;">Score breakdown</div>
+          <div class="breakdown">
+            ${brTiles.map(t => `
+              <div class="brTile">
+                <div class="l">${t.l}</div>
+                <div class="v">${t.v}</div>
+                <div class="bar"><i style="width:${t.w}%"></i></div>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      </div>
+
+      <h3>Cash flow at a glance</h3>
+      <div class="statGrid">
+        <div class="statTile"><div class="l">Monthly Net</div><div class="v">${$(m.monthlyNet)}</div></div>
+        <div class="statTile"><div class="l">Monthly Out</div><div class="v">${$(m.totalMonthlyOut)}</div></div>
+        <div class="statTile ${m.monthlyLeftover >= 0 ? "accent" : "warn"}"><div class="l">Leftover</div><div class="v">${$(m.monthlyLeftover)}</div></div>
+        <div class="statTile"><div class="l">Total Savings</div><div class="v">${$(m.totalSavings)}</div></div>
+        <div class="statTile"><div class="l">Investments</div><div class="v">${$(m.totalInvestments)}</div></div>
+        <div class="statTile ${m.totalDebt > 0 ? "warn" : ""}"><div class="l">Total Debt</div><div class="v">${$(m.totalDebt)}</div></div>
+      </div>
+
+      <div class="chartWrap">
+        <h4>Monthly cash flow (income vs categories)</h4>
+        ${chart}
+      </div>
+
+      <div class="callout ${m.savingsRate < 10 ? "warn" : "good"}">
+        <h4>${m.savingsRate < 10 ? "Savings rate needs attention" : "Savings rate is on track"}</h4>
+        <p>A savings rate of ${pct(m.savingsRate)} means you save that much of every dollar you earn (after tax). The generally recommended target is 15-20%.</p>
+      </div>
+
+      <div class="actionBar">
+        <button class="btn primary" onclick="goto('insights')">See AI Recommendations →</button>
+      </div>
+    </div>
+  `;
+}
+
+function cashFlowChart(m) {
+  const w = 800, h = 220, pad = 30;
+  const cats = [
+    { name:"Housing",   v:data.expenses.housing, color:"#f472b6" },
+    { name:"Food",      v:data.expenses.food, color:"#fbbf24" },
+    { name:"Transport", v:data.expenses.transportation, color:"#38bdf8" },
+    { name:"Utilities", v:data.expenses.utilities, color:"#a687ff" },
+    { name:"Healthcare",v:data.expenses.healthcare, color:"#4ade80" },
+    { name:"Entertain", v:data.expenses.entertainment, color:"#ff7bb5" },
+    { name:"Shopping",  v:data.expenses.shopping, color:"#f56565" },
+    { name:"Other",     v:data.expenses.other, color:"#7c8aa5" },
+    { name:"Debts",     v:data.debts.reduce((a,d)=>a+d.minPayment,0), color:"#fbbf24" },
+    { name:"Subs",      v:m.monthlySubs, color:"#a687ff" },
+    { name:"Invest",    v:data.investments.contributionMonthly, color:"#4ade80" },
+  ];
+  const maxV = Math.max(m.monthlyNet, cats.reduce((a,c)=>a+c.v, 0));
+  const barW = (w - 2*pad) / cats.length - 4;
+  const bars = cats.map((c, i) => {
+    const barH = (c.v / maxV) * (h - 2*pad - 40);
+    const x = pad + i * (barW + 4);
+    const y = h - pad - barH;
+    return `
+      <rect x="${x}" y="${y}" width="${barW}" height="${barH}" fill="${c.color}" opacity="0.85" rx="3"/>
+      <text x="${x + barW/2}" y="${h - 12}" text-anchor="middle" font-size="10" fill="#6c7a94" font-family="system-ui">${c.name}</text>
+      <text x="${x + barW/2}" y="${y - 4}" text-anchor="middle" font-size="10" fill="#a8b4c9" font-family="monospace">${$(c.v)}</text>
+    `;
+  }).join("");
+  return `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">${bars}</svg>`;
+}
+
+/* ============================================================
+   INCOME
+   ============================================================ */
+function renderIncome() {
+  const m = metrics();
+  el("stage").innerHTML = `
+    <div class="card">
+      <span class="tag">INCOME</span>
+      <h2 style="margin-top:14px;">Your income streams</h2>
+      <p>Enter your annual pre-tax income. The dashboard uses these to compute monthly net, tax burden, and savings rate.</p>
+
+      <div class="formGrid">
+        <div class="formField"><label>Annual Salary</label><input type="number" data-key="income.salary" value="${data.income.salary}"/></div>
+        <div class="formField"><label>Annual Bonus</label><input type="number" data-key="income.bonus" value="${data.income.bonus}"/></div>
+        <div class="formField"><label>Side Income (annual)</label><input type="number" data-key="income.sideIncome" value="${data.income.sideIncome}"/></div>
+        <div class="formField"><label>Effective Tax Rate (%)</label><input type="number" step="0.5" data-key="income.taxRate" value="${data.income.taxRate}"/></div>
+      </div>
+
+      <div class="statGrid">
+        <div class="statTile"><div class="l">Total Annual Gross</div><div class="v">${$(data.income.salary + data.income.bonus + data.income.sideIncome)}</div></div>
+        <div class="statTile"><div class="l">Monthly Gross</div><div class="v">${$(m.monthlyGross)}</div></div>
+        <div class="statTile"><div class="l">Est. Tax Withheld</div><div class="v">${$(m.monthlyGross * data.income.taxRate/100)}</div></div>
+        <div class="statTile accent"><div class="l">Monthly Net</div><div class="v">${$(m.monthlyNet)}</div></div>
+      </div>
+
+      <div class="callout">
+        <h4>Reality check</h4>
+        <p>Your effective tax rate typically differs from your marginal bracket. For a US $95K salary, effective federal + state + FICA is typically 22-28%. Adjust based on your actual paystub.</p>
+      </div>
+    </div>
+  `;
+  bindFormInputs();
+}
+
+/* ============================================================
+   EXPENSES
+   ============================================================ */
+function renderExpenses() {
+  const m = metrics();
+  const cats = [
+    ["housing", "🏠 Housing (rent/mortgage)"],
+    ["food", "🍽️ Food & groceries"],
+    ["transportation", "🚗 Transportation"],
+    ["utilities", "💡 Utilities"],
+    ["healthcare", "🏥 Healthcare"],
+    ["entertainment", "🎬 Entertainment"],
+    ["shopping", "🛒 Shopping"],
+    ["other", "📦 Other"],
+  ];
+
+  el("stage").innerHTML = `
+    <div class="card">
+      <span class="tag">MONTHLY EXPENSES</span>
+      <h2 style="margin-top:14px;">Where your money goes</h2>
+      <p>Enter your typical monthly spending per category. Track it for a month if you're unsure.</p>
+
+      <div class="formGrid">
+        ${cats.map(([k, label]) => `
+          <div class="formField"><label>${label}</label><input type="number" data-key="expenses.${k}" value="${data.expenses[k]}"/></div>
+        `).join("")}
+      </div>
+
+      <div class="statGrid">
+        <div class="statTile"><div class="l">Total Monthly Expenses</div><div class="v">${$(m.monthlyExpenses)}</div></div>
+        <div class="statTile"><div class="l">Annual Equivalent</div><div class="v">${$(m.monthlyExpenses * 12)}</div></div>
+        <div class="statTile"><div class="l">% of Monthly Net</div><div class="v">${pct(m.monthlyExpenses / m.monthlyNet * 100)}</div></div>
+      </div>
+
+      <h3>Category breakdown</h3>
+      ${cats.map(([k, label]) => {
+        const v = data.expenses[k]; const p = (v / m.monthlyExpenses * 100);
+        return `
+          <div class="pRow">
+            <div class="l">${label}</div>
+            <div class="bar"><i style="width:${Math.min(100, p*2)}%"></i></div>
+            <div class="v">${$(v)}</div>
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
+  bindFormInputs();
+}
+
+/* ============================================================
+   BUDGET (50/30/20 rule visualization)
+   ============================================================ */
+function renderBudget() {
+  const m = metrics();
+  const needs = data.expenses.housing + data.expenses.food + data.expenses.utilities + data.expenses.transportation + data.expenses.healthcare + data.debts.reduce((a,d)=>a+d.minPayment,0);
+  const wants = data.expenses.entertainment + data.expenses.shopping + data.expenses.other + m.monthlySubs;
+  const savings = data.investments.contributionMonthly + Math.max(0, m.monthlyLeftover);
+  const needsP = m.monthlyNet > 0 ? needs / m.monthlyNet * 100 : 0;
+  const wantsP = m.monthlyNet > 0 ? wants / m.monthlyNet * 100 : 0;
+  const savingsP = m.monthlyNet > 0 ? savings / m.monthlyNet * 100 : 0;
+
+  el("stage").innerHTML = `
+    <div class="card">
+      <span class="tag">50/30/20 BUDGET RULE</span>
+      <h2 style="margin-top:14px;">Are you in balance?</h2>
+      <p>The classic rule: 50% of after-tax income for needs, 30% for wants, 20% for savings and debt payoff beyond minimums.</p>
+
+      <h3>Where you actually are</h3>
+      <div class="pRow ${needsP > 55 ? "warn" : ""}">
+        <div class="l">🔒 Needs (target 50%)</div>
+        <div class="bar"><i style="width:${Math.min(100, needsP)}%"></i></div>
+        <div class="v">${pct(needsP)}</div>
+      </div>
+      <div class="pRow ${wantsP > 35 ? "warn" : ""}">
+        <div class="l">🎬 Wants (target 30%)</div>
+        <div class="bar"><i style="width:${Math.min(100, wantsP)}%"></i></div>
+        <div class="v">${pct(wantsP)}</div>
+      </div>
+      <div class="pRow ${savingsP < 15 ? "warn" : ""}">
+        <div class="l">💰 Savings (target 20%)</div>
+        <div class="bar"><i style="width:${Math.min(100, savingsP)}%"></i></div>
+        <div class="v">${pct(savingsP)}</div>
+      </div>
+
+      <div class="statGrid">
+        <div class="statTile ${needsP > 55 ? "warn" : ""}"><div class="l">Needs</div><div class="v">${$(needs)}</div><div class="delta">${needsP > 55 ? "Over target" : "On target"}</div></div>
+        <div class="statTile ${wantsP > 35 ? "warn" : ""}"><div class="l">Wants</div><div class="v">${$(wants)}</div><div class="delta">${wantsP > 35 ? "Over target" : "On target"}</div></div>
+        <div class="statTile ${savingsP < 15 ? "warn" : "accent"}"><div class="l">Savings + Extra Debt</div><div class="v">${$(savings)}</div><div class="delta">${savingsP < 15 ? "Under target" : "On target"}</div></div>
+      </div>
+
+      <div class="callout ${needsP > 55 ? "warn" : "good"}">
+        <h4>${needsP > 55 ? "Housing + essentials are heavy" : "Essentials are in a healthy range"}</h4>
+        <p>${needsP > 55
+          ? "When needs exceed 50% of net income, the flexibility for saving and dealing with surprises shrinks fast. If rent is the biggest chunk, that's typically the first lever."
+          : "Your essential spending leaves room for both wants and saving without stress."}</p>
+      </div>
+
+      <div class="callout">
+        <h4>Why "wants" isn't a bad word</h4>
+        <p>The 50/30/20 rule intentionally reserves 30% for wants — travel, dining, hobbies. Slashing wants below 15% is often unsustainable and leads to a "budget blowout" cycle within 3-4 months.</p>
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   SAVINGS
+   ============================================================ */
+function renderSavings() {
+  const m = metrics();
+  const emergencyPct = m.emergencyMonths >= 6 ? 100 : (m.emergencyMonths / 6 * 100);
+  el("stage").innerHTML = `
+    <div class="card">
+      <span class="tag">SAVINGS & EMERGENCY FUND</span>
+      <h2 style="margin-top:14px;">Your safety net</h2>
+      <p>Your emergency fund should cover 3-6 months of essential expenses. Everything above that is opportunity capital.</p>
+
+      <div class="formGrid">
+        <div class="formField"><label>Emergency Fund</label><input type="number" data-key="savings.emergency" value="${data.savings.emergency}"/></div>
+        <div class="formField"><label>High-Yield Savings</label><input type="number" data-key="savings.highYield" value="${data.savings.highYield}"/></div>
+        <div class="formField"><label>Checking Balance</label><input type="number" data-key="savings.checking" value="${data.savings.checking}"/></div>
+      </div>
+
+      <div class="statGrid">
+        <div class="statTile accent"><div class="l">Emergency Runway</div><div class="v">${m.emergencyMonths.toFixed(1)} mo</div><div class="delta">${m.emergencyMonths >= 3 ? "up" : "down"}">${m.emergencyMonths >= 3 ? "Above minimum" : "Below minimum"}</div></div>
+        <div class="statTile"><div class="l">Total Liquid</div><div class="v">${$(m.totalSavings)}</div></div>
+        <div class="statTile"><div class="l">Monthly Essentials</div><div class="v">${$(m.essentials)}</div></div>
+        <div class="statTile"><div class="l">6-Month Target</div><div class="v">${$(m.essentials * 6)}</div></div>
+      </div>
+
+      <h3>Emergency fund progress</h3>
+      <div class="pRow">
+        <div class="l">Toward 6 months</div>
+        <div class="bar"><i style="width:${emergencyPct}%"></i></div>
+        <div class="v">${pct(emergencyPct)}</div>
+      </div>
+
+      <div class="callout ${m.emergencyMonths < 3 ? "warn" : "good"}">
+        <h4>${m.emergencyMonths < 3 ? "Under 3 months of runway" : "Emergency fund is healthy"}</h4>
+        <p>${m.emergencyMonths < 3
+          ? "Prioritize building this to at least 3 months of essentials before aggressive investing. Job loss is the #1 reason people take on high-interest debt."
+          : "You have enough runway to weather most short-term crises without going into debt."}</p>
+      </div>
+
+      <div class="callout">
+        <h4>Where to keep emergency savings</h4>
+        <p>High-yield savings accounts (currently 4-5% APY) at online banks (Ally, Marcus, Wealthfront Cash). Not in checking (0.01%), not in stocks (volatile), not in CDs (locked). Liquidity is the point.</p>
+      </div>
+    </div>
+  `;
+  bindFormInputs();
+}
+
+/* ============================================================
+   DEBT
+   ============================================================ */
+function renderDebt() {
+  const m = metrics();
+  const totalMinPay = data.debts.reduce((a,d)=>a+d.minPayment, 0);
+  const avgRate = data.debts.length ? data.debts.reduce((a,d)=>a + d.rate * d.balance, 0) / m.totalDebt : 0;
+
+  const rows = data.debts.map(d => {
+    const monthlyInterest = d.balance * (d.rate / 100 / 12);
+    return `
+      <div class="itemRow debt">
+        <div class="ico">${d.type === "credit" ? "💳" : "🎓"}</div>
+        <div>
+          <div class="n">${esc(d.name)}</div>
+          <div class="sub">${d.rate}% APR · Min $${d.minPayment}/mo</div>
+        </div>
+        <div class="num">${$(d.balance)}</div>
+        <div class="num" style="color:var(--bad);">${$(monthlyInterest)}<div class="sub">interest/mo</div></div>
+        <button class="btn compact danger" onclick="removeDebt('${d.id}')">Remove</button>
+      </div>
+    `;
+  }).join("");
+
+  // Avalanche = highest rate first; Snowball = smallest balance first
+  const sortedByRate = [...data.debts].sort((a,b) => b.rate - a.rate);
+  const sortedByBalance = [...data.debts].sort((a,b) => a.balance - b.balance);
+
+  el("stage").innerHTML = `
+    <div class="card">
+      <span class="tag">DEBT</span>
+      <h2 style="margin-top:14px;">What you owe</h2>
+      <p>List every debt with balance, rate, and minimum payment. The dashboard computes total interest and payoff order under two strategies.</p>
+
+      <div class="statGrid">
+        <div class="statTile warn"><div class="l">Total Debt</div><div class="v">${$(m.totalDebt)}</div></div>
+        <div class="statTile"><div class="l">Weighted Avg Rate</div><div class="v">${avgRate.toFixed(1)}%</div></div>
+        <div class="statTile"><div class="l">Min Payments/mo</div><div class="v">${$(totalMinPay)}</div></div>
+        <div class="statTile ${m.debtToIncome > 36 ? "warn" : ""}"><div class="l">Debt-to-Income</div><div class="v">${pct(m.debtToIncome)}</div></div>
+      </div>
+
+      <h3>Debts</h3>
+      <div class="itemList">${rows || "<p>No debts recorded. Nice.</p>"}</div>
+
+      <div class="actionBar">
+        <button class="btn compact" onclick="addDebt()">+ Add Debt</button>
+      </div>
+
+      <h3>Payoff strategy comparison</h3>
+      <div class="formGrid" style="grid-template-columns:1fr 1fr;">
+        <div class="callout">
+          <h4>❄️ Avalanche (highest rate first)</h4>
+          <p><b>Mathematically optimal.</b> Saves the most interest.</p>
+          <p style="margin-top:8px;">Order:</p>
+          <p style="color:var(--text);">${sortedByRate.map((d,i) => `${i+1}. ${d.name} (${d.rate}%)`).join(" · ")}</p>
+        </div>
+        <div class="callout warn">
+          <h4>⛄ Snowball (smallest balance first)</h4>
+          <p><b>Psychologically motivating.</b> Fast wins build momentum.</p>
+          <p style="margin-top:8px;">Order:</p>
+          <p style="color:var(--text);">${sortedByBalance.map((d,i) => `${i+1}. ${d.name} (${$(d.balance)})`).join(" · ")}</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <h4>Which to pick</h4>
+        <p>If you're disciplined, use Avalanche — it saves the most interest. If you've failed at debt payoff before, use Snowball — the momentum matters more than the math for most people.</p>
+      </div>
+    </div>
+  `;
+}
+
+window.addDebt = function() {
+  const name = prompt("Debt name:", "New Loan");
+  if (!name) return;
+  const balance = parseFloat(prompt("Balance:", "5000")) || 0;
+  const rate = parseFloat(prompt("Interest rate (%):", "10")) || 0;
+  const minPayment = parseFloat(prompt("Minimum monthly payment:", "150")) || 0;
+  data.debts.push({ id: "d" + Date.now(), name, balance, rate, minPayment, type: rate > 15 ? "credit" : "loan" });
+  saveData(); render();
+};
+window.removeDebt = function(id) {
+  if (!confirm("Remove this debt?")) return;
+  data.debts = data.debts.filter(d => d.id !== id);
+  saveData(); render();
+};
+
+/* ============================================================
+   INVESTMENTS
+   ============================================================ */
+function renderInvestments() {
+  const total = data.investments.k401 + data.investments.ira + data.investments.brokerage;
+  const alloc = data.investments.allocation;
+  const monthlyContrib = data.investments.contributionMonthly;
+  // 30-year projection at 7% annual return
+  const yearsToRetire = Math.max(1, 65 - data.profile.age);
+  const monthlyRate = 0.07 / 12;
+  const months = yearsToRetire * 12;
+  const futureVal = total * Math.pow(1 + 0.07, yearsToRetire) + monthlyContrib * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate);
+
+  el("stage").innerHTML = `
+    <div class="card">
+      <span class="tag">INVESTMENTS</span>
+      <h2 style="margin-top:14px;">Your portfolio</h2>
+      <p>Retirement + brokerage + IRA. The projection assumes 7% average annual return (roughly the historical S&P 500 real return after inflation).</p>
+
+      <div class="formGrid">
+        <div class="formField"><label>401(k) Balance</label><input type="number" data-key="investments.k401" value="${data.investments.k401}"/></div>
+        <div class="formField"><label>IRA Balance</label><input type="number" data-key="investments.ira" value="${data.investments.ira}"/></div>
+        <div class="formField"><label>Brokerage Balance</label><input type="number" data-key="investments.brokerage" value="${data.investments.brokerage}"/></div>
+        <div class="formField"><label>Monthly Contribution</label><input type="number" data-key="investments.contributionMonthly" value="${data.investments.contributionMonthly}"/></div>
+      </div>
+
+      <div class="statGrid">
+        <div class="statTile accent"><div class="l">Total Invested</div><div class="v">${$(total)}</div></div>
+        <div class="statTile"><div class="l">Annual Contribution</div><div class="v">${$(monthlyContrib * 12)}</div></div>
+        <div class="statTile"><div class="l">Projected @ 65</div><div class="v">${$(futureVal)}</div></div>
+        <div class="statTile"><div class="l">Years to 65</div><div class="v">${yearsToRetire}</div></div>
+      </div>
+
+      <h3>Asset allocation</h3>
+      <div class="chartWrap">${allocationPie(alloc)}</div>
+
+      <div class="formGrid">
+        <div class="formField"><label>Stocks %</label><input type="number" data-key="investments.allocation.stocks" value="${alloc.stocks}"/></div>
+        <div class="formField"><label>Bonds %</label><input type="number" data-key="investments.allocation.bonds" value="${alloc.bonds}"/></div>
+        <div class="formField"><label>Cash %</label><input type="number" data-key="investments.allocation.cash" value="${alloc.cash}"/></div>
+        <div class="formField"><label>Crypto %</label><input type="number" data-key="investments.allocation.crypto" value="${alloc.crypto}"/></div>
+      </div>
+
+      <div class="callout">
+        <h4>Rule of thumb: 110 minus your age = stock %</h4>
+        <p>A ${data.profile.age}-year-old typically holds ~${110 - data.profile.age}% in stocks, the rest in bonds and cash. This shifts more conservative as you approach retirement.</p>
+      </div>
+
+      <div class="callout ${alloc.crypto > 10 ? "warn" : ""}">
+        <h4>${alloc.crypto > 10 ? "Crypto allocation is aggressive" : "Diversification looks reasonable"}</h4>
+        <p>${alloc.crypto > 10 ? "Most advisors cap crypto at 5-10% of a portfolio due to volatility. Above that, position sizing risk becomes significant." : "Your allocation matches conventional guidance for your age. Rebalance annually to keep the ratios drifting."}</p>
+      </div>
+    </div>
+  `;
+  bindFormInputs();
+}
+
+function allocationPie(alloc) {
+  const total = alloc.stocks + alloc.bonds + alloc.cash + alloc.crypto;
+  if (total === 0) return "<p style='color:var(--text-mute);'>No allocation set.</p>";
+  const items = [
+    { name:"Stocks", v:alloc.stocks, color:"#4ade80" },
+    { name:"Bonds",  v:alloc.bonds, color:"#38bdf8" },
+    { name:"Cash",   v:alloc.cash, color:"#a687ff" },
+    { name:"Crypto", v:alloc.crypto, color:"#fbbf24" },
+  ];
+  const cx=200, cy=140, r=110;
+  let start = -Math.PI/2;
+  const slices = items.filter(x => x.v > 0).map(it => {
+    const angle = (it.v/total) * 2 * Math.PI;
+    const end = start + angle;
+    const x1 = cx + r*Math.cos(start), y1 = cy + r*Math.sin(start);
+    const x2 = cx + r*Math.cos(end),   y2 = cy + r*Math.sin(end);
+    const large = angle > Math.PI ? 1 : 0;
+    const path = `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} Z`;
+    const mx = cx + (r*0.6)*Math.cos(start + angle/2);
+    const my = cy + (r*0.6)*Math.sin(start + angle/2);
+    const label = `<text x="${mx}" y="${my}" text-anchor="middle" dominant-baseline="middle" fill="#0a0e18" font-weight="800" font-size="12" font-family="system-ui">${it.v}%</text>`;
+    start = end;
+    return `<path d="${path}" fill="${it.color}" opacity="0.85"/>${label}`;
+  }).join("");
+  const legend = items.map(it => `
+    <div style="display:flex; align-items:center; gap:6px; font-size:12px;">
+      <span style="width:12px; height:12px; background:${it.color}; border-radius:3px;"></span>
+      ${it.name} <b style="color:var(--text)">${it.v}%</b>
+    </div>
+  `).join("");
+  return `
+    <div style="display:flex; align-items:center; gap:22px; flex-wrap:wrap;">
+      <svg viewBox="0 0 400 280" style="width:100%; max-width:340px;">${slices}</svg>
+      <div style="display:grid; gap:8px;">${legend}</div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   SUBSCRIPTIONS
+   ============================================================ */
+function renderSubs() {
+  const monthly = data.subscriptions.reduce((a,b)=>a+b.cost, 0);
+  const yearly = monthly * 12;
+  const rows = data.subscriptions.map((s, i) => `
+    <div class="itemRow sub">
+      <div class="ico">🔁</div>
+      <div><div class="n">${esc(s.name)}</div><div class="sub">Recurring monthly</div></div>
+      <div class="num">${$(s.cost)}/mo</div>
+      <div class="num">${$(s.cost*12)}/yr</div>
+      <button class="btn compact danger" onclick="removeSub(${i})">Remove</button>
+    </div>
+  `).join("");
+
+  el("stage").innerHTML = `
+    <div class="card">
+      <span class="tag">SUBSCRIPTIONS</span>
+      <h2 style="margin-top:14px;">Silent budget leaks</h2>
+      <p>The average person underestimates their subscription total by 40%. Review every 6 months. Cancel anything you haven't used in 60 days.</p>
+
+      <div class="statGrid">
+        <div class="statTile"><div class="l">Active Subs</div><div class="v">${data.subscriptions.length}</div></div>
+        <div class="statTile"><div class="l">Monthly Total</div><div class="v">${$(monthly)}</div></div>
+        <div class="statTile warn"><div class="l">Annual Total</div><div class="v">${$(yearly)}</div></div>
+        <div class="statTile"><div class="l">= Invested @ 7% in 10 yrs</div><div class="v">${$(yearly * 14.78)}</div></div>
+      </div>
+
+      <div class="itemList">${rows || "<p>No subscriptions.</p>"}</div>
+
+      <div class="actionBar">
+        <button class="btn compact" onclick="addSub()">+ Add Subscription</button>
+      </div>
+
+      <div class="callout warn">
+        <h4>The subscription creep</h4>
+        <p>Every $15/month subscription = $180/year = $2,660 in 10 years at a 7% return. Ten unused subscriptions is a small vacation. Audit quarterly.</p>
+      </div>
+    </div>
+  `;
+}
+
+window.addSub = function() {
+  const name = prompt("Subscription name:", "New sub");
+  if (!name) return;
+  const cost = parseFloat(prompt("Monthly cost:", "9.99")) || 0;
+  data.subscriptions.push({ name, cost });
+  saveData(); render();
+};
+window.removeSub = function(idx) {
+  if (!confirm("Remove this subscription?")) return;
+  data.subscriptions.splice(idx, 1);
+  saveData(); render();
+};
+
+/* ============================================================
+   GOALS
+   ============================================================ */
+function renderGoals() {
+  const rows = data.goals.map((g, i) => {
+    const p = g.target > 0 ? Math.min(100, g.current / g.target * 100) : 0;
+    const remaining = Math.max(0, g.target - g.current);
+    const deadlineDate = new Date(g.deadline);
+    const months = Math.max(1, (deadlineDate - new Date()) / (1000 * 60 * 60 * 24 * 30));
+    const monthlyNeed = remaining / months;
+    return `
+      <div class="itemRow saving" style="grid-template-columns:32px 1.5fr 1fr 1fr auto;">
+        <div class="ico">🎯</div>
+        <div>
+          <div class="n">${esc(g.name)}</div>
+          <div class="sub">By ${g.deadline}</div>
+        </div>
+        <div class="num">
+          <div style="display:flex; align-items:center; gap:6px;">
+            <div class="bar" style="width:80px; height:6px; background:rgba(255,255,255,.05); border-radius:3px; overflow:hidden;">
+              <i style="display:block; height:100%; width:${p}%; background:linear-gradient(90deg, var(--accent), var(--sky));"></i>
+            </div>
+            <span>${pct(p, 0)}</span>
+          </div>
+        </div>
+        <div class="num">${$(g.current)}<div class="sub">of ${$(g.target)}</div></div>
+        <div style="text-align:right;">
+          <div class="mono" style="font-size:12px; color:var(--accent);">${$(monthlyNeed)}/mo</div>
+          <div class="sub">to hit deadline</div>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  el("stage").innerHTML = `
+    <div class="card">
+      <span class="tag">FINANCIAL GOALS</span>
+      <h2 style="margin-top:14px;">What you're saving toward</h2>
+      <p>Named goals with a target and a deadline force clarity. The dashboard computes the monthly savings needed to hit each on time.</p>
+
+      <div class="itemList">${rows}</div>
+
+      <div class="actionBar">
+        <button class="btn compact" onclick="addGoal()">+ Add Goal</button>
+      </div>
+
+      <div class="callout">
+        <h4>Prioritize by "regret" not by "excitement"</h4>
+        <p>Emergency fund and retirement contributions should always come before house down payment or vacation. The reason isn't math — it's that you'll regret an under-funded emergency fund faster than a shorter vacation.</p>
+      </div>
+    </div>
+  `;
+}
+window.addGoal = function() {
+  const name = prompt("Goal name:", "New Goal");
+  if (!name) return;
+  const target = parseFloat(prompt("Target amount:", "5000")) || 0;
+  const current = parseFloat(prompt("Current savings toward it:", "0")) || 0;
+  const deadline = prompt("Deadline (YYYY-MM-DD):", "2027-01-01") || "2027-01-01";
+  data.goals.push({ name, target, current, deadline });
+  saveData(); render();
+};
+
+/* ============================================================
+   WHAT-IF SIMULATOR
+   ============================================================ */
+function renderWhatIf() {
+  const w = data.whatif;
+  const m = metrics();
+
+  // Scenario 1: extra debt payment
+  const extraDebtSaved = w.extraDebt * 12 * 3; // 3 years at avg rate ~10% avoided
+  // Scenario 2: extra investment
+  const monthlyRate = 0.07 / 12;
+  const years = Math.max(1, 65 - data.profile.age);
+  const months = years * 12;
+  const extraInvestFV = w.extraInvest * ((Math.pow(1+monthlyRate, months) - 1) / monthlyRate);
+  // Scenario 3: raise
+  const raiseNet = (w.raise * (1 - data.income.taxRate/100)) / 12;
+  const newSavingsRate = m.monthlyNet > 0 ? ((data.investments.contributionMonthly + Math.max(0, m.monthlyLeftover + raiseNet)) / (m.monthlyNet + raiseNet) * 100) : 0;
+
+  el("stage").innerHTML = `
+    <div class="card">
+      <span class="tag">SIMULATION</span>
+      <h2 style="margin-top:14px;">What-if scenarios</h2>
+      <p>Small changes compound. Adjust the sliders to see how one habit changes the trajectory.</p>
+
+      <h3>Scenario 1: Extra debt payment</h3>
+      <div class="formField">
+        <label>Extra monthly toward highest-rate debt: <b class="mono" style="color:var(--accent);">$${w.extraDebt}</b></label>
+        <input type="range" min="0" max="1000" step="25" data-key="whatif.extraDebt" value="${w.extraDebt}"/>
+      </div>
+      <div class="callout good">
+        <h4>Impact</h4>
+        <p>An extra <b>$${w.extraDebt}/mo</b> toward your highest-rate debt could save you approximately <b>${$(extraDebtSaved)}</b> in interest over 3 years and clear your credit card balance in <b>${(3200 / (95 + w.extraDebt) < 12 ? Math.ceil(3200 / (95 + w.extraDebt)) : Math.ceil(3200 / (95 + w.extraDebt))) + " months"}</b>.</p>
+      </div>
+
+      <h3>Scenario 2: Extra investment</h3>
+      <div class="formField">
+        <label>Extra monthly to investment: <b class="mono" style="color:var(--accent);">$${w.extraInvest}</b></label>
+        <input type="range" min="0" max="1500" step="25" data-key="whatif.extraInvest" value="${w.extraInvest}"/>
+      </div>
+      <div class="callout good">
+        <h4>Impact</h4>
+        <p>An extra <b>$${w.extraInvest}/mo</b> compounded at 7% real return over <b>${years} years</b> becomes approximately <b>${$(extraInvestFV)}</b> at retirement.</p>
+      </div>
+
+      <h3>Scenario 3: Raise</h3>
+      <div class="formField">
+        <label>Annual raise: <b class="mono" style="color:var(--accent);">$${w.raise.toLocaleString()}</b></label>
+        <input type="range" min="0" max="30000" step="1000" data-key="whatif.raise" value="${w.raise}"/>
+      </div>
+      <div class="callout good">
+        <h4>Impact</h4>
+        <p>A <b>$${w.raise.toLocaleString()}</b> raise increases your monthly net by <b>${$(raiseNet)}</b>. If you save 100% of it, your savings rate climbs to <b>${pct(newSavingsRate)}</b>. Lifestyle inflation typically absorbs 60-80% of raises — resist it deliberately.</p>
+      </div>
+
+      <div class="callout">
+        <h4>The 1% habit</h4>
+        <p>Increasing your investment contribution by 1% of income each year (or with every raise) is the single most reliable path to a well-funded retirement. Automate it in your 401(k) settings.</p>
+      </div>
+    </div>
+  `;
+  bindFormInputs();
+}
+
+/* ============================================================
+   INSIGHTS · AI-generated recommendations (rule-based)
+   ============================================================ */
+function renderInsights() {
+  const m = metrics();
+  const s = healthScore();
+  const insights = generateInsights(m, s);
+
+  el("stage").innerHTML = `
+    <div class="card">
+      <span class="tag">AI-GENERATED RECOMMENDATIONS</span>
+      <h2 style="margin-top:14px;">Personalized next steps</h2>
+      <p>Insights computed from your current dashboard state. Priorities are ranked by impact-to-effort ratio.</p>
+
+      ${insights.map((i, idx) => `
+        <div class="callout ${i.kind}">
+          <h4>Priority ${idx + 1}: ${esc(i.title)}</h4>
+          <p>${i.body}</p>
+        </div>
+      `).join("")}
+
+      <h3>Overall assessment</h3>
+      <div class="statGrid">
+        <div class="statTile accent"><div class="l">Health Score</div><div class="v">${s}/100</div></div>
+        <div class="statTile"><div class="l">Savings Rate</div><div class="v">${pct(m.savingsRate)}</div></div>
+        <div class="statTile"><div class="l">Emergency Runway</div><div class="v">${m.emergencyMonths.toFixed(1)} mo</div></div>
+        <div class="statTile"><div class="l">Net Worth</div><div class="v">${$(m.netWorth)}</div></div>
+      </div>
+    </div>
+  `;
+}
+function generateInsights(m, s) {
+  const list = [];
+  // Emergency
+  if (m.emergencyMonths < 3) {
+    list.push({ kind:"bad", title:"Build your emergency fund to 3+ months",
+      body:`Your current runway is ${m.emergencyMonths.toFixed(1)} months of essential expenses. Before aggressive investing or paying down low-rate debt, hit 3 months minimum. Target: <b>${$(m.essentials * 3 - data.savings.emergency)}</b> more into your high-yield savings account.` });
+  }
+  // High-rate debt
+  const highRate = data.debts.find(d => d.rate > 15);
+  if (highRate) {
+    list.push({ kind:"bad", title:`Attack your ${highRate.name} first`,
+      body:`At ${highRate.rate}% APR, this debt is costing approximately <b>${$(highRate.balance * highRate.rate / 100 / 12)}</b> in interest per month. This is your highest-priority lever — every dollar toward it beats every dollar into investments returning 7%.` });
+  }
+  // Savings rate
+  if (m.savingsRate < 10) {
+    list.push({ kind:"warn", title:"Raise your savings rate to at least 10%",
+      body:`Your current savings rate is <b>${pct(m.savingsRate)}</b>. Even 10% requires discipline but compounds significantly. Look at your discretionary categories (entertainment, shopping, subscriptions) as the fastest levers.` });
+  }
+  // Subscriptions
+  const subsMonthly = data.subscriptions.reduce((a,b)=>a+b.cost, 0);
+  if (subsMonthly > 100) {
+    list.push({ kind:"warn", title:"Review your subscription stack",
+      body:`You're spending <b>${$(subsMonthly)}/mo</b> across ${data.subscriptions.length} subscriptions — ${$(subsMonthly * 12)}/year. Cutting even 30% saves ${$(subsMonthly * 12 * 0.3)}/year.` });
+  }
+  // Debt-to-income
+  if (m.debtToIncome > 36) {
+    list.push({ kind:"warn", title:"Debt-to-income ratio is high",
+      body:`At <b>${pct(m.debtToIncome)}</b>, your minimum debt payments consume more than a third of gross income. Lenders consider anything above 36% risky. Pay down aggressively before taking on new debt.` });
+  }
+  // 401k match check
+  const investRatio = m.monthlyGross > 0 ? (data.investments.contributionMonthly / m.monthlyGross) : 0;
+  if (investRatio < 0.10) {
+    list.push({ kind:"warn", title:"You may be missing 401(k) match",
+      body:`You're contributing <b>${pct(investRatio*100)}</b> of gross income to retirement. Most employers match 3-6% dollar-for-dollar. Missing that match is leaving free money on the table.` });
+  }
+  // Positive reinforcement
+  if (m.savingsRate >= 15 && m.emergencyMonths >= 3 && !highRate) {
+    list.push({ kind:"good", title:"You're on a strong track",
+      body:`Savings rate healthy, emergency fund solid, no high-rate debt. Focus areas: max out your Roth IRA if eligible, look at tax-loss harvesting opportunities in your brokerage account, and start thinking about a house down payment if that's a goal.` });
+  }
+  // Investment concentration
+  if (data.investments.allocation.crypto > 15) {
+    list.push({ kind:"warn", title:"Crypto exposure is aggressive",
+      body:`At <b>${data.investments.allocation.crypto}%</b>, your crypto allocation is above what most advisors recommend (5-10% max). Consider trimming to reduce volatility risk.` });
+  }
+  // Default nudge
+  if (list.length === 0) {
+    list.push({ kind:"good", title:"No urgent action items",
+      body:`Your dashboard looks balanced. Revisit monthly and adjust as your income, expenses, or goals change.` });
+  }
+  return list.slice(0, 6);
+}
+
+/* ============================================================
+   RESOURCES · Tips · Checklist · Prompts
+   ============================================================ */
+function renderResources() {
+  el("stage").innerHTML = `
+    <div class="card">
+      <span class="tag">RESOURCES & CONTINUE LEARNING</span>
+      <h2 style="margin-top:14px;">Keep improving</h2>
+      <p>Tools, books, communities, and prompts to sharpen your financial literacy over time.</p>
+
+      <h3>Planning checklist</h3>
+      <div class="itemList">
+        ${[
+          "Automate 401(k) contributions to at least the employer match",
+          "Open a high-yield savings account for your emergency fund (Ally, Marcus, Wealthfront)",
+          "Set up 2 checking accounts — one for bills, one for spending",
+          "Review your credit report annually at annualcreditreport.com (free)",
+          "Set an annual investing check-in for portfolio rebalancing (each January)",
+          "Increase your 401(k) contribution by 1% every raise",
+          "Audit subscriptions every 6 months",
+          "Consolidate old 401(k)s from previous employers into an IRA",
+        ].map(t => `<div class="itemRow saving" style="grid-template-columns:32px 1fr;"><div class="ico">✓</div><div>${t}</div></div>`).join("")}
+      </div>
+
+      <h3>Books</h3>
+      <div class="statGrid">
+        <div class="statTile"><div class="l">Foundational</div><div class="v" style="font-size:15px;">The Simple Path to Wealth</div><div class="delta">JL Collins</div></div>
+        <div class="statTile"><div class="l">Behavioral</div><div class="v" style="font-size:15px;">The Psychology of Money</div><div class="delta">Morgan Housel</div></div>
+        <div class="statTile"><div class="l">Practical</div><div class="v" style="font-size:15px;">I Will Teach You to Be Rich</div><div class="delta">Ramit Sethi</div></div>
+      </div>
+
+      <h3>Trusted resources</h3>
+      <div class="statGrid">
+        <div class="statTile"><div class="l">Bogleheads Wiki</div><div class="v" style="font-size:14px;">bogleheads.org</div><div class="delta">Investing fundamentals</div></div>
+        <div class="statTile"><div class="l">NerdWallet</div><div class="v" style="font-size:14px;">nerdwallet.com</div><div class="delta">Product comparisons</div></div>
+        <div class="statTile"><div class="l">r/personalfinance</div><div class="v" style="font-size:14px;">The wiki</div><div class="delta">The flowchart is gold</div></div>
+        <div class="statTile"><div class="l">Choose FI</div><div class="v" style="font-size:14px;">choosefi.com</div><div class="delta">Financial independence</div></div>
+      </div>
+
+      <h3>AI prompts to keep learning</h3>
+      <div class="callout">
+        <p>Copy any of these into Claude for personalized guidance:</p>
+        <ul style="color:var(--text-dim); font-size:13.5px; line-height:1.65; padding-left:22px; margin-top:6px;">
+          <li>"Review my current monthly budget: [paste details] — where should I cut and where can I invest more?"</li>
+          <li>"Explain the difference between a Roth IRA, Traditional IRA, and 401(k) for someone earning $95K."</li>
+          <li>"I have a credit card at 22% APR and student loans at 5.5% — walk me through the payoff order I should follow."</li>
+          <li>"Given my current savings rate of X% and a target of buying a house in 3 years, is my plan realistic?"</li>
+          <li>"How much should I keep in cash vs. invested if I'm planning a career change in 12 months?"</li>
+          <li>"Explain tax-loss harvesting in plain English with a numeric example."</li>
+        </ul>
+      </div>
+
+      <div class="callout">
+        <h4>Financial tips worth internalizing</h4>
+        <p><b>Pay yourself first.</b> Automate savings/investing the day you're paid. What lands in checking is the max you can spend.</p>
+        <p><b>Match rate is the true guaranteed return.</b> Missing employer match is like turning down a raise.</p>
+        <p><b>Emergency fund > investment gains.</b> Skipping the fund to invest more is the #1 mistake in a young portfolio.</p>
+        <p><b>Fees compound just like returns.</b> A 1% expense ratio can eat 25% of your retirement portfolio over 40 years.</p>
+        <p><b>Buying a house isn't investing.</b> It's a lifestyle decision with real returns after 7+ years of ownership.</p>
+      </div>
+
+      <div class="actionBar">
+        <button class="btn" onclick="window.print()">🖨️ Print Full Report</button>
+        <button class="btn primary leftActions" onclick="goto('overview')">← Back to Overview</button>
+      </div>
+    </div>
+  `;
+}
+
+/* ============================================================
+   Form binding + init
+   ============================================================ */
+function bindFormInputs() {
+  document.querySelectorAll("input[data-key]").forEach(inp => {
+    inp.addEventListener("input", e => {
+      const key = inp.dataset.key;
+      const path = key.split(".");
+      let obj = data;
+      for (let i = 0; i < path.length - 1; i++) obj = obj[path[i]];
+      const val = inp.type === "number" || inp.type === "range" ? parseFloat(e.target.value) || 0 : e.target.value;
+      obj[path[path.length - 1]] = val;
+      saveData();
+      // Live update non-form parts of the page
+      if (["income","savings","expenses","investments","whatif"].includes(currentTab)) render();
+      const s = healthScore(); const band = healthBand(s);
+      el("healthPill").textContent = `Health · ${s}/100 · ${band.label}`;
+      el("healthPill").className = "hud " + band.cls;
+    });
+  });
+}
+
+el("themeBtn").addEventListener("click", () => {
+  const isLight = document.body.classList.toggle("lightMode");
+  el("themeBtn").textContent = isLight ? "☀️ Light" : "🌙 Dark";
+});
+el("printBtn").addEventListener("click", () => window.print());
+el("resetBtn").addEventListener("click", () => {
+  if (!confirm("Reset all data to defaults? This clears your saved dashboard.")) return;
+  data = JSON.parse(JSON.stringify(DEFAULT));
+  saveData();
+  toast("Reset to defaults", "good");
+  render();
+});
+
+renderTabs();
+render();
+</script>
+</body>
+</html>
