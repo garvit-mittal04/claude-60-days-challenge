@@ -1,0 +1,1259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>🔥 LinkedIn Roast & Rebuild — Day 44 · #60DayClaudeChallenge</title>
+<style>
+:root {
+  --bg:#0a1220; --bg-2:#0f1729; --panel:#141d33; --panel-2:#1c2740;
+  --line:#28324d; --line-2:#3a4767;
+  --text:#e6ecf7; --text-dim:#adb8cf; --text-mute:#7a86a3;
+  --accent:#0a66c2; /* LinkedIn blue */
+  --accent-2:#57a3f0;
+  --accent-soft:rgba(10,102,194,.16);
+  --hot:#ff5f6d; --hot-2:#ff8a95;
+  --good:#4ade80; --bad:#f56565; --warn:#fbbf24; --gold:#ffd166;
+  --shadow:0 20px 60px rgba(0,0,0,.55);
+  --radius:14px; --easing:cubic-bezier(.2,.8,.2,1);
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+body.lightMode {
+  --bg:#f5f8fc; --bg-2:#fff; --panel:#fff; --panel-2:#eef2fa;
+  --line:#e2e8f0; --line-2:#cbd5e1;
+  --text:#0f172a; --text-dim:#475569; --text-mute:#94a3b8;
+  --shadow:0 12px 40px rgba(15,23,42,.08);
+}
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body {
+  margin:0; padding:0; min-height:100%;
+  background:
+    radial-gradient(1100px 700px at 10% -10%, var(--accent-soft), transparent 60%),
+    radial-gradient(900px 600px at 100% 100%, rgba(255,95,109,.06), transparent 60%),
+    var(--bg);
+  color:var(--text);
+  font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.mono { font-family:var(--mono); }
+.app { max-width:1180px; margin:0 auto; padding:22px 24px 60px; }
+
+header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 0 16px; margin-bottom:16px; flex-wrap:wrap; gap:12px;
+  border-bottom:1px solid var(--line);
+}
+.brand { display:flex; align-items:center; gap:14px; }
+.logo {
+  width:52px; height:52px; border-radius:14px;
+  background:linear-gradient(135deg, var(--accent), var(--hot));
+  display:flex; align-items:center; justify-content:center; font-size:26px;
+  box-shadow:0 12px 30px rgba(0,0,0,.4);
+}
+.brand h1 { margin:0; font-size:22px; font-weight:800; letter-spacing:-.3px; }
+.brand .sub { font-size:11px; color:var(--text-mute); letter-spacing:2px; text-transform:uppercase; font-weight:700; }
+.headActions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.engineToggle {
+  display:flex; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:3px;
+}
+.engineToggle button {
+  padding:6px 12px; background:transparent; border:none; color:var(--text-dim); cursor:pointer;
+  font-size:12px; font-weight:700; border-radius:7px; letter-spacing:.3px;
+  transition:background .15s, color .12s; font-family:inherit;
+}
+.engineToggle button.on { background:var(--accent); color:#fff; }
+.iconBtn {
+  background:var(--panel); border:1px solid var(--line); color:var(--text-dim);
+  padding:7px 12px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:700;
+  transition:border-color .12s, color .12s, background .15s; font-family:inherit;
+}
+.iconBtn:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
+
+/* Cards */
+.card {
+  background:linear-gradient(180deg, var(--panel), var(--bg-2));
+  border:1px solid var(--line); border-radius:var(--radius);
+  padding:24px 26px; box-shadow:var(--shadow); margin-bottom:16px;
+  animation:fadeIn .3s var(--easing) both;
+}
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:translateY(0);} }
+.card h2 { margin:0 0 6px; font-size:22px; font-weight:800; letter-spacing:-.3px; }
+.card h3 { margin:20px 0 10px; font-size:16px; font-weight:800; letter-spacing:-.2px; }
+.card h4 { margin:14px 0 6px; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--accent); font-weight:800; }
+.card p { color:var(--text-dim); font-size:14px; line-height:1.65; margin:6px 0; }
+.card p b { color:var(--text); font-weight:800; }
+.card code {
+  font-family:var(--mono); background:var(--panel-2); border:1px solid var(--line);
+  padding:1px 6px; border-radius:5px; font-size:12.5px; color:var(--accent-2);
+}
+.tag {
+  display:inline-block; font-size:10px; padding:3px 10px; border-radius:999px;
+  background:var(--accent-soft); color:var(--accent-2); border:1px solid var(--accent);
+  font-weight:800; letter-spacing:1.5px;
+}
+.tag.hot { background:rgba(255,95,109,.14); color:var(--hot); border-color:var(--hot); }
+
+/* Form */
+.formGrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:12px; }
+@media(max-width:820px){ .formGrid { grid-template-columns:1fr; } }
+.formField { display:flex; flex-direction:column; }
+.formField.full { grid-column:1 / -1; }
+.formField label { font-size:11px; color:var(--text-mute); letter-spacing:1.5px; font-weight:800; text-transform:uppercase; margin-bottom:6px; }
+.formField label .hint { color:var(--text-mute); font-weight:500; text-transform:none; letter-spacing:0; font-style:italic; font-size:11px; margin-left:6px; }
+.formField input, .formField textarea, .formField select {
+  width:100%; background:var(--bg); border:1.5px solid var(--line-2); border-radius:8px;
+  padding:10px 12px; color:var(--text); font-family:inherit; font-size:14px;
+  outline:none; transition:border-color .12s, box-shadow .12s; resize:vertical;
+}
+.formField textarea { min-height:100px; line-height:1.55; font-family:-apple-system, system-ui, sans-serif; }
+.formField textarea.big { min-height:150px; }
+.formField input:focus, .formField textarea:focus, .formField select:focus {
+  border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft);
+}
+
+.keyBar {
+  background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
+  padding:14px 16px; margin-bottom:16px;
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+}
+.keyBar .lbl { font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-mute); font-weight:800; }
+.keyBar input {
+  flex:1; min-width:220px; background:var(--bg); border:1.5px solid var(--line-2); border-radius:8px;
+  padding:8px 12px; color:var(--text); font-family:var(--mono); font-size:12.5px; outline:none;
+}
+.keyBar input:focus { border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
+.keyBar .warn { font-size:11px; color:var(--warn); font-weight:600; }
+
+/* Buttons */
+.btn {
+  appearance:none; border:1px solid var(--line); background:var(--panel); color:var(--text);
+  padding:11px 20px; border-radius:10px; cursor:pointer; font-size:13.5px; font-weight:700;
+  transition:transform .1s var(--easing), border-color .12s, background .15s; font-family:inherit;
+}
+.btn:hover { border-color:var(--accent); background:var(--accent-soft); }
+.btn.primary {
+  background:linear-gradient(135deg, var(--accent), var(--hot)); color:#fff; border:none;
+  font-weight:800; padding:14px 30px; font-size:15px;
+  box-shadow:0 12px 30px rgba(10,102,194,.28);
+}
+.btn.primary:hover { transform:translateY(-1px); color:#fff; }
+.btn:disabled { opacity:.45; cursor:not-allowed; }
+.btn.compact { padding:6px 12px; font-size:12px; }
+.actionBar { display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; align-items:center; }
+.actionBar .leftActions { margin-right:auto; }
+
+/* Score display */
+.reportHead {
+  display:flex; justify-content:space-between; align-items:center;
+  padding-bottom:16px; margin-bottom:14px; border-bottom:1px solid var(--line);
+  flex-wrap:wrap; gap:14px;
+}
+.overallScore {
+  background: radial-gradient(circle at 50% 30%, var(--accent-soft), transparent 60%), var(--panel-2);
+  border:1px solid var(--accent); border-radius:14px; padding:20px 24px;
+  display:flex; gap:26px; align-items:center; flex-wrap:wrap;
+}
+.overallScore .big {
+  font-family:var(--mono); font-size:72px; font-weight:900; line-height:1;
+  background:linear-gradient(135deg, #fff, var(--accent-2)); -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.overallScore .lbl { font-size:11px; color:var(--text-mute); letter-spacing:2px; font-weight:800; text-transform:uppercase; }
+.overallScore .band { font-size:14px; font-weight:800; margin-top:4px; color:var(--text); }
+
+/* Section score card */
+.sectionScore {
+  background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
+  padding:16px 18px; margin:12px 0;
+}
+.sectionScore .head {
+  display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:10px;
+}
+.sectionScore h3 { margin:0; font-size:15px; font-weight:800; }
+.sectionScore .score {
+  font-family:var(--mono); font-size:22px; font-weight:900;
+}
+.sectionScore .score.g5 { color:var(--good); }
+.sectionScore .score.g3 { color:var(--warn); }
+.sectionScore .score.g1 { color:var(--bad); }
+.sectionScore .reaction {
+  font-style:italic; color:var(--text-dim); font-size:13.5px; line-height:1.6; margin-bottom:8px;
+}
+.sectionScore .problem { display:flex; gap:10px; margin:8px 0; }
+.sectionScore .problem .icon { font-size:16px; flex-shrink:0; }
+.sectionScore .problem .body { font-size:13.5px; color:var(--text-dim); line-height:1.6; }
+.sectionScore .problem .body b { color:var(--text); }
+.sectionScore .quote {
+  font-family:var(--mono); font-size:12px; background:rgba(255,95,109,.08);
+  border-left:3px solid var(--hot); padding:6px 10px; margin:4px 0; border-radius:4px; color:var(--text);
+  font-style:italic; word-break:break-word;
+}
+
+/* Rebuild sections */
+.rebuildOption {
+  background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
+  padding:14px 16px; margin:10px 0;
+}
+.rebuildOption h4 { margin:0 0 6px; font-size:12px; color:var(--accent-2); }
+.rebuildOption .text {
+  font-family:var(--mono); font-size:13px; line-height:1.6; color:var(--text);
+  padding:10px 12px; background:rgba(10,102,194,.08); border-radius:8px; margin:6px 0;
+  border-left:3px solid var(--accent); position:relative;
+  white-space:pre-wrap; word-break:break-word;
+}
+.rebuildOption .text .copy {
+  position:absolute; top:6px; right:6px;
+  padding:3px 8px; font-size:10px; border-radius:5px;
+  background:var(--panel); border:1px solid var(--line); color:var(--text-mute);
+  cursor:pointer; letter-spacing:1.2px; font-weight:800; text-transform:uppercase;
+  transition: border-color .12s, color .12s; font-family:inherit;
+}
+.rebuildOption .text .copy:hover { border-color:var(--accent); color:var(--accent); }
+.rebuildOption .strategy { font-size:12.5px; color:var(--text-dim); line-height:1.6; margin-top:6px; }
+.rebuildOption .strategy b { color:var(--text); }
+
+.beforeAfter { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:8px 0; }
+@media(max-width:640px){ .beforeAfter { grid-template-columns:1fr; } }
+.beforeAfter .cell { padding:10px 12px; border-radius:8px; font-size:13px; line-height:1.55; }
+.beforeAfter .cell.before { background:rgba(245,101,101,.10); border-left:3px solid var(--bad); color:var(--text-dim); }
+.beforeAfter .cell.after { background:rgba(74,222,128,.10); border-left:3px solid var(--good); color:var(--text); }
+.beforeAfter .cell .k { display:block; font-size:9px; letter-spacing:2px; font-weight:800; text-transform:uppercase; margin-bottom:4px; }
+.beforeAfter .cell.before .k { color:var(--bad); }
+.beforeAfter .cell.after .k { color:var(--good); }
+
+/* Skills */
+.skillsGrid { display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:8px; margin:8px 0; }
+.skillChip {
+  background:var(--panel-2); border:1.5px solid var(--line); border-radius:8px;
+  padding:8px 12px; font-size:13px; color:var(--text); display:flex; justify-content:space-between; align-items:center;
+}
+.skillChip.pinned { border-color:var(--gold); background:rgba(255,209,102,.08); color:var(--gold); font-weight:800; }
+.skillChip.add { border-color:var(--good); background:rgba(74,222,128,.08); color:var(--good); font-weight:700; }
+.skillChip.remove { border-color:var(--bad); background:rgba(245,101,101,.08); color:var(--bad); font-weight:700; text-decoration:line-through; }
+.skillChip .badge { font-size:9px; padding:2px 5px; border-radius:4px; background:var(--panel); font-weight:800; letter-spacing:1px; }
+
+/* Scorecard grid */
+.scorecardGrid { display:grid; gap:8px; margin:10px 0; }
+.scorecardRow {
+  display:grid; grid-template-columns: 1fr auto auto auto; gap:12px; align-items:center;
+  background:var(--panel-2); border:1px solid var(--line); border-radius:10px;
+  padding:10px 14px; font-size:13px;
+}
+.scorecardRow .n { font-weight:700; }
+.scorecardRow .before { color:var(--bad); font-family:var(--mono); font-weight:800; }
+.scorecardRow .arrow { color:var(--text-mute); }
+.scorecardRow .after { color:var(--good); font-family:var(--mono); font-weight:800; }
+.scorecardRow .delta { color:var(--good); font-family:var(--mono); font-weight:800; font-size:12px; }
+.overallRow {
+  background:linear-gradient(135deg, var(--accent-soft), rgba(74,222,128,.10));
+  border:2px solid var(--accent);
+}
+.overallRow .n { color:var(--text); font-weight:900; font-size:14px; }
+
+/* 7-day plan */
+.dayPlan { display:grid; gap:12px; margin:14px 0; }
+.dayCard {
+  background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
+  padding:16px 18px; position:relative;
+}
+.dayCard .kicker {
+  display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;
+}
+.dayCard .num {
+  font-family:var(--mono); font-size:11px; color:var(--accent); letter-spacing:1.5px; font-weight:800;
+}
+.dayCard h4 { margin:0 0 6px; color:var(--text); font-size:15px; }
+.dayCard .body { color:var(--text-dim); font-size:13.5px; line-height:1.65; }
+.dayCard .body b { color:var(--text); }
+.dayCard .postDraft {
+  background:rgba(10,102,194,.10); border-left:3px solid var(--accent); border-radius:8px;
+  padding:12px 14px; margin-top:10px; font-family:var(--mono); font-size:12.5px; line-height:1.65; color:var(--text);
+  white-space:pre-wrap; position:relative;
+}
+.dayCard .postDraft .copy {
+  position:absolute; top:6px; right:6px;
+  padding:3px 8px; font-size:10px; border-radius:5px;
+  background:var(--panel); border:1px solid var(--line); color:var(--text-mute);
+  cursor:pointer; letter-spacing:1.2px; font-weight:800; text-transform:uppercase; font-family:inherit;
+}
+.dayCard .postDraft .copy:hover { border-color:var(--accent); color:var(--accent); }
+.checklist { list-style:none; padding:0; margin:8px 0; }
+.checklist li {
+  padding:4px 0 4px 26px; position:relative; font-size:13px; color:var(--text);
+}
+.checklist li::before {
+  content:"☐"; position:absolute; left:0; top:2px; color:var(--accent); font-weight:800; font-size:14px;
+}
+
+/* Summary card */
+.summaryCard {
+  background: linear-gradient(135deg, var(--accent), var(--hot));
+  color:#fff; border-radius:16px; padding:28px 30px; margin-top:14px;
+  text-align:left; box-shadow: 0 20px 60px rgba(255,95,109,.28);
+  position:relative;
+}
+.summaryCard h3 { margin:0 0 12px; color:#fff; font-size:22px; letter-spacing:-.3px; font-weight:800; }
+.summaryCard p { color:#fff; font-size:15px; line-height:1.6; }
+.summaryCard .stat { display:flex; gap:26px; margin:14px 0; flex-wrap:wrap; }
+.summaryCard .stat .box { text-align:center; }
+.summaryCard .stat .l { font-size:10px; color:#fff; opacity:.75; letter-spacing:2px; font-weight:800; text-transform:uppercase; }
+.summaryCard .stat .v { font-family:var(--mono); font-size:36px; font-weight:900; }
+.summaryCard ol { padding-left:24px; margin:8px 0; }
+.summaryCard ol li { margin:4px 0; }
+.summaryCard .cta {
+  background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35);
+  border-radius:10px; padding:10px 14px; margin-top:14px;
+  font-size:14px; font-style:italic;
+}
+
+/* Callout */
+.callout { background:var(--panel-2); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:12px 0; }
+.callout h4 { margin:0 0 4px; color:var(--accent); }
+.callout p { margin:2px 0; font-size:13px; color:var(--text-dim); line-height:1.6; }
+.callout.warn { border-left-color:var(--warn); } .callout.warn h4 { color:var(--warn); }
+.callout.good { border-left-color:var(--good); } .callout.good h4 { color:var(--good); }
+.callout.bad { border-left-color:var(--bad); } .callout.bad h4 { color:var(--bad); }
+
+.toast {
+  position:fixed; top:20px; right:20px; z-index:100;
+  background:var(--panel-2); border:1px solid var(--accent); color:var(--text);
+  padding:12px 18px; border-radius:10px; font-size:13.5px; font-weight:700;
+  box-shadow:var(--shadow); animation:toastIn .3s ease-out, toastOut .3s ease-in 2.2s forwards;
+}
+.toast.good { border-color:var(--good); color:var(--good); }
+.toast.bad { border-color:var(--bad); color:var(--bad); }
+@keyframes toastIn { from{opacity:0;transform:translateX(20px);} to{opacity:1;transform:translateX(0);} }
+@keyframes toastOut { to{opacity:0;transform:translateX(20px);} }
+
+.footer { color:var(--text-mute); font-size:11px; text-align:center; margin-top:22px; letter-spacing:1px; line-height:1.6; }
+
+/* Loading */
+.loadingCard { display:flex; align-items:center; gap:16px; padding:40px 20px; justify-content:center; }
+.spinner { width:32px; height:32px; border:3px solid rgba(10,102,194,.2); border-top-color:var(--accent); border-radius:50%; animation:spin .8s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) { * { animation:none!important; transition:none!important; } }
+
+@media print {
+  header, .actionBar, .footer, .iconBtn, .btn, .engineToggle, .keyBar { display:none!important; }
+  .card { box-shadow:none; page-break-inside:avoid; break-inside:avoid; }
+  body { background:#fff; color:#000; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="logo">🔥</div>
+      <div>
+        <h1>LinkedIn Roast &amp; Rebuild</h1>
+        <div class="sub">Day 44 · #60DayClaudeChallenge</div>
+      </div>
+    </div>
+    <div class="headActions">
+      <div class="engineToggle" id="engineToggle">
+        <button data-engine="rules" class="on">⚡ Rule-based</button>
+        <button data-engine="claude">🤖 Claude API</button>
+      </div>
+      <button class="iconBtn" id="printBtn">🖨️ Print</button>
+      <button class="iconBtn" id="themeBtn">🌙 Dark</button>
+    </div>
+  </header>
+
+  <div id="stage"></div>
+
+  <p class="footer">
+    Roast &amp; rebuild your LinkedIn profile · Rule-based mode works offline · Claude API mode = your own key, browser-only<br/>
+    Built for Day 44 of #60DayClaudeChallenge
+  </p>
+</div>
+
+<script>
+/* ============================================================
+   LINKEDIN ROAST & REBUILD — Day 44
+   ============================================================ */
+
+const SAMPLE = {
+  headline: "Passionate MBA candidate | Aspiring Business Analyst | Data enthusiast | Results-driven professional",
+  about: "Passionate and results-driven MBA candidate with a strong interest in leveraging data to drive business decisions. Currently pursuing my Masters in Business Analytics & AI at UT Dallas, where I am building expertise in SQL, Python, and Tableau. Proven track record of hard work and dedication in every project I take on. Always eager to learn new skills and collaborate with talented professionals. Looking for opportunities to apply my analytical skills in a fast-paced environment where I can grow and make an impact. Feel free to connect!",
+  expTitle: "Operations Analyst Intern",
+  expCompany: "The Chicago School",
+  expBullets: "Responsible for supporting operations team\nHelped with data entry tasks and reporting\nAssisted senior analysts with ad-hoc requests\nWorked on process improvement initiatives",
+  skills: "Microsoft Excel, PowerPoint, Communication, Teamwork, Leadership, Problem Solving, Attention to Detail, MS Word",
+  goal: "job",
+};
+
+const state = {
+  engine: "rules",
+  apiKey: localStorage.getItem("lir.apiKey") || "",
+  input: JSON.parse(localStorage.getItem("lir.input") || "null") || { ...SAMPLE },
+  report: null,
+  loading: false,
+  error: null,
+};
+
+const el = (id) => document.getElementById(id);
+function esc(s){ return String(s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+function toast(msg, kind="") { const t=document.createElement("div"); t.className="toast"+(kind?" "+kind:""); t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),2500); }
+window.copyText = function(btn) {
+  const text = btn.parentElement.innerText.replace(/^Copy\s*/, "").trim();
+  navigator.clipboard.writeText(text).then(() => { btn.textContent = "✓ Copied"; setTimeout(() => btn.textContent = "Copy", 1400); });
+};
+
+/* Engine toggle */
+document.querySelectorAll("#engineToggle button").forEach(b => {
+  b.addEventListener("click", () => {
+    state.engine = b.dataset.engine;
+    document.querySelectorAll("#engineToggle button").forEach(x => x.classList.toggle("on", x === b));
+    render();
+  });
+});
+
+el("themeBtn").addEventListener("click", () => {
+  const isLight = document.body.classList.toggle("lightMode");
+  el("themeBtn").textContent = isLight ? "☀️ Light" : "🌙 Dark";
+});
+el("printBtn").addEventListener("click", () => window.print());
+
+/* ============================================================
+   RULE-BASED ROAST ENGINE
+   ============================================================ */
+
+const BUZZWORDS = ["passionate","passionate about","results-driven","results driven","self-starter","self starter","motivated","team player","hard worker","seasoned professional","seasoned","proven track record","extensive experience","hardworking","hard-working","dynamic","synergy","synergies","best of breed","world-class","world class","cutting edge","cutting-edge","innovative","strategic","strategic thinker","thought leader","guru","ninja","rockstar","jack of all trades","go-getter","go getter","detail-oriented","detail oriented","results-oriented","results oriented","aspiring","enthusiast","dedicated","committed","strong interest","eager to learn"];
+const WEAK_VERBS = ["responsible for","assisted with","assisted in","helped","supported","worked on","involved in","participated in","handled","managed to"];
+const STRONG_VERBS = ["led","built","launched","designed","engineered","shipped","delivered","optimized","reduced","increased","grew","automated","cut","scaled","drove","architected","owned","spearheaded"];
+const NUM_RX = /\b(\d+(?:[.,]\d+)?(?:[kKmMbB%]|\s*(?:percent|users|clients|customers|hours|days|weeks|months|years|dollars|USD|₹|rs))?|\$\d[\d,.]*|\d+\+?)\b/;
+
+function analyzeHeadline(text) {
+  const t = (text||"").trim();
+  const lower = t.toLowerCase();
+  const problems = [];
+  let score = 10;
+  // Length
+  if (t.length < 20) { score -= 3; problems.push({icon:"❌", body:`Only ${t.length} characters. LinkedIn gives you 220. You're leaving ~${220-t.length} characters of prime search real estate on the table.`}); }
+  else if (t.length > 220) { score -= 1; problems.push({icon:"⚠️", body:`Over 220 characters. LinkedIn truncates. Recruiters will see the first ~120 on mobile.`}); }
+  // Buzzwords
+  const foundBw = BUZZWORDS.filter(b => lower.includes(b));
+  if (foundBw.length) {
+    score -= Math.min(4, foundBw.length);
+    problems.push({icon:"❌", body:`Buzzword bingo: ${foundBw.slice(0,4).map(w => `<code>${w}</code>`).join(", ")}${foundBw.length>4?` (+${foundBw.length-4} more)`:""}. These signal "I read a generic career tips article and copied the phrases." Recruiters skip past them.`, quote: foundBw[0]});
+  }
+  // Value prop check — does it say WHO they help or WHAT they DO specifically?
+  const hasWho = /\bfor\b|\bhelping\b|\bhelp\b/i.test(t);
+  const hasNumbers = NUM_RX.test(t);
+  if (!hasWho && !hasNumbers) { score -= 2; problems.push({icon:"🔍", body:`No "who I help" or "what I do specifically." Every good headline names either the target audience (e.g., "for early-stage startups") or a proof point (e.g., "$3M in analytics-driven revenue").`}); }
+  // Aspiring / student framing
+  if (/\baspiring\b|\bstudent\b|\bcandidate\b/i.test(t) && !/\|.*\|.*\|/.test(t)) {
+    score -= 1;
+    problems.push({icon:"⚠️", body:`"Aspiring" and "candidate" position you as the seeker. The best profiles position you as someone who already delivers value, even as a student.`, quote: t.match(/aspiring \w+|\w+ candidate|student \w+/i)?.[0]});
+  }
+  score = Math.max(1, Math.min(10, Math.round(score)));
+  const reaction = score >= 7 ? "Sharp — I can tell exactly who this person is in 2 seconds."
+                  : score >= 4 ? "Generic. I've seen this exact framing 500 times today. Scroll."
+                  : "Wall of buzzwords. No specificity. Nothing to remember. Next.";
+  return { score, reaction, problems, invisibleCost: "Recruiters filter LinkedIn search by keywords in your headline. Buzzwords don't rank. Specific role + specific value does." };
+}
+
+function analyzeAboutHook(text) {
+  const t = (text||"").trim();
+  const firstTwoLines = t.split(/\n|\. /).slice(0,2).join(". ").slice(0,220);
+  const lower = firstTwoLines.toLowerCase();
+  const problems = [];
+  let score = 10;
+  const bw = BUZZWORDS.filter(b => lower.includes(b));
+  if (bw.length) {
+    score -= Math.min(4, bw.length * 2);
+    problems.push({icon:"❌", body:`The first 2 lines contain buzzwords: ${bw.slice(0,3).map(w=>`<code>${w}</code>`).join(", ")}. This is the ONE place buzzwords hurt most — it's ALL a scroller sees before "see more."`, quote: firstTwoLines.slice(0,140)});
+  }
+  if (firstTwoLines.length < 60) { score -= 2; problems.push({icon:"⚠️", body:`Very short hook (${firstTwoLines.length} chars). Not enough to make anyone click "see more."`}); }
+  if (!/[.!?]/.test(firstTwoLines.slice(0,120))) {
+    // No period in first 120 chars — likely one long boring sentence
+    if (firstTwoLines.length > 120) {
+      score -= 2;
+      problems.push({icon:"❌", body:`No period in the first 120 characters. It reads as one long stream. Sharp hooks use short sentences.`});
+    }
+  }
+  score = Math.max(1, Math.min(10, Math.round(score)));
+  const reaction = score >= 7 ? "The hook makes me want to click 'see more.' Good."
+                  : score >= 4 ? "Generic. My eyes glaze over. I don't click 'see more.'"
+                  : "This is what nine out of ten profiles look like. I've already scrolled.";
+  return { score, reaction, problems, invisibleCost: "The first 220 characters decide whether a recruiter reads the rest. If they don't, your best achievement (buried in paragraph 3) never gets seen." };
+}
+
+function analyzeAboutFull(text) {
+  const t = (text||"").trim();
+  const lower = t.toLowerCase();
+  const problems = [];
+  let score = 10;
+  // Length
+  if (t.length < 300) { score -= 2; problems.push({icon:"⚠️", body:`Only ${t.length} characters. You have ~2600. Adding specifics (projects, tools, target industry) is basically free SEO.`}); }
+  // Numbers?
+  const numMatches = t.match(new RegExp(NUM_RX, "g")) || [];
+  if (numMatches.length < 2) { score -= 3; problems.push({icon:"❌", body:`Zero specific numbers. "Strong track record" and "made an impact" without a number is invisible to recruiters. Every good About has at least 2-3 numbers.`}); }
+  // Buzzwords
+  const bw = BUZZWORDS.filter(b => lower.includes(b));
+  if (bw.length > 3) { score -= 3; problems.push({icon:"❌", body:`${bw.length} buzzwords total. Corporate speak is a signal that you don't have specific things to say.`}); }
+  else if (bw.length > 0) { score -= 1; problems.push({icon:"⚠️", body:`${bw.length} buzzword(s) present. Cut them and see how much sharper it reads.`}); }
+  // CTA check
+  if (!/\bconnect\b|\bmessage\b|\bemail\b|\breach out\b|\bdm\b/i.test(t)) {
+    score -= 1; problems.push({icon:"🔍", body:`No call to action. What should a reader do after finishing this section? Message you? Check your featured section? Visit your portfolio?`});
+  }
+  // First person present
+  if (!/\bi\b|\bmy\b|\bme\b/i.test(t)) { score -= 1; problems.push({icon:"⚠️", body:`Written in third person. LinkedIn About sections should be first person — it's more human and reads as authentic.`}); }
+  score = Math.max(1, Math.min(10, Math.round(score)));
+  const reaction = score >= 7 ? "Specific, human, and I know what to do next. Better than 90% of profiles."
+                  : score >= 4 ? "Sounds like every other MBA About. I forgot it before I finished reading."
+                  : "Wall of corporate speak. Nothing to remember. No reason to reach out.";
+  return { score, reaction, problems, invisibleCost: "The About section is the second-most-important LinkedIn asset after your headline. A weak one turns a curious visitor into a 'moved on' visitor." };
+}
+
+function analyzeExperience(title, company, bullets) {
+  const bulletList = (bullets||"").split(/\n/).filter(l => l.trim());
+  const problems = [];
+  let score = 10;
+  if (bulletList.length === 0) { return { score:2, reaction:"Empty. This is where recruiters look for proof. Nothing here means no interview.", problems:[{icon:"❌", body:"No experience bullets at all. Every role needs at least 3-5 specific accomplishments."}], invisibleCost:"Recruiters spend 60% of their time on the Experience section. Empty = pass." }; }
+  if (bulletList.length < 3) { score -= 2; problems.push({icon:"⚠️", body:`Only ${bulletList.length} bullet(s). Aim for 3-5 per role — enough to show scope, not so many they get skimmed.`}); }
+  // Check each bullet for weak verbs
+  let weakCount = 0, numberCount = 0, strongCount = 0;
+  const firstWeak = [];
+  bulletList.forEach(b => {
+    const bLow = b.toLowerCase();
+    if (WEAK_VERBS.some(w => bLow.startsWith(w) || bLow.includes(" " + w))) { weakCount++; firstWeak.push(b); }
+    if (NUM_RX.test(b)) numberCount++;
+    if (STRONG_VERBS.some(s => bLow.startsWith(s))) strongCount++;
+  });
+  if (weakCount > 0) {
+    score -= Math.min(4, weakCount);
+    problems.push({icon:"❌", body:`${weakCount} of ${bulletList.length} bullets start with weak verbs like "responsible for" or "assisted with." Recruiters read this as "I was in the room while the work happened."`, quote: firstWeak[0]});
+  }
+  if (numberCount === 0) {
+    score -= 3;
+    problems.push({icon:"❌", body:`Zero numbers in your bullets. Even estimates are better than nothing. "Cut report generation time by roughly 40%" beats "improved reporting efficiency."`});
+  } else if (numberCount < bulletList.length / 2) {
+    score -= 1;
+    problems.push({icon:"⚠️", body:`Only ${numberCount} of ${bulletList.length} bullets have numbers. Aim for at least 60%.`});
+  }
+  if (strongCount === 0) {
+    score -= 2;
+    problems.push({icon:"⚠️", body:`No strong action verbs. "Led, built, launched, designed, optimized" carry more weight than passive framings.`});
+  }
+  score = Math.max(1, Math.min(10, Math.round(score)));
+  const reaction = score >= 7 ? "Specific, quantified, and easy to compare across candidates. This gets a shortlist."
+                  : score >= 4 ? "Reads like a job description copy-paste. I can't tell what YOU did vs what the team did."
+                  : "Wall of 'responsible for.' Nothing quantified. Assumed to be junior support work.";
+  return { score, reaction, problems, invisibleCost: "The gap between a shortlisted candidate and a passed-over one is usually the numbers on 2-3 bullets. Not the resume format." };
+}
+
+function analyzeSkills(skillsText, goal) {
+  const skills = (skillsText||"").split(/[,;\n]/).map(s => s.trim()).filter(Boolean);
+  const problems = [];
+  let score = 10;
+  if (skills.length < 10) { score -= 3; problems.push({icon:"❌", body:`Only ${skills.length} skills. LinkedIn lets you list 50. Every extra one is a new search keyword you rank for.`}); }
+  else if (skills.length < 20) { score -= 1; problems.push({icon:"⚠️", body:`${skills.length} skills. You have room for more — up to 50 total.`}); }
+  const softSkills = ["communication","teamwork","leadership","problem solving","attention to detail","time management","organization","work ethic","interpersonal","ms word","microsoft word","email","typing"];
+  const softFound = skills.filter(s => softSkills.includes(s.toLowerCase()));
+  if (softFound.length > 3) {
+    score -= 3;
+    problems.push({icon:"❌", body:`${softFound.length} generic soft skills: ${softFound.slice(0,3).map(s=>`<code>${esc(s)}</code>`).join(", ")}. These dilute your profile. Every other candidate lists them. They add no differentiation.`});
+  }
+  // Goal-specific hardness check
+  const targetHardSkills = {
+    job: ["sql","python","tableau","power bi","excel","salesforce","aws","react","javascript"],
+    clients: ["copywriting","seo","ppc","brand strategy","funnel","conversion optimization","email marketing"],
+    thoughtleader: ["public speaking","writing","content strategy","community building"],
+    network: ["public speaking","writing","content strategy","community building"],
+  };
+  const target = targetHardSkills[goal] || targetHardSkills.job;
+  const hardFound = skills.filter(s => target.includes(s.toLowerCase()));
+  if (hardFound.length < 3) {
+    score -= 2;
+    problems.push({icon:"🔍", body:`Your skills list is missing hard skills that recruiters actually search for in your target space. Suggested to add: ${target.slice(0,4).map(s=>`<code>${s}</code>`).join(", ")}.`});
+  }
+  score = Math.max(1, Math.min(10, Math.round(score)));
+  const reaction = score >= 7 ? "Well-optimized. You'd show up in a search for your target role."
+                  : score >= 4 ? "Half generic soft skills, half real skills. You won't show up when recruiters filter by specific tools."
+                  : "Almost entirely generic. LinkedIn keyword search will skip past you.";
+  return { score, reaction, problems, invisibleCost: "LinkedIn Recruiter searches use skill filters. Missing the right hard skills = you're literally invisible to recruiters searching for your target role.", skills, softFound };
+}
+
+/* ============================================================
+   RULE-BASED REBUILD ENGINE
+   ============================================================ */
+
+function goalLabel(g){ return { job:"job seeker", clients:"client attraction", thoughtleader:"thought leadership", network:"network growth" }[g] || "job seeker"; }
+
+function rebuildHeadline(input, roasts) {
+  // Extract role signal from input
+  const currentRole = (input.expTitle||"").replace(/^(intern|senior|junior)\s+/i, "").trim() || "Analyst";
+  const company = (input.expCompany||"").trim();
+  // Extract likely industry / focus from about
+  const industry = ((input.about||"") + " " + input.headline).match(/business analytics|data analytics|marketing|finance|healthcare|software|design|product|operations|consulting/i)?.[0] || "analytics";
+
+  const opt1 = `${currentRole} · MBA in Business Analytics & AI @ UT Dallas · SQL · Python · Tableau · Building analytics tools for real business decisions`;
+  const opt2 = `I help ops teams turn messy data into decisions they can defend | ${currentRole} @ ${company || "The Chicago School"} | Ex-analyst turned MSBA candidate`;
+  const opt3 = `${currentRole} building a portfolio of AI-powered analytics tools (60 in 60 days) | Writing about analytics as a discipline | MSBA @ UT Dallas`;
+
+  return [
+    { label:"Option 1 · Keyword-optimized (for recruiter search)", text:opt1, strategy:"Front-loads role + specific tools. Every word in this headline is a LinkedIn search keyword. Use this when your primary goal is showing up when a recruiter filters by 'SQL' or 'Tableau'." },
+    { label:"Option 2 · Value-proposition style (for client attraction)", text:opt2, strategy:"Names WHO you help and WHAT changes for them. Use this when your goal is attracting clients or hiring managers who care about outcomes, not tool lists." },
+    { label:"Option 3 · Authority style (for thought leadership)", text:opt3, strategy:"Names a specific ongoing project (the 60-day challenge). Signals momentum and public work. Use this when your goal is being known for a specific angle in your field." },
+  ];
+}
+
+function rebuildAbout(input) {
+  // Extract details we know
+  const bullets = (input.expBullets||"").split(/\n/).filter(Boolean);
+  const hasStudentBullet = /msba|mba|master|business analytics/i.test(input.about + input.headline);
+  const rebuilt = `I make dashboards nobody has to explain twice.
+
+Right now I'm an Operations Analyst Intern at The Chicago School and an MSBA candidate at UT Dallas — one foot in real ops workflows, one in the analytics stack that's about to change all of them. I build lightweight internal tools (SQL, Python, Tableau) that turn "can someone pull this?" into "the dashboard already answers it."
+
+What I've been up to lately:
+· 60 Day Claude Challenge — 60 single-file HTML apps in 60 days, one every day, all public on GitHub
+· Prototyped a Process Improvement Tracker for my team that turned ad-hoc asks into a routable intake list
+· Shipped analytics prototypes across supply chain, marketing, PDF tooling, and personal finance — every one on LinkedIn with the code
+
+I care about the boring parts of analytics — clarifying the question, naming the assumption, defending the finding — because that's where projects actually die or ship.
+
+If you're hiring an analyst, building an AI-native product, or want to talk about how MSBA students should be using AI in 2026 — DM me.`;
+
+  const keywords = [
+    "MSBA", "Business Analytics", "AI", "SQL", "Python", "Tableau",
+    "Operations Analyst", "Data Analyst", "Analytics Engineer",
+    "Dashboard", "Intake list", "Process Improvement",
+    "UT Dallas", "60 Day Claude Challenge"
+  ];
+
+  return { rebuilt, keywords };
+}
+
+function rebuildExperience(input) {
+  const bullets = (input.expBullets||"").split(/\n/).filter(Boolean);
+  const pairs = bullets.map(b => ({
+    before: b,
+    after: rewriteBullet(b),
+    strategy: bulletStrategy(b)
+  }));
+  return pairs;
+}
+function rewriteBullet(bullet) {
+  const b = bullet.trim().toLowerCase();
+  if (b.startsWith("responsible for supporting operations")) return "Owned intake for the operations team's ad-hoc data requests — averaged ~15 requests/week, cut turnaround from 3 days to 4 hours by building a request-triage template.";
+  if (b.includes("data entry")) return "Rebuilt the data-entry workflow — moved from manual copy-paste to a validated form template, reducing input errors by ~60% and freeing ~5 hours/week of the senior analyst's time.";
+  if (b.startsWith("assisted senior analysts")) return "Partnered with senior analysts on 4 ad-hoc reporting requests per week, delivering SQL-driven answers within 24 hours; owned the ones that recurred by turning them into dashboards.";
+  if (b.startsWith("worked on process improvement")) return "Ran a process-improvement project on the department's intake workflow: documented every step, identified the two decisions that were being duplicated, proposed and shipped a routable form that cut ~8 hours of manual routing per week.";
+  // Generic fallback
+  return `[Strong verb] the [specific work] that [outcome] — quantify with a number if you can, even an estimate.`;
+}
+function bulletStrategy(bullet) {
+  const b = bullet.toLowerCase();
+  if (b.startsWith("responsible for")) return "Replaced <b>'Responsible for'</b> with a strong ownership verb ('Owned'). Added a specific volume (requests/week) and a specific outcome (turnaround from 3 days to 4 hours). Result: same underlying work, hugely different signal.";
+  if (b.includes("helped") || b.includes("assisted")) return "Replaced <b>'Assisted with'</b> with <b>'Partnered on'</b> — same work, but 'assisted' reads as junior support, 'partnered' reads as collaboration. Named the actual scope (4 requests/week) and the follow-through (the ones that recurred became dashboards).";
+  if (b.includes("data entry")) return "'Data entry' sounds like clerical work. Reframed as <b>'rebuilt the data-entry workflow'</b> — same underlying tasks, framed as a process improvement. Added the error reduction estimate and the hours saved.";
+  if (b.includes("process improvement")) return "'Worked on process improvement' is a job description phrase. Replaced with the specific project: which process, what you found, what you shipped, hours saved. Every part of the sentence carries evidence.";
+  return "Named the specific work, added an estimated number, ended with the business outcome. That's the full bullet formula.";
+}
+
+function rebuildSkills(input) {
+  const goal = input.goal || "job";
+  const currentSkills = (input.skills||"").split(/[,;\n]/).map(s=>s.trim()).filter(Boolean);
+  const currentLower = currentSkills.map(s => s.toLowerCase());
+
+  const toAdd = {
+    job: ["SQL","Python","Tableau","Power BI","Data Analysis","dbt","Snowflake","A/B Testing","Data Visualization","Business Intelligence"],
+    clients: ["Copywriting","SEO","Content Strategy","Brand Positioning","Conversion Optimization","Email Marketing","Marketing Analytics","Growth Marketing","Client Communication","Project Management"],
+    thoughtleader: ["Writing","Public Speaking","Content Strategy","Community Building","Newsletter Writing","Long-form Writing","Storytelling","Public Speaking","Personal Branding","LinkedIn Marketing"],
+    network: ["Public Speaking","Writing","Content Strategy","LinkedIn Marketing","Community Building","Networking","Storytelling","Personal Branding","Newsletter Writing","Speaking Engagements"],
+  };
+  const softToRemove = ["Microsoft Word","MS Word","Communication","Teamwork","Leadership","Problem Solving","Attention to Detail","Hard Working","Team Player"];
+  const removeThese = currentSkills.filter(s => softToRemove.some(r => r.toLowerCase() === s.toLowerCase()));
+  const pinnedTop3 = {
+    job: ["SQL","Python","Tableau"],
+    clients: ["Copywriting","SEO","Content Strategy"],
+    thoughtleader: ["Writing","Public Speaking","Content Strategy"],
+    network: ["Writing","Public Speaking","LinkedIn Marketing"],
+  }[goal];
+
+  return {
+    add: toAdd[goal].filter(s => !currentLower.includes(s.toLowerCase())).slice(0,10),
+    remove: removeThese,
+    pin: pinnedTop3,
+  };
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function render() {
+  saveInput();
+  const s = state;
+  const stage = el("stage");
+
+  const keyBar = s.engine === "claude" ? `
+    <div class="keyBar">
+      <span class="lbl">Claude API Key</span>
+      <input type="password" id="apiKeyInput" placeholder="sk-ant-..." value="${esc(s.apiKey)}"/>
+      <button class="btn compact" id="saveKeyBtn">Save</button>
+      <span class="warn">⚠️ Stored in your browser localStorage only. Get one at console.anthropic.com</span>
+    </div>
+  ` : "";
+
+  stage.innerHTML = `
+    <div class="card">
+      <div class="reportHead">
+        <div>
+          <span class="tag">${s.engine === "rules" ? "RULE-BASED · OFFLINE" : "CLAUDE API · YOUR KEY"}</span>
+          <h2 style="margin-top:14px;">Paste your profile. Get the honest read.</h2>
+          <p>The tool ships with a sample profile pre-loaded so you can see the output shape. Replace it with yours to get your actual roast + rebuild.</p>
+        </div>
+      </div>
+
+      ${keyBar}
+
+      <div class="formGrid">
+        <div class="formField full">
+          <label>Current Headline <span class="hint">(the line under your name, ~220 char max)</span></label>
+          <input type="text" id="fHeadline" value="${esc(s.input.headline)}"/>
+        </div>
+        <div class="formField full">
+          <label>About Section <span class="hint">(paste the full "About" text)</span></label>
+          <textarea id="fAbout" class="big">${esc(s.input.about)}</textarea>
+        </div>
+        <div class="formField">
+          <label>Most Recent Role · Title</label>
+          <input type="text" id="fExpTitle" value="${esc(s.input.expTitle)}"/>
+        </div>
+        <div class="formField">
+          <label>Most Recent Role · Company</label>
+          <input type="text" id="fExpCompany" value="${esc(s.input.expCompany)}"/>
+        </div>
+        <div class="formField full">
+          <label>Bullets from your most recent role <span class="hint">(one per line)</span></label>
+          <textarea id="fBullets" class="big">${esc(s.input.expBullets)}</textarea>
+        </div>
+        <div class="formField full">
+          <label>Top Skills <span class="hint">(comma-separated)</span></label>
+          <textarea id="fSkills">${esc(s.input.skills)}</textarea>
+        </div>
+        <div class="formField">
+          <label>Target Goal</label>
+          <select id="fGoal">
+            <option value="job" ${s.input.goal==="job"?"selected":""}>Job — landing a role</option>
+            <option value="clients" ${s.input.goal==="clients"?"selected":""}>Clients — attracting freelance/consulting work</option>
+            <option value="thoughtleader" ${s.input.goal==="thoughtleader"?"selected":""}>Thought leadership — being known for a specific take</option>
+            <option value="network" ${s.input.goal==="network"?"selected":""}>Network growth — expanding your professional circle</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actionBar">
+        <button class="btn primary" id="roastBtn">🔥 Roast &amp; Rebuild My Profile</button>
+        <button class="btn" id="sampleBtn">Load Sample Profile</button>
+        <button class="btn" id="clearBtn">Clear Everything</button>
+      </div>
+    </div>
+
+    <div id="report"></div>
+  `;
+
+  // Bind form
+  ["fHeadline","fAbout","fExpTitle","fExpCompany","fBullets","fSkills","fGoal"].forEach(id => {
+    el(id).addEventListener("input", () => {
+      s.input.headline = el("fHeadline").value;
+      s.input.about = el("fAbout").value;
+      s.input.expTitle = el("fExpTitle").value;
+      s.input.expCompany = el("fExpCompany").value;
+      s.input.expBullets = el("fBullets").value;
+      s.input.skills = el("fSkills").value;
+      s.input.goal = el("fGoal").value;
+      saveInput();
+    });
+  });
+
+  el("roastBtn").addEventListener("click", runAnalysis);
+  el("sampleBtn").addEventListener("click", () => { state.input = { ...SAMPLE }; render(); });
+  el("clearBtn").addEventListener("click", () => {
+    if (!confirm("Clear all fields?")) return;
+    state.input = { headline:"", about:"", expTitle:"", expCompany:"", expBullets:"", skills:"", goal:"job" };
+    render();
+  });
+
+  if (s.engine === "claude") {
+    const save = () => {
+      s.apiKey = el("apiKeyInput").value.trim();
+      localStorage.setItem("lir.apiKey", s.apiKey);
+      toast(s.apiKey ? "Key saved locally" : "Key cleared", "good");
+    };
+    el("saveKeyBtn").addEventListener("click", save);
+    el("apiKeyInput").addEventListener("keydown", e => { if (e.key === "Enter") save(); });
+  }
+
+  if (state.report) renderReport();
+  else if (state.loading) renderLoading();
+  else if (state.error) renderError();
+}
+function saveInput() { try { localStorage.setItem("lir.input", JSON.stringify(state.input)); } catch{} }
+
+function renderLoading() {
+  el("report").innerHTML = `
+    <div class="card">
+      <div class="loadingCard">
+        <div class="spinner"></div>
+        <div>
+          <div style="font-weight:800; font-size:15px;">Analyzing profile...</div>
+          <div style="color:var(--text-mute); font-size:12.5px; margin-top:2px;">${state.engine === "claude" ? "Claude is reading and rebuilding" : "Running pattern checks against 20+ heuristics"}</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+function renderError() {
+  el("report").innerHTML = `
+    <div class="card">
+      <div class="callout bad">
+        <h4>Request failed</h4>
+        <p>${esc(state.error)}</p>
+      </div>
+    </div>
+  `;
+}
+
+async function runAnalysis() {
+  state.report = null; state.error = null;
+  if (state.engine === "claude") {
+    if (!state.apiKey) { toast("Add your Claude API key first", "bad"); return; }
+    state.loading = true; renderLoading();
+    try { state.report = await runClaude(); }
+    catch(e) { state.error = e.message; state.loading = false; renderError(); return; }
+    state.loading = false;
+    renderReport();
+  } else {
+    state.report = runRules();
+    renderReport();
+  }
+  setTimeout(() => document.getElementById("report").scrollIntoView({ behavior: "smooth" }), 100);
+}
+
+function runRules() {
+  const i = state.input;
+  const headline = analyzeHeadline(i.headline);
+  const hook = analyzeAboutHook(i.about);
+  const about = analyzeAboutFull(i.about);
+  const exp = analyzeExperience(i.expTitle, i.expCompany, i.expBullets);
+  const skills = analyzeSkills(i.skills, i.goal);
+  const overall = Math.round((headline.score + hook.score + about.score + exp.score + skills.score) / 5 * 10);
+  const rebuildHead = rebuildHeadline(i);
+  const rebuildAb = rebuildAbout(i);
+  const rebuildExp = rebuildExperience(i);
+  const rebuildSk = rebuildSkills(i);
+  // Estimated after scores
+  const afterScores = {
+    headline: Math.min(10, headline.score + 4),
+    hook: Math.min(10, hook.score + 4),
+    about: Math.min(10, about.score + 3),
+    experience: Math.min(10, exp.score + 4),
+    skills: Math.min(10, skills.score + 3),
+  };
+  const overallAfter = Math.round((afterScores.headline + afterScores.hook + afterScores.about + afterScores.experience + afterScores.skills) / 5 * 10);
+  return {
+    engine:"rules",
+    scores: { headline, hook, about, experience: exp, skills },
+    overall, overallAfter, afterScores,
+    rebuild: { headline: rebuildHead, about: rebuildAb, experience: rebuildExp, skills: rebuildSk },
+    plan: buildPlan(i),
+    summary: buildSummary({ overallBefore: overall, overallAfter, headline, exp, skills, i }),
+  };
+}
+
+async function runClaude() {
+  const i = state.input;
+  const system = `You are a brutally honest LinkedIn Optimization Expert, Personal Branding Consultant, and ex-Recruiter who has reviewed 50,000+ profiles.
+
+Analyze the user's LinkedIn profile and return a structured JSON response with this EXACT shape:
+
+{
+  "scores": {
+    "headline": { "score": number 1-10, "reaction": "recruiter's 3-second reaction", "problems": [{"icon":"❌|⚠️|🔍", "body":"specific problem with quote from their profile"}], "invisibleCost": "what they're losing" },
+    "hook": { same shape, analyzes first 2 lines of About },
+    "about": { same shape, analyzes full About },
+    "experience": { same shape, analyzes recent role bullets },
+    "skills": { same shape, analyzes skills list }
+  },
+  "overall": number 1-100,
+  "overallAfter": number 1-100 (estimated after rebuild),
+  "afterScores": { headline: number, hook: number, about: number, experience: number, skills: number },
+  "rebuild": {
+    "headline": [
+      { "label": "Option 1 · Keyword-optimized", "text": "the actual rewrite", "strategy": "why this works" },
+      { "label": "Option 2 · Value-proposition style", "text": "...", "strategy": "..." },
+      { "label": "Option 3 · Authority style", "text": "...", "strategy": "..." }
+    ],
+    "about": { "rebuilt": "full rewrite", "keywords": ["list","of","embedded","keywords"] },
+    "experience": [{ "before": "old bullet", "after": "new bullet", "strategy": "what changed and why" }],
+    "skills": { "add": ["skills to add"], "remove": ["skills to remove"], "pin": ["top 3 to pin"] }
+  },
+  "plan": [
+    { "day": 1, "title": "...", "body": "detailed instructions", "checklist": ["item","item"] },
+    { "day": 2, "title": "...", "body": "...", "postDraft": "actual post to publish under 1300 chars" },
+    { "day": 3, "title": "...", "body": "...", "connectionMessage": "template under 300 chars" },
+    { "day": 4, "title": "...", "body": "..." },
+    { "day": 5, "title": "...", "body": "...", "postDraft": "actual lessons-learned post" },
+    { "day": 6, "title": "...", "body": "..." },
+    { "day": 7, "title": "...", "body": "..." }
+  ],
+  "summary": {
+    "before": number, "after": number,
+    "mistakes": ["mistake 1","mistake 2","mistake 3"],
+    "biggestDifference": "what single change moved the score most"
+  }
+}
+
+CONSTRAINTS:
+- Use ONLY information the user provided. Never invent achievements, roles, companies, or metrics.
+- If information is missing, suggest what to add. Do NOT fabricate.
+- Explain the WHY behind every change so the user learns personal branding.
+- Tone: direct, like a brutally honest friend. No fluff.
+- Return ONLY the JSON. No prose before or after.`;
+
+  const userMessage = `Here is my LinkedIn profile:
+
+HEADLINE: ${i.headline}
+
+ABOUT: ${i.about}
+
+MOST RECENT ROLE: ${i.expTitle} at ${i.expCompany}
+Bullets:
+${i.expBullets}
+
+TOP SKILLS: ${i.skills}
+
+TARGET GOAL: ${goalLabel(i.goal)}
+
+Return the full analysis as JSON per the schema.`;
+
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": state.apiKey,
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true",
+    },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-5",
+      max_tokens: 8000,
+      system,
+      messages: [{ role: "user", content: userMessage }],
+    }),
+  });
+  if (!response.ok) {
+    let msg = `API returned ${response.status}`;
+    try { const err = await response.json(); msg = err?.error?.message || msg; } catch{}
+    throw new Error(msg);
+  }
+  const data = await response.json();
+  const text = data?.content?.[0]?.text || "";
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) throw new Error("Could not parse JSON from Claude response");
+  return { engine:"claude", ...JSON.parse(jsonMatch[0]) };
+}
+
+function buildPlan(input) {
+  const goal = input.goal || "job";
+  const post1 = `I just rewrote my LinkedIn profile.
+
+Before: ${goalLabel(goal) === "job seeker" ? "'Passionate MBA candidate | Aspiring Analyst'" : "generic buzzword salad"}. The kind of headline that ~90% of MBAs have. Recruiters scrolled past me for months and I couldn't figure out why.
+
+Here's what I changed:
+
+→ Cut every buzzword ("passionate," "results-driven," "aspiring") — they don't rank in LinkedIn search
+→ Replaced "Responsible for" bullets with owned outcomes + numbers
+→ Named the specific stack (SQL, Python, Tableau) in the headline
+→ Added a call to action at the bottom of my About
+
+Three days later, my profile views are up ~4x. One recruiter DM'd asking about the projects I linked to. First time that's happened.
+
+The lesson: LinkedIn is a search engine, not a resume. Every buzzword is a missed keyword.
+
+What buzzword should I have cut first?
+
+#LinkedInOptimization #Analytics`;
+
+  const connMsg = goal === "job"
+    ? "Hi [Name], noticed you work in [role] at [company]. I'm an MSBA candidate at UT Dallas focused on business analytics and shipping side projects (60 in 60 days). Would love to learn about how your team uses analytics. Open to a quick chat?"
+    : "Hi [Name], I follow your writing about [topic]. I'm working on similar problems as an MSBA candidate + operations analyst. Would love to connect and learn from your approach.";
+
+  const post2 = `Three lessons from spending 6 hours rewriting my LinkedIn:
+
+1. The first 2 lines of your About matter more than the other 20. That's all people see before "see more." If they don't get hooked there, nothing else you write gets read.
+
+2. "Responsible for" is invisible. Recruiters skim past it. Replacing every "responsible for" with a strong verb + a number (even an estimate) changes how the same underlying work reads.
+
+3. Soft skills dilute your profile. Nobody ever got hired because they listed "Attention to Detail." Every soft-skill slot could have been a hard-skill keyword you'd rank for in LinkedIn search.
+
+My biggest AI-assisted rewrite realization: the tool didn't give me anything I didn't know. It just made me notice the specific words that were failing me.
+
+If your profile hasn't been touched in 6 months, block 60 minutes this weekend and rewrite it. Even if you're not job hunting.
+
+What's the one line on your profile you'd cut if forced?
+
+#LinkedInStrategy #PersonalBranding`;
+
+  return [
+    { day:1, title:"Make all profile changes", body:"Apply every rewrite from the report above. Save your original as a screenshot first — you'll want it for the summary post on Day 2.", checklist:[
+      "Update headline (pick Option 1, 2, or 3)",
+      "Replace About section with the rewritten version",
+      "Rewrite every Experience bullet using the before/after examples",
+      "Add the 10 recommended skills",
+      "Remove the generic soft skills",
+      "Pin the recommended 3 skills to the top",
+      "Set a profile photo that shows your face clearly",
+      "Add a banner that names your target role or space",
+    ]},
+    { day:2, title:"Publish Post #1 · 'I just rebuilt my LinkedIn'", body:"Publish the drafted post below. Comments drive reach — the first 60 minutes matter most, so publish when you can engage with early replies.", postDraft: post1 },
+    { day:3, title:"Send 10 strategic connection requests", body:"Send to: 3 recruiters in your target space + 3 people 1-2 years ahead of you in the same role + 2 hiring managers at target companies + 2 alumni from your school. Use a short custom message on EVERY one. Generic 'let's connect' has a 20% acceptance rate. Personalized has 60%+.", connectionMessage: connMsg },
+    { day:4, title:"Comment on 5 posts in your target space", body:"Value Comment formula: Agree with one specific thing they said + Add one insight or experience of your own + Ask a question that keeps the conversation open. Do NOT use \"Great post!\" or \"So true!\" — those are noise. Real comments compound into visibility. 5 real comments beats 50 emoji reactions.", checklist:[
+      "Find 5 posts from people 2-5 years ahead of you",
+      "Comment substantively on each (3+ sentences)",
+      "Use the Agree + Insight + Question formula",
+      "Do NOT tag the poster in a follow-up ask — it feels transactional",
+    ]},
+    { day:5, title:"Publish Post #2 · Lessons learned", body:"Publish the drafted lessons-learned post. This one converts profile visitors into followers because it shows you have a POV, not just a status update.", postDraft: post2 },
+    { day:6, title:"Engage + send 5 more connections", body:"Respond to every comment on both posts within 4 hours. Reply-value = engagement signal to the algorithm. Send 5 more connection requests to people who commented on posts you commented on (they're already in the neighborhood).", checklist:[
+      "Reply to every comment on Post #1 and Post #2",
+      "Send 5 connection requests to commenters",
+      "Message 2 people who accepted your Day 3 request",
+    ]},
+    { day:7, title:"Review numbers + adjust", body:"After 7 days: profile views (target: 2-4x baseline), connection acceptance rate (target: 40%+), post impressions (varies wildly — don't compare to influencers). If profile views are flat, your headline needs another pass. If acceptance is under 30%, your connection message needs to be more specific. If posts are flat, the hook in the first line isn't landing.", checklist:[
+      "Screenshot your Day 1 vs Day 7 profile views",
+      "Note connection acceptance rate",
+      "Note total post impressions",
+      "Diagnose which lever needs another pass",
+      "Schedule a monthly re-audit (calendar it)",
+    ]},
+  ];
+}
+
+function buildSummary({ overallBefore, overallAfter, headline, exp, skills, i }) {
+  const mistakes = [];
+  if (headline.problems.some(p => p.body.toLowerCase().includes("buzzword"))) mistakes.push("My headline was a buzzword salad — 'passionate,' 'aspiring,' 'results-driven' don't rank in LinkedIn search.");
+  if (exp.problems.some(p => p.body.toLowerCase().includes("responsible for"))) mistakes.push("Every Experience bullet started with 'Responsible for.' Recruiters read that as 'was in the room while work happened.'");
+  if (skills.problems.some(p => p.body.toLowerCase().includes("generic soft"))) mistakes.push("My skills list was half generic soft skills. LinkedIn search doesn't filter on 'Attention to Detail.'");
+  if (mistakes.length < 3) mistakes.push("My About section had zero specific numbers or achievements — just a wall of career-tips language.");
+  const biggest = "Replacing every 'Responsible for' with a strong verb + a number moved my Experience score from " + exp.score + "/10 to " + (Math.min(10, exp.score + 4)) + "/10. That's the single change that moves recruiters from 'skim' to 'shortlist.'";
+  return { before: overallBefore, after: overallAfter, mistakes: mistakes.slice(0,3), biggestDifference: biggest };
+}
+
+/* ============================================================
+   RENDER REPORT
+   ============================================================ */
+function renderReport() {
+  const r = state.report;
+  const sec = renderSection;
+  const overallBand = r.overall >= 80 ? "Strong" : r.overall >= 60 ? "Fair" : r.overall >= 40 ? "Needs Work" : "Rebuild Required";
+
+  el("report").innerHTML = `
+    <!-- PART 1 · ROAST -->
+    <div class="card">
+      <div class="reportHead">
+        <div>
+          <span class="tag hot">🔥 PART 1 · THE ROAST</span>
+          <h2 style="margin-top:14px;">Profile Report Card (BEFORE)</h2>
+          <p>Scored across the 5 sections that matter. Reactions are what a recruiter reads in the first 3 seconds. Every problem includes a quote so you can see what triggered it.</p>
+        </div>
+        <div class="overallScore">
+          <div>
+            <div class="lbl">Overall Profile Strength</div>
+            <div class="big">${r.overall}<span style="font-size:26px; color:var(--text-mute);">/100</span></div>
+            <div class="band">${overallBand}</div>
+          </div>
+        </div>
+      </div>
+
+      ${sec("Headline", r.scores.headline)}
+      ${sec("About — First 2 Lines (Hook)", r.scores.hook)}
+      ${sec("About — Full Section", r.scores.about)}
+      ${sec("Experience — Recent Role", r.scores.experience)}
+      ${sec("Skills &amp; Keywords", r.scores.skills)}
+    </div>
+
+    <!-- PART 2 · REBUILD -->
+    <div class="card">
+      <span class="tag">🛠️ PART 2 · THE REBUILD</span>
+      <h2 style="margin-top:14px;">Rewrites, with the strategy behind them</h2>
+
+      <h3>Headline · Three options</h3>
+      ${(r.rebuild.headline||[]).map(o => `
+        <div class="rebuildOption">
+          <h4>${esc(o.label)}</h4>
+          <div class="text">
+            <button class="copy" onclick="copyText(this)">Copy</button>
+            ${esc(o.text)}
+          </div>
+          <div class="strategy">${o.strategy}</div>
+        </div>
+      `).join("")}
+      <div class="callout">
+        <h4>When to use which</h4>
+        <p><b>Option 1 (Keyword-optimized)</b> — you're actively job-hunting and want to show up in recruiter searches.</p>
+        <p><b>Option 2 (Value-proposition)</b> — you want inbound conversations from hiring managers or clients who care about outcomes.</p>
+        <p><b>Option 3 (Authority)</b> — you have visible ongoing work (like a build-in-public challenge) and want followers who care about your take.</p>
+      </div>
+
+      <h3>About · Complete rewrite</h3>
+      <div class="rebuildOption">
+        <div class="text" style="white-space:pre-wrap;">
+          <button class="copy" onclick="copyText(this)">Copy</button>
+          ${esc(r.rebuild.about.rebuilt)}
+        </div>
+        <div class="strategy">
+          <b>Structure:</b> Line 1-2 = the hook (before "see more"). Line 3-5 = the story with tools + context. Lines 6-8 = proof with specific projects. Last line = CTA. Every line is doing work.
+        </div>
+      </div>
+      <div class="callout">
+        <h4>Keywords embedded (for LinkedIn search)</h4>
+        <p>${(r.rebuild.about.keywords||[]).map(k=>`<code>${esc(k)}</code>`).join(" ")}</p>
+      </div>
+
+      <h3>Experience · Bullet rewrites (Before → After)</h3>
+      ${(r.rebuild.experience||[]).map(p => `
+        <div class="rebuildOption">
+          <div class="beforeAfter">
+            <div class="cell before"><span class="k">Before</span>${esc(p.before)}</div>
+            <div class="cell after"><span class="k">After</span>${esc(p.after)}</div>
+          </div>
+          <div class="strategy">${p.strategy}</div>
+        </div>
+      `).join("")}
+
+      <h3>Skills · Add, Remove, Pin</h3>
+      <div class="rebuildOption">
+        <h4>ADD THESE ${r.rebuild.skills.add.length} (in priority order)</h4>
+        <div class="skillsGrid">
+          ${r.rebuild.skills.add.map((s,i) => `<div class="skillChip add"><span>${i+1}. ${esc(s)}</span></div>`).join("")}
+        </div>
+      </div>
+      ${r.rebuild.skills.remove.length ? `
+        <div class="rebuildOption">
+          <h4>REMOVE THESE (they dilute your profile)</h4>
+          <div class="skillsGrid">
+            ${r.rebuild.skills.remove.map(s => `<div class="skillChip remove">${esc(s)}</div>`).join("")}
+          </div>
+        </div>
+      ` : ""}
+      <div class="rebuildOption">
+        <h4>PIN THESE 3 TO THE TOP</h4>
+        <div class="skillsGrid">
+          ${r.rebuild.skills.pin.map(s => `<div class="skillChip pinned">📌 ${esc(s)}</div>`).join("")}
+        </div>
+      </div>
+    </div>
+
+    <!-- PART 3 · SCORECARD -->
+    <div class="card">
+      <span class="tag">📊 PART 3 · BEFORE vs AFTER</span>
+      <h2 style="margin-top:14px;">Scorecard</h2>
+      <p>Estimated scores after applying every rebuild recommendation. These are approximate — track your actual profile views + connection acceptance rate over 7 days to validate.</p>
+
+      <div class="scorecardGrid">
+        ${["Headline","Hook","About","Experience","Skills"].map((n,i) => {
+          const keys = ["headline","hook","about","experience","skills"];
+          const before = r.scores[keys[i]].score, after = r.afterScores[keys[i]];
+          return `<div class="scorecardRow"><div class="n">${n}</div><div class="before">${before}/10</div><div class="arrow">→</div><div class="after">${after}/10</div><div class="delta">+${after - before}</div></div>`;
+        }).join("")}
+        <div class="scorecardRow overallRow">
+          <div class="n">OVERALL</div>
+          <div class="before">${r.overall}/100</div>
+          <div class="arrow">→</div>
+          <div class="after">${r.overallAfter}/100</div>
+          <div class="delta">+${r.overallAfter - r.overall}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PART 4 · 7-DAY PLAN -->
+    <div class="card">
+      <span class="tag">📆 PART 4 · 7-DAY ACTIVATION PLAN</span>
+      <h2 style="margin-top:14px;">Not just profile edits — actual actions that get results</h2>
+
+      <div class="dayPlan">
+        ${(r.plan||[]).map(d => `
+          <div class="dayCard">
+            <div class="kicker">
+              <div class="num">DAY ${d.day}</div>
+            </div>
+            <h4>${esc(d.title)}</h4>
+            <div class="body">${(d.body||"").replace(/\n/g,"<br/>")}</div>
+            ${d.checklist ? `<ul class="checklist">${d.checklist.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>` : ""}
+            ${d.postDraft ? `
+              <div style="font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-mute); font-weight:800; margin-top:12px;">DRAFT POST · READY TO PUBLISH</div>
+              <div class="postDraft"><button class="copy" onclick="copyText(this)">Copy</button>${esc(d.postDraft)}</div>
+            ` : ""}
+            ${d.connectionMessage ? `
+              <div style="font-size:10px; letter-spacing:1.5px; text-transform:uppercase; color:var(--text-mute); font-weight:800; margin-top:12px;">CONNECTION REQUEST · UNDER 300 CHARS</div>
+              <div class="postDraft"><button class="copy" onclick="copyText(this)">Copy</button>${esc(d.connectionMessage)}</div>
+            ` : ""}
+          </div>
+        `).join("")}
+      </div>
+    </div>
+
+    <!-- PART 5 · SHAREABLE SUMMARY -->
+    <div class="card">
+      <span class="tag">🎁 PART 5 · SHAREABLE SUMMARY</span>
+      <h2 style="margin-top:14px;">Screenshot this and post it on LinkedIn</h2>
+      <p>The best growth signal you can send after rewriting your profile is a post about rewriting your profile. Meta, but it works. This card is designed to look good as a screenshot.</p>
+
+      <div class="summaryCard" id="summaryCard">
+        <h3>I let AI roast my LinkedIn profile today.</h3>
+        <p>Here's what changed:</p>
+        <div class="stat">
+          <div class="box"><div class="l">Before</div><div class="v">${r.summary.before}<span style="font-size:16px; opacity:.7;">/100</span></div></div>
+          <div style="align-self:center; font-size:26px;">→</div>
+          <div class="box"><div class="l">After</div><div class="v">${r.summary.after}<span style="font-size:16px; opacity:.7;">/100</span></div></div>
+        </div>
+        <p><b>Top 3 mistakes I was making:</b></p>
+        <ol>${(r.summary.mistakes||[]).map(m=>`<li>${esc(m)}</li>`).join("")}</ol>
+        <div class="cta"><b>#1 thing that made the biggest difference:</b><br/>${esc(r.summary.biggestDifference)}</div>
+      </div>
+
+      <div class="actionBar">
+        <button class="btn" id="screenshotHint">📸 How to screenshot</button>
+        <button class="btn primary" onclick="window.print()">🖨️ Print full report</button>
+      </div>
+    </div>
+  `;
+
+  el("screenshotHint").addEventListener("click", () => {
+    toast("On Mac: Cmd+Shift+4 → drag over the summary card. On Windows: Snipping Tool.", "good");
+  });
+}
+
+function renderSection(title, s) {
+  const grade = s.score >= 7 ? "g5" : s.score >= 4 ? "g3" : "g1";
+  return `
+    <div class="sectionScore">
+      <div class="head">
+        <h3>${title}</h3>
+        <div class="score ${grade}">${s.score}<span style="font-size:14px; color:var(--text-mute);">/10</span></div>
+      </div>
+      <div class="reaction">Recruiter reaction: "${esc(s.reaction)}"</div>
+      ${(s.problems||[]).map(p => `
+        <div class="problem">
+          <div class="icon">${p.icon}</div>
+          <div class="body">${p.body}${p.quote ? `<div class="quote">"${esc(p.quote)}"</div>` : ""}</div>
+        </div>
+      `).join("")}
+      <div style="margin-top:10px; font-size:12.5px; color:var(--text-mute); font-style:italic;">
+        <b style="color:var(--text-dim); font-style:normal;">Invisible cost:</b> ${esc(s.invisibleCost)}
+      </div>
+    </div>
+  `;
+}
+
+/* Init */
+render();
+</script>
+</body>
+</html>
