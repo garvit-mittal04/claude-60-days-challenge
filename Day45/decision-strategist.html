@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Decision Report — 60-Day Challenge vs. Full-Time Applications · Day 45</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-main:#0f0f14;
+  --bg-card:#1a1a24;
+  --bg-card-alt:#1e1e2e;
+  --text-primary:#f0f0f5;
+  --text-secondary:#8888a0;
+  --accent-green:#34d399;
+  --accent-red:#f87171;
+  --accent-blue:#60a5fa;
+  --accent-gold:#fbbf24;
+  --accent-purple:#a78bfa;
+  --border-subtle:rgba(255,255,255,0.06);
+}
+* { box-sizing:border-box; -webkit-font-smoothing:antialiased; }
+html { scroll-behavior:smooth; }
+body {
+  margin:0; padding:0;
+  background:var(--bg-main); color:var(--text-primary);
+  font-family:'Inter', 'Segoe UI', system-ui, sans-serif;
+  font-size:15px; line-height:1.7;
+}
+.container { max-width:720px; margin:0 auto; padding:32px 20px 60px; }
+
+/* Header */
+header { padding:20px 0 24px; border-bottom:1px solid var(--border-subtle); margin-bottom:32px; }
+header .date { font-size:12px; color:var(--text-secondary); letter-spacing:1.5px; font-weight:500; text-transform:uppercase; }
+header h1 { margin:8px 0 6px; font-size:28px; font-weight:800; letter-spacing:-.4px; }
+header p { margin:0; font-size:16px; color:var(--text-secondary); line-height:1.55; }
+.headerBar { height:3px; background:linear-gradient(90deg, var(--accent-blue), var(--accent-purple), var(--accent-gold)); margin-top:20px; border-radius:2px; }
+
+/* Cards */
+.card {
+  background:var(--bg-card);
+  border:1px solid var(--border-subtle);
+  border-left:4px solid var(--accent-blue);
+  border-radius:16px; padding:28px 30px; margin-bottom:24px;
+  box-shadow:0 4px 24px rgba(0,0,0,0.3);
+  transition: transform 0.2s ease;
+}
+.card:hover { transform:translateY(-2px); }
+.card h2 {
+  margin:0 0 14px; font-size:20px; font-weight:700; text-transform:uppercase; letter-spacing:1px;
+}
+.card p { margin:6px 0; }
+.card p b, .card p strong { color:var(--text-primary); font-weight:700; }
+.card ul, .card ol { padding-left:22px; margin:8px 0; }
+.card ul li, .card ol li { margin:6px 0; color:var(--text-primary); }
+.card .lbl { font-size:12px; font-weight:600; color:var(--text-secondary); text-transform:uppercase; letter-spacing:1.2px; margin-top:12px; margin-bottom:4px; display:block; }
+.card code { font-family:ui-monospace, "SF Mono", Menlo, monospace; background:rgba(255,255,255,0.04); padding:1px 6px; border-radius:5px; font-size:13px; color:var(--accent-blue); }
+
+/* Section accents */
+.card.s1 { border-left-color:var(--accent-blue); }
+.card.s1 h2 { color:var(--accent-blue); }
+.card.s2 { border-left-color:var(--accent-green); }
+.card.s2 h2 { color:var(--accent-green); }
+.card.s3 { border-left-color:var(--accent-purple); }
+.card.s3 h2 { color:var(--accent-purple); }
+.card.s4 { border-left-color:var(--accent-blue); }
+.card.s4 h2 { color:var(--accent-blue); }
+.card.s5 { border-left-color:var(--accent-red); }
+.card.s5 h2 { color:var(--accent-red); }
+.card.s6 { border-left-color:var(--accent-green); }
+.card.s6 h2 { color:var(--accent-green); }
+.card.s7 { border-left-color:var(--accent-gold); background:var(--bg-card-alt); padding:36px 40px; box-shadow:0 0 20px rgba(251,191,36,0.15), 0 4px 24px rgba(0,0,0,0.3); }
+.card.s7 h2 { color:var(--accent-gold); }
+.card.s8 { border-left-color:var(--accent-gold); }
+.card.s8 h2 { color:var(--accent-gold); }
+
+/* Option cards inside Section 2 */
+.optionCard {
+  background:var(--bg-card-alt); border:1px solid var(--border-subtle);
+  border-radius:12px; padding:20px; margin:14px 0;
+}
+.optionCard h3 { margin:0 0 12px; font-size:17px; font-weight:700; color:var(--text-primary); }
+.optionCard.A h3 { color:var(--accent-blue); }
+.optionCard.B h3 { color:var(--accent-green); }
+.optionCard.C h3 { color:var(--accent-purple); }
+.optionCard .cross { display:block; font-size:11px; color:var(--text-secondary); text-transform:uppercase; letter-spacing:1.5px; font-weight:600; margin-top:12px; margin-bottom:4px; }
+.optionCard p { margin:4px 0; font-size:14px; }
+.optionCard .best {
+  background:rgba(255,255,255,0.03); border-left:2px solid var(--accent-gold);
+  padding:8px 12px; margin-top:14px; border-radius:6px; font-size:13.5px; color:var(--text-primary);
+}
+.optionCard .best b { color:var(--accent-gold); }
+
+/* Assumption / Bias chips */
+.chipGrid { display:grid; grid-template-columns:1fr; gap:10px; margin-top:8px; }
+.chip {
+  background:var(--bg-card-alt); border-left:3px solid var(--accent-purple);
+  padding:12px 14px; border-radius:8px; font-size:14px;
+}
+.chip .k { font-size:11px; color:var(--accent-purple); text-transform:uppercase; letter-spacing:1.2px; font-weight:700; margin-bottom:4px; display:block; }
+
+/* Decision Matrix */
+.matrix { margin-top:14px; }
+.matrixHead { display:grid; grid-template-columns:40% 1fr 1fr; gap:12px; margin-bottom:12px; }
+@media (max-width:600px) { .matrixHead { grid-template-columns:1fr; } }
+.matrixHead .opt {
+  padding:8px 12px; border-radius:8px; font-size:12px; font-weight:700;
+  text-transform:uppercase; letter-spacing:1px; text-align:center;
+}
+.matrixHead .opt.A { background:rgba(96,165,250,0.15); color:var(--accent-blue); }
+.matrixHead .opt.B { background:rgba(52,211,153,0.15); color:var(--accent-green); }
+.matrixHead .opt.C { background:rgba(167,139,250,0.15); color:var(--accent-purple); }
+.matrixRow { display:grid; grid-template-columns:40% 1fr 1fr; gap:12px; align-items:center; margin:8px 0; }
+@media (max-width:600px) {
+  .matrixRow { grid-template-columns:1fr; gap:4px; }
+  .matrixRow .lbl { margin-bottom:2px; }
+}
+.matrixRow .lbl { font-size:13px; color:var(--text-primary); font-weight:500; }
+.matrixRow .bars { display:contents; }
+@media (max-width:600px) { .matrixRow .bars { display:grid; grid-template-columns:1fr 1fr; gap:8px; } }
+.barTrack {
+  height:28px; background:rgba(255,255,255,0.05); border-radius:8px; overflow:hidden; position:relative;
+}
+.barFill {
+  height:100%; border-radius:8px;
+  display:flex; align-items:center; justify-content:flex-end;
+  padding-right:10px;
+  font-size:13px; font-weight:700; color:#fff;
+  width:0%;
+  animation: growBar 0.8s cubic-bezier(.2,.8,.2,1) forwards;
+}
+.barFill.A { background:linear-gradient(90deg, #60a5fa, #3b82f6); }
+.barFill.B { background:linear-gradient(90deg, #34d399, #10b981); }
+.barFill.C { background:linear-gradient(90deg, #a78bfa, #8b5cf6); }
+@keyframes growBar { from { width:0%; } }
+
+.matrixTotal {
+  display:grid; grid-template-columns:40% 1fr 1fr; gap:12px; align-items:center;
+  margin-top:16px; padding:14px 0 6px; border-top:1px solid var(--border-subtle);
+  font-size:16px; font-weight:800;
+}
+@media (max-width:600px) { .matrixTotal { grid-template-columns:1fr; text-align:left; } }
+.matrixTotal .lbl { color:var(--text-primary); text-transform:uppercase; letter-spacing:1px; }
+.matrixTotal .totalBox { padding:10px 12px; border-radius:8px; text-align:center; font-family:ui-monospace, "SF Mono", Menlo, monospace; }
+.matrixTotal .totalBox.A { background:rgba(96,165,250,0.15); color:var(--accent-blue); }
+.matrixTotal .totalBox.B { background:rgba(52,211,153,0.15); color:var(--accent-green); }
+.matrixTotal .totalBox.C { background:rgba(167,139,250,0.15); color:var(--accent-purple); }
+.matrixTotal .totalBox.winner { box-shadow:0 0 20px rgba(251,191,36,0.35); border:1.5px solid var(--accent-gold); }
+
+/* Premortem */
+.premortem { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:12px; }
+@media (max-width:600px) { .premortem { grid-template-columns:1fr; } }
+.pmCard {
+  background:var(--bg-card-alt); border:1px solid var(--border-subtle);
+  border-top:3px solid var(--accent-red);
+  border-radius:10px; padding:16px 18px;
+}
+.pmCard h3 { margin:0 0 8px; font-size:14px; color:var(--accent-red); font-weight:700; letter-spacing:.5px; }
+.pmCard ul { padding-left:20px; margin:6px 0; }
+.pmCard li { font-size:13.5px; margin:4px 0; }
+.pmCard .warn { background:rgba(248,113,113,0.10); border-left:2px solid var(--accent-red); padding:6px 10px; border-radius:6px; font-size:13px; margin-top:10px; }
+.pmCard .warn b { color:var(--accent-red); }
+.pmCard .prev { background:rgba(52,211,153,0.10); border-left:2px solid var(--accent-green); padding:6px 10px; border-radius:6px; font-size:13px; margin-top:8px; }
+.pmCard .prev b { color:var(--accent-green); }
+
+/* 7-day plan */
+.dayGrid { display:grid; gap:8px; margin-top:8px; }
+.dayRow {
+  display:grid; grid-template-columns:100px 1fr; gap:12px; align-items:center;
+  background:var(--bg-card-alt); border:1px solid var(--border-subtle);
+  border-radius:8px; padding:10px 14px;
+}
+@media (max-width:600px) { .dayRow { grid-template-columns:1fr; } }
+.dayRow .day {
+  font-size:12px; font-weight:700; color:var(--accent-green); text-transform:uppercase; letter-spacing:1px;
+}
+.dayRow .action { font-size:14px; color:var(--text-primary); }
+
+/* Verdict */
+.verdict .winner {
+  font-size:32px; font-weight:800; color:var(--accent-gold);
+  margin:6px 0 12px; line-height:1.15;
+}
+.verdict p { margin:8px 0; font-size:15.5px; }
+.verdict .flip {
+  background:rgba(255,255,255,0.03); border-left:2px solid var(--accent-blue);
+  padding:10px 14px; margin-top:14px; border-radius:6px; font-size:14px;
+}
+.verdict .flip b { color:var(--accent-blue); }
+.verdict .hardTruth {
+  font-style:italic; color:var(--text-secondary); font-size:14.5px;
+  margin-top:18px; padding-top:14px; border-top:1px solid var(--border-subtle);
+}
+
+/* Shareable cards */
+.shareGrid { display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin-top:14px; }
+@media (max-width:600px) { .shareGrid { grid-template-columns:1fr; } }
+.shareCard {
+  background:var(--bg-card-alt); border-radius:12px; padding:16px;
+  border:1px solid var(--border-subtle); display:flex; flex-direction:column;
+  min-height:220px;
+}
+.shareCard h3 { margin:0 0 8px; font-size:12px; text-transform:uppercase; letter-spacing:1.5px; color:var(--accent-gold); font-weight:700; }
+.shareCard .body { flex:1; font-size:13px; line-height:1.65; }
+.shareCard .body b { color:var(--text-primary); font-weight:700; }
+.shareCard .totals { margin-top:8px; }
+.shareCard .totals div { display:flex; justify-content:space-between; align-items:center; padding:5px 0; font-size:13px; border-bottom:1px dashed var(--border-subtle); }
+.shareCard .totals div:last-child { border-bottom:none; }
+.shareCard .totals .n { font-family:ui-monospace, "SF Mono", Menlo, monospace; font-weight:700; }
+.shareCard .totals .winner { color:var(--accent-gold); }
+.shareCard .watermark { font-size:10px; color:var(--text-secondary); margin-top:12px; padding-top:8px; border-top:1px solid var(--border-subtle); letter-spacing:.5px; }
+.shareCard .verdict-name { font-size:18px; font-weight:800; color:var(--accent-gold); line-height:1.2; margin:6px 0 8px; }
+
+/* Footer */
+footer { text-align:center; color:var(--text-secondary); font-size:12px; margin-top:40px; }
+
+@media (max-width:600px) {
+  .card { padding:22px; border-radius:14px; }
+  .card h2 { font-size:18px; }
+  header h1 { font-size:24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .barFill { animation:none; width:var(--targetWidth); }
+  .card { transition:none; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="date">DAY 45 · #60DAYCLAUDECHALLENGE · TUE 4:22 PM</div>
+    <h1>DECISION REPORT</h1>
+    <p>Should I finish the 60-Day Challenge at current pace, pause it and go all-in on applications, or compress the remaining days?</p>
+    <div class="headerBar"></div>
+  </header>
+
+  <!-- ============ SECTION 1 · THE REAL DECISION ============ -->
+  <div class="card s1">
+    <h2>01 · The Real Decision</h2>
+    <p>You're 45 days into a public 60-day build challenge. The <b>real</b> question isn't "which is the smarter allocation of my next 15 days" — it's <b>whether you trust the compounding of visible work over the certainty of applying more</b>.</p>
+    <p><b>The trade-off:</b> Deep-work portfolio + brand momentum (challenge) vs. shipped applications and interview reps (job hunt), with an F-1 timeline that turns "later" into "gone."</p>
+    <p><b>Why it's hard:</b> Both feel productive. Neither has a scoreboard yet. The one that goes unfinished will be the one you regret — but you can only afford to finish one all the way.</p>
+  </div>
+
+  <!-- ============ SECTION 2 · THE CASE FOR EACH OPTION ============ -->
+  <div class="card s2">
+    <h2>02 · The Case For Each Option</h2>
+
+    <div class="optionCard A">
+      <h3>Option A — Finish the challenge at current pace (2-3 hrs/day)</h3>
+      <span class="cross">STRONGEST CASE</span>
+      <p>You're 45/60. You have the muscle memory. Stopping now means having a 45-day trail that doesn't get to say "I did 60." Recruiters and Anil Bajpai are watching the run — the finish is the story.</p>
+      <span class="cross">HIDDEN UPSIDE</span>
+      <p>The last 15 days are when the compounding hits — followers who now recognize you decide whether to DM. Cutting off pre-finish forfeits the tail.</p>
+      <span class="cross">BIGGEST WEAKNESS</span>
+      <p>2-3 hours/day is exactly the 2-3 hours you could be using to send 5 more applications or do 2 interview loops. Compounding also applies to reps.</p>
+      <div class="best"><b>Best if you value:</b> Long-term brand and portfolio compounding over immediate offer volume.</div>
+    </div>
+
+    <div class="optionCard B">
+      <h3>Option B — Pause the challenge for 30 days, all-in on applications</h3>
+      <span class="cross">STRONGEST CASE</span>
+      <p>F-1 timeline is real. Every week without an offer narrows options. Doubling application volume + interview reps is the highest-EV move for a June deadline.</p>
+      <span class="cross">HIDDEN UPSIDE</span>
+      <p>The 45 days of work is already on LinkedIn. It's a portfolio artifact whether you finish or not. Nothing you've built disappears.</p>
+      <span class="cross">BIGGEST WEAKNESS</span>
+      <p>You break the streak. The narrative flips from "shipped every day" to "shipped 45 days, then stopped." Recruiters remember completions. Pauses look like burnout.</p>
+      <div class="best"><b>Best if you value:</b> Certainty over story. A guaranteed offer beats a beautifully-finished challenge with no job.</div>
+    </div>
+
+    <div class="optionCard C">
+      <h3>Option C — Compress: finish the 15 days in 8, then all-in</h3>
+      <span class="cross">STRONGEST CASE</span>
+      <p>Have both. Ship the story ending AND buy back the applying-time weeks. If the schedule holds, this is dominant.</p>
+      <span class="cross">HIDDEN UPSIDE</span>
+      <p>Compression forces you to pick your <b>best</b> 15 build ideas. Quality goes up, not down, if you're honest about which topics are hits.</p>
+      <span class="cross">BIGGEST WEAKNESS</span>
+      <p>2 apps per day at higher intensity risks burnout that leaks into interview performance. And your posts have real quality — you can't fake 2 in 24 hours.</p>
+      <div class="best"><b>Best if you value:</b> Optionality. If you can hold the pace, you don't have to choose.</div>
+    </div>
+  </div>
+
+  <!-- ============ SECTION 3 · ASSUMPTION BUSTER ============ -->
+  <div class="card s3">
+    <h2>03 · Assumption Buster</h2>
+
+    <div class="chipGrid">
+      <div class="chip">
+        <span class="k">Assumption #1</span>
+        You're assuming the last 15 posts will land as strongly as the first 45. Signal fatigue is real — the same audience seeing the 46th day of the same challenge won't respond like they did to day 20.
+      </div>
+      <div class="chip">
+        <span class="k">Assumption #2</span>
+        You're assuming 2-3 hours/day on the challenge is the tradeoff. It's not — it's 2-3 hours of building plus ~1 hour on the LinkedIn post + visual + engagement. Real cost: 3-4 hours/day.
+      </div>
+      <div class="chip">
+        <span class="k">Assumption #3</span>
+        You're assuming applications and interview prep are highly time-elastic — that "just spending more time" produces more offers. There's a floor: quality prep and thoughtful targeting matter more than raw volume past 5-7 applications/week.
+      </div>
+      <div class="chip">
+        <span class="k">Bias · Sunk Cost Fallacy</span>
+        45 days invested doesn't obligate you to finish. It's already earned you the followers and portfolio. You can leave with dignity — "shipped 45" is not failure.
+      </div>
+      <div class="chip">
+        <span class="k">Bias · Status Quo Bias</span>
+        Current pace is the default. Defaults feel safer than they are. If a friend was in your exact spot, you'd probably tell them to prioritize the job. Take your own advice.
+      </div>
+      <div class="chip" style="border-left-color:var(--accent-gold);">
+        <span class="k" style="color:var(--accent-gold);">What You're Ignoring</span>
+        The two paths aren't as separate as they feel. Every application you send NOW that references a specific project from your challenge is stronger than one that doesn't. The challenge IS your job-search asset, not competition to it.
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SECTION 4 · DECISION MATRIX ============ -->
+  <div class="card s4">
+    <h2>04 · Decision Matrix</h2>
+    <p style="color:var(--text-secondary); font-size:13.5px; margin-bottom:14px;">Each option scored 1-10 on 7 dimensions. Higher is better. Winner highlighted.</p>
+
+    <div class="matrix">
+      <div class="matrixHead">
+        <div></div>
+        <div class="opt A">Option A · Continue</div>
+        <div class="opt B">Option B · Pause</div>
+      </div>
+
+      <div class="matrixRow">
+        <div class="lbl">Life / Career Upside</div>
+        <div class="barTrack"><div class="barFill A" style="--targetWidth:70%; animation-delay:0.05s;">7</div></div>
+        <div class="barTrack"><div class="barFill B" style="--targetWidth:80%; animation-delay:0.1s;">8</div></div>
+      </div>
+      <div class="matrixRow">
+        <div class="lbl">Financial Safety</div>
+        <div class="barTrack"><div class="barFill A" style="--targetWidth:50%; animation-delay:0.15s;">5</div></div>
+        <div class="barTrack"><div class="barFill B" style="--targetWidth:80%; animation-delay:0.2s;">8</div></div>
+      </div>
+      <div class="matrixRow">
+        <div class="lbl">Growth &amp; Learning</div>
+        <div class="barTrack"><div class="barFill A" style="--targetWidth:80%; animation-delay:0.25s;">8</div></div>
+        <div class="barTrack"><div class="barFill B" style="--targetWidth:60%; animation-delay:0.3s;">6</div></div>
+      </div>
+      <div class="matrixRow">
+        <div class="lbl">Stress Level <span style="color:var(--text-secondary); font-size:12px;">(10 = low)</span></div>
+        <div class="barTrack"><div class="barFill A" style="--targetWidth:60%; animation-delay:0.35s;">6</div></div>
+        <div class="barTrack"><div class="barFill B" style="--targetWidth:70%; animation-delay:0.4s;">7</div></div>
+      </div>
+      <div class="matrixRow">
+        <div class="lbl">Reversibility <span style="color:var(--text-secondary); font-size:12px;">(10 = easy)</span></div>
+        <div class="barTrack"><div class="barFill A" style="--targetWidth:80%; animation-delay:0.45s;">8</div></div>
+        <div class="barTrack"><div class="barFill B" style="--targetWidth:50%; animation-delay:0.5s;">5</div></div>
+      </div>
+      <div class="matrixRow">
+        <div class="lbl">Long-term Alignment</div>
+        <div class="barTrack"><div class="barFill A" style="--targetWidth:80%; animation-delay:0.55s;">8</div></div>
+        <div class="barTrack"><div class="barFill B" style="--targetWidth:70%; animation-delay:0.6s;">7</div></div>
+      </div>
+      <div class="matrixRow">
+        <div class="lbl">Regret Risk <span style="color:var(--text-secondary); font-size:12px;">(10 = low)</span></div>
+        <div class="barTrack"><div class="barFill A" style="--targetWidth:60%; animation-delay:0.65s;">6</div></div>
+        <div class="barTrack"><div class="barFill B" style="--targetWidth:70%; animation-delay:0.7s;">7</div></div>
+      </div>
+
+      <div class="matrixTotal">
+        <div class="lbl">Total / 70</div>
+        <div class="totalBox A">48 / 70</div>
+        <div class="totalBox B winner">51 / 70</div>
+      </div>
+    </div>
+
+    <p style="color:var(--text-secondary); font-size:13px; margin-top:16px;"><b style="color:var(--accent-gold);">Note:</b> Option C (Compress) scored 46/70 in a separate pass — dominated by A and B on execution risk given the current pace already stretches capacity. The gap between A and B is small on total, wide on the two dimensions that matter most: <b style="color:var(--text-primary);">Financial Safety</b> and <b style="color:var(--text-primary);">Regret Risk</b>.</p>
+  </div>
+
+  <!-- ============ SECTION 5 · PREMORTEM ============ -->
+  <div class="card s5">
+    <h2>05 · Premortem — Imagine It Failed at 12 Months</h2>
+
+    <div class="premortem">
+      <div class="pmCard">
+        <h3>Option A failed — I finished the challenge but had no offer by June</h3>
+        <span class="lbl">Three likely reasons:</span>
+        <ul>
+          <li>Kept the daily build habit but didn't send enough targeted applications</li>
+          <li>Assumed brand traction would produce inbound. It didn't at MSBA scale.</li>
+          <li>Interview prep suffered — showed up to 3 rounds under-rehearsed</li>
+        </ul>
+        <div class="warn"><b>Early warning:</b> No recruiter DMs by Day 55 despite peak posts</div>
+        <div class="prev"><b>Prevention:</b> Cap challenge work at 2 hrs, protect 2 hrs/day for applications from Day 46 onward</div>
+      </div>
+
+      <div class="pmCard">
+        <h3>Option B failed — I paused the challenge but still had no offer</h3>
+        <span class="lbl">Three likely reasons:</span>
+        <ul>
+          <li>Increased volume of applications didn't help — the ceiling was targeting, not quantity</li>
+          <li>Lost the LinkedIn engagement that made recruiters warm before the DM</li>
+          <li>Broke a streak habit that took 45 days to build — hard to restart</li>
+        </ul>
+        <div class="warn"><b>Early warning:</b> Application response rate flat after 2 weeks of increased volume</div>
+        <div class="prev"><b>Prevention:</b> Ship one weekly "here's what I built this week" post even during the pause. Keep the audience warm.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SECTION 6 · 7-DAY TEST PLAN ============ -->
+  <div class="card s6">
+    <h2>06 · 7-Day Test Plan</h2>
+
+    <div class="dayGrid">
+      <div class="dayRow"><div class="day">Day 1</div><div class="action">Research: list your 15 highest-priority target companies and pull each hiring manager's LinkedIn. This is your target list for the next 30 days.</div></div>
+      <div class="dayRow"><div class="day">Day 2</div><div class="action">Research: audit the last 3 challenge posts' impressions and DMs. Which format actually converted to real conversations? Do more of that; drop the rest.</div></div>
+      <div class="dayRow"><div class="day">Day 3</div><div class="action">Experiment: send 3 tailored applications that explicitly reference your Day 43 or Day 44 build. Note response rate over the following 5 days.</div></div>
+      <div class="dayRow"><div class="day">Day 4</div><div class="action">Experiment: build ONE day's project but limit it to 90 minutes. See if compressed builds still land or if quality drops visibly.</div></div>
+      <div class="dayRow"><div class="day">Day 5</div><div class="action">Conversation: DM 2 people who have the exact role you want at your target companies. Ask one specific question. Don't ask for a referral yet.</div></div>
+      <div class="dayRow"><div class="day">Day 6</div><div class="action">Conversation: 30-min call with someone who did the MSBA-to-analyst move successfully. Ask what they'd do differently in the last 60 days of school.</div></div>
+      <div class="dayRow"><div class="day">Day 7</div><div class="action"><b>Decision day.</b> If Day 3's applications got zero responses AND Day 5/6 conversations pointed at volume gap → Option B. If Day 4's compressed build was quality → Option C. Otherwise → Option A with time cap.</div></div>
+    </div>
+  </div>
+
+  <!-- ============ SECTION 7 · THE VERDICT ============ -->
+  <div class="card s7 verdict">
+    <h2>07 · The Verdict</h2>
+
+    <div style="font-size:11px; color:var(--text-secondary); letter-spacing:1.5px; text-transform:uppercase; font-weight:600; margin-bottom:4px;">BEST OPTION</div>
+    <div class="winner">Option A · Continue the challenge — with a hard 2-hour cap</div>
+
+    <p><b>Why it wins:</b> You've already done the hard part. The finish delivers the story ending recruiters remember, the F-1 clock still has runway if you protect application time, and the reversibility on this path is highest — you can hop to Option B any day the numbers say to.</p>
+    <p><b>What could flip it:</b> If by Day 50 you have zero recruiter conversations from your last 5 posts, the compounding case collapses and you should switch to full-throttle applications.</p>
+
+    <div class="flip"><b>Not what the matrix said.</b> Matrix said B by 3 points. The verdict overrides because the reversibility gap (A=8, B=5) is the tiebreaker — you can still get to B from A. You can't easily get back to A after abandoning it.</div>
+
+    <p class="hardTruth">The finish is the story. But no story gets told without an offer letter. Cap the hours, protect the applications, and let the last 15 days close the loop.</p>
+  </div>
+
+  <!-- ============ SECTION 8 · SHAREABLE CARDS ============ -->
+  <div class="card s8">
+    <h2>08 · Shareable Cards</h2>
+    <p style="color:var(--text-secondary); font-size:13.5px;">Screenshot any of these — they're designed to stand alone.</p>
+
+    <div class="shareGrid">
+      <div class="shareCard">
+        <h3>Matrix Summary</h3>
+        <div class="body">
+          <div class="totals">
+            <div><span>Option A · Continue</span><span class="n">48/70</span></div>
+            <div><span>Option B · Pause</span><span class="n winner">51/70 ★</span></div>
+            <div><span>Option C · Compress</span><span class="n">46/70</span></div>
+          </div>
+        </div>
+        <div class="watermark">Built with Claude AI</div>
+      </div>
+
+      <div class="shareCard">
+        <h3>Verdict</h3>
+        <div class="body">
+          <div class="verdict-name">Continue with a 2-hour cap.</div>
+          <p style="margin:0;">Highest reversibility. Story ending. Cap the hours, protect the applications, let the finish close the loop.</p>
+        </div>
+        <div class="watermark">Built with Claude AI</div>
+      </div>
+
+      <div class="shareCard">
+        <h3>LinkedIn Hook</h3>
+        <div class="body">
+          <p style="margin:0 0 6px;"><b>Ran a real decision I've been avoiding through an AI Decision Strategist.</b></p>
+          <p style="margin:0 0 6px;">The matrix said pause the challenge. The reversibility check said don't. Small gaps on total scores; huge gaps on the dimension that mattered most.</p>
+          <p style="margin:0;"><b>Try it →</b> your call, my dashboard.</p>
+        </div>
+        <div class="watermark">Built with Claude AI</div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Built with Claude AI · ABTalks 60-Day Challenge</footer>
+</div>
+
+<script>
+  // Set CSS variable for reduced-motion fallback
+  document.querySelectorAll('.barFill').forEach(el => {
+    const w = el.style.getPropertyValue('--targetWidth');
+    el.style.width = w;
+  });
+</script>
+</body>
+</html>
