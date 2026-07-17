@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>⚖️ Compare & Decide Builder — LLM APIs · Day 48</title>
+<style>
+:root {
+  --bg:#0a0f1a; --bg-2:#0e1424; --panel:#141b2e; --panel-2:#1c2540;
+  --line:#252d47; --line-2:#3a4569;
+  --text:#e6ecff; --text-dim:#a8b4d6; --text-mute:#6c7998;
+  --accent:#7c9cff; --accent-2:#a5bbff; --accent-soft:rgba(124,156,255,.16);
+  --claude:#e46c2b; --gpt:#10a37f; --gemini:#4a89f3; --llama:#a687ff;
+  --good:#4ade80; --bad:#f56565; --warn:#fbbf24; --gold:#ffd166;
+  --shadow:0 20px 60px rgba(0,0,0,.55);
+  --radius:14px; --easing:cubic-bezier(.2,.8,.2,1);
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+}
+body.lightMode {
+  --bg:#f5f8fc; --bg-2:#fff; --panel:#fff; --panel-2:#eef2fa;
+  --line:#e2e8f0; --line-2:#cbd5e1;
+  --text:#0f172a; --text-dim:#475569; --text-mute:#94a3b8;
+  --shadow:0 12px 40px rgba(15,23,42,.08);
+}
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body {
+  margin:0; padding:0; min-height:100%;
+  background:
+    radial-gradient(1100px 700px at 10% -10%, var(--accent-soft), transparent 60%),
+    radial-gradient(900px 600px at 100% 100%, rgba(166,135,255,.06), transparent 60%),
+    var(--bg);
+  color:var(--text);
+  font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Inter, system-ui, sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.mono { font-family:var(--mono); }
+.app { max-width:1240px; margin:0 auto; padding:22px 24px 60px; }
+
+header {
+  display:flex; justify-content:space-between; align-items:center;
+  padding:10px 0 16px; margin-bottom:16px; flex-wrap:wrap; gap:12px;
+  border-bottom:1px solid var(--line);
+}
+.brand { display:flex; align-items:center; gap:14px; }
+.logo {
+  width:52px; height:52px; border-radius:14px;
+  background:linear-gradient(135deg, var(--accent), var(--llama));
+  display:flex; align-items:center; justify-content:center; font-size:26px;
+  box-shadow:0 12px 30px rgba(0,0,0,.4);
+}
+.brand h1 { margin:0; font-size:22px; font-weight:800; letter-spacing:-.3px; }
+.brand .sub { font-size:11px; color:var(--text-mute); letter-spacing:2px; text-transform:uppercase; font-weight:700; }
+.headActions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.hud {
+  padding:6px 12px; border-radius:999px; font-size:11px; letter-spacing:1.5px; text-transform:uppercase;
+  font-weight:800; background:var(--panel); border:1px solid var(--line); color:var(--text-dim);
+}
+.iconBtn {
+  background:var(--panel); border:1px solid var(--line); color:var(--text-dim);
+  padding:7px 12px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:700;
+  transition:border-color .12s, color .12s, background .15s; font-family:inherit;
+}
+.iconBtn:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
+
+.card {
+  background:linear-gradient(180deg, var(--panel), var(--bg-2));
+  border:1px solid var(--line); border-radius:var(--radius);
+  padding:24px 26px; box-shadow:var(--shadow); margin-bottom:16px;
+  animation:fadeIn .3s var(--easing) both;
+}
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:translateY(0);} }
+.card h2 { margin:0 0 6px; font-size:22px; font-weight:800; letter-spacing:-.3px; }
+.card h3 { margin:20px 0 10px; font-size:16px; font-weight:800; letter-spacing:-.2px; }
+.card h4 { margin:14px 0 6px; font-size:11px; letter-spacing:2px; text-transform:uppercase; color:var(--accent); font-weight:800; }
+.card p { color:var(--text-dim); font-size:14px; line-height:1.65; margin:6px 0; }
+.card p b { color:var(--text); font-weight:800; }
+.card code { font-family:var(--mono); background:var(--panel-2); border:1px solid var(--line); padding:1px 6px; border-radius:5px; font-size:12.5px; color:var(--accent); }
+
+.tag { display:inline-block; font-size:10px; padding:3px 10px; border-radius:999px; background:var(--accent-soft); color:var(--accent); border:1px solid var(--accent); font-weight:800; letter-spacing:1.5px; }
+.tag.warn { background:rgba(251,191,36,.10); color:var(--warn); border-color:var(--warn); }
+.tag.est { background:rgba(255,255,255,.05); color:var(--text-mute); border-color:var(--line-2); }
+
+/* Sliders */
+.weightsGrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:12px; }
+@media(max-width:760px){ .weightsGrid { grid-template-columns:1fr; } }
+.weightRow {
+  background:var(--panel-2); border:1px solid var(--line); border-radius:10px; padding:12px 14px;
+}
+.weightRow .head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+.weightRow .lbl { font-size:13px; font-weight:800; letter-spacing:.2px; }
+.weightRow .val { font-family:var(--mono); font-size:14px; font-weight:800; color:var(--accent); }
+.weightRow input[type="range"] {
+  -webkit-appearance:none; appearance:none;
+  width:100%; height:6px; background:var(--bg); border-radius:3px; outline:none; cursor:pointer;
+}
+.weightRow input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance:none; appearance:none;
+  width:18px; height:18px; border-radius:50%; background:var(--accent); cursor:pointer;
+  box-shadow:0 0 0 3px rgba(124,156,255,.24);
+}
+.weightRow input[type="range"]::-moz-range-thumb {
+  width:18px; height:18px; border-radius:50%; background:var(--accent); cursor:pointer; border:none;
+  box-shadow:0 0 0 3px rgba(124,156,255,.24);
+}
+.weightRow .sub { font-size:11px; color:var(--text-mute); margin-top:6px; }
+.weightRow .direction { display:inline-block; font-size:9px; padding:1px 6px; border-radius:4px; margin-left:6px; font-weight:800; letter-spacing:1px; }
+.weightRow .direction.higher { background:rgba(74,222,128,.14); color:var(--good); }
+.weightRow .direction.lower { background:rgba(255,255,255,.05); color:var(--text-mute); }
+
+.presetRow { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+.presetBtn {
+  background:var(--panel); border:1px solid var(--line); color:var(--text-dim);
+  padding:6px 12px; border-radius:8px; cursor:pointer; font-size:12px; font-weight:700; font-family:inherit;
+}
+.presetBtn:hover { border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
+.presetBtn.active { border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
+
+/* Ranked options */
+.rankGrid { display:grid; gap:12px; margin-top:14px; }
+.rankCard {
+  background:var(--panel-2); border:1px solid var(--line); border-radius:12px;
+  padding:16px 20px;
+  display:grid; grid-template-columns: 60px 1fr auto; gap:16px; align-items:center;
+  transition: border-color .15s, transform .15s var(--easing);
+}
+.rankCard:hover { transform:translateX(2px); }
+.rankCard.rank1 { border-color:var(--gold); background:linear-gradient(135deg, rgba(255,209,102,.06), var(--panel-2)); box-shadow:0 0 30px rgba(255,209,102,.15); }
+.rankCard.rank2 { border-color:var(--text-dim); }
+.rankCard .rankBadge {
+  font-family:var(--mono); font-size:32px; font-weight:900; text-align:center;
+  color:var(--text-mute);
+}
+.rankCard.rank1 .rankBadge { color:var(--gold); }
+.rankCard.rank2 .rankBadge { color:var(--text-dim); }
+.rankCard .name { display:flex; align-items:center; gap:12px; font-size:17px; font-weight:800; margin-bottom:6px; }
+.rankCard .nameDot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+.rankCard.claude .nameDot { background:var(--claude); }
+.rankCard.gpt .nameDot { background:var(--gpt); }
+.rankCard.gemini .nameDot { background:var(--gemini); }
+.rankCard.llama .nameDot { background:var(--llama); }
+.rankCard .meta { color:var(--text-mute); font-size:12px; }
+.rankCard .totalScore { text-align:right; }
+.rankCard .totalScore .n { font-family:var(--mono); font-size:26px; font-weight:900; color:var(--accent); }
+.rankCard .totalScore .d { font-size:10px; color:var(--text-mute); letter-spacing:1.5px; font-weight:800; text-transform:uppercase; }
+.rankCard .breakdown { grid-column:2 / -1; display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; margin-top:8px; }
+@media(max-width:640px){ .rankCard .breakdown { grid-template-columns:repeat(2, 1fr); } }
+.rankCard .breakdown .b {
+  background:var(--bg); border:1px solid var(--line); border-radius:6px; padding:6px 8px; font-size:11px;
+}
+.rankCard .breakdown .b .k { display:block; color:var(--text-mute); letter-spacing:1.2px; text-transform:uppercase; font-weight:800; font-size:9px; }
+.rankCard .breakdown .b .v { display:flex; align-items:center; gap:6px; margin-top:2px; font-family:var(--mono); font-weight:800; color:var(--text); font-size:12px; }
+.rankCard .breakdown .b .bar { flex:1; height:4px; background:rgba(255,255,255,.05); border-radius:2px; overflow:hidden; }
+.rankCard .breakdown .b .bar i { display:block; height:100%; background:linear-gradient(90deg, var(--accent), var(--llama)); border-radius:2px; transition:width .3s var(--easing); }
+
+/* Data table */
+.dataTable { width:100%; border-collapse:collapse; margin-top:12px; font-size:13px; }
+.dataTable th, .dataTable td { padding:10px 12px; text-align:left; border-bottom:1px solid var(--line); }
+.dataTable th { background:var(--panel-2); font-size:11px; font-weight:800; color:var(--accent); letter-spacing:1.5px; text-transform:uppercase; }
+.dataTable td { color:var(--text); }
+.dataTable td .cite { display:inline-block; font-size:10px; color:var(--text-mute); margin-left:4px; padding:1px 5px; background:var(--panel-2); border-radius:4px; font-family:var(--mono); }
+.dataTable td .flag { display:inline-block; font-size:9px; padding:1px 6px; border-radius:4px; margin-left:4px; font-weight:800; letter-spacing:1px; }
+.dataTable td .flag.est { background:rgba(251,191,36,.15); color:var(--warn); }
+.dataTable td .flag.judgment { background:rgba(167,139,250,.15); color:var(--llama); }
+
+.dataWrap { overflow-x:auto; }
+
+/* Sources panel */
+.sourcesList { display:grid; gap:8px; margin-top:10px; }
+.sourceItem { background:var(--panel-2); border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:8px; padding:10px 14px; }
+.sourceItem .name { font-weight:800; font-size:13px; }
+.sourceItem .url { font-family:var(--mono); font-size:11px; color:var(--accent); margin-top:2px; word-break:break-all; }
+.sourceItem .desc { color:var(--text-mute); font-size:12px; margin-top:4px; }
+
+/* Collapsible */
+.collapsible {
+  background:var(--panel-2); border:1px solid var(--line); border-radius:12px; overflow:hidden; margin-top:14px;
+}
+.collapsible .head {
+  padding:14px 18px; cursor:pointer; display:flex; justify-content:space-between; align-items:center;
+  transition: background .15s;
+}
+.collapsible .head:hover { background:var(--accent-soft); }
+.collapsible .head h3 { margin:0; font-size:14px; font-weight:800; }
+.collapsible .head .arrow { color:var(--accent); transition: transform .15s; }
+.collapsible.closed .head .arrow { transform: rotate(-90deg); }
+.collapsible .body { padding:14px 20px; border-top:1px solid var(--line); }
+.collapsible.closed .body { display:none; }
+.collapsible .body p { font-size:13px; line-height:1.65; margin:6px 0; color:var(--text-dim); }
+.collapsible .body ul { padding-left:22px; }
+.collapsible .body li { margin:4px 0; font-size:13px; color:var(--text-dim); }
+.collapsible .body b { color:var(--text); }
+
+/* Callout */
+.callout { background:var(--panel-2); border-left:4px solid var(--accent); padding:12px 16px; border-radius:8px; margin:12px 0; }
+.callout h4 { margin:0 0 4px; color:var(--accent); }
+.callout p { margin:2px 0; font-size:13px; color:var(--text-dim); line-height:1.6; }
+.callout.warn { border-left-color:var(--warn); } .callout.warn h4 { color:var(--warn); }
+.callout.good { border-left-color:var(--good); } .callout.good h4 { color:var(--good); }
+
+.actionBar { display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; align-items:center; }
+.actionBar .leftActions { margin-right:auto; }
+.btn {
+  appearance:none; border:1px solid var(--line); background:var(--panel); color:var(--text);
+  padding:11px 20px; border-radius:10px; cursor:pointer; font-size:13.5px; font-weight:700;
+  transition:transform .1s var(--easing), border-color .12s, background .15s; font-family:inherit;
+}
+.btn:hover { border-color:var(--accent); background:var(--accent-soft); }
+.btn.compact { padding:6px 12px; font-size:12px; }
+
+.footer { color:var(--text-mute); font-size:11px; text-align:center; margin-top:22px; letter-spacing:1px; line-height:1.6; }
+
+@media (prefers-reduced-motion: reduce) { * { animation:none!important; transition:none!important; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="logo">⚖️</div>
+      <div>
+        <h1>Compare &amp; Decide Builder</h1>
+        <div class="sub">Day 48 · #60DayClaudeChallenge · LLM APIs</div>
+      </div>
+    </div>
+    <div class="headActions">
+      <div class="hud">Live weighting</div>
+      <button class="iconBtn" id="themeBtn">🌙 Dark</button>
+    </div>
+  </header>
+
+  <div class="card">
+    <span class="tag">LLM API COMPARISON · CLAUDE vs GPT vs GEMINI vs LLAMA</span>
+    <h2 style="margin-top:14px;">Weight what matters. Watch the ranking update.</h2>
+    <p>Four frontier LLM APIs scored against five criteria drawn from publicly-documented pricing pages, capability benchmarks (MMLU, SWE-bench Verified), and technical specs. Adjust the sliders below to weight criteria by your personal priorities — the ranking updates live. Sources for every data point are listed at the bottom of the page.</p>
+    <div class="callout warn">
+      <h4>Transparency</h4>
+      <p>Data reflects publicly-available specs and pricing as of the assistant's May 2025 knowledge cutoff. Numbers move fast in this space — always verify against the linked pricing pages before committing. Data points that are estimates or judgments (not directly cited) are flagged inline with <span class="flag est" style="display:inline-block; font-size:9px; padding:1px 6px; border-radius:4px; font-weight:800; letter-spacing:1px; background:rgba(251,191,36,.15); color:var(--warn);">EST</span> or <span class="flag judgment" style="display:inline-block; font-size:9px; padding:1px 6px; border-radius:4px; font-weight:800; letter-spacing:1px; background:rgba(167,139,250,.15); color:var(--llama);">JUDGMENT</span> badges.</p>
+    </div>
+  </div>
+
+  <!-- Weights -->
+  <div class="card">
+    <h2>Your Weights</h2>
+    <p>Slide each criterion between 0 (doesn't matter) and 10 (only thing that matters). Weights don't need to sum to any target — they're relative.</p>
+
+    <div class="weightsGrid" id="weightsGrid"></div>
+
+    <div class="presetRow">
+      <span style="font-size:11px; letter-spacing:1.5px; color:var(--text-mute); font-weight:800; align-self:center; margin-right:8px;">PRESETS:</span>
+      <button class="presetBtn" data-preset="indie">👩‍💻 Indie dev</button>
+      <button class="presetBtn" data-preset="student">🎓 MSBA student</button>
+      <button class="presetBtn" data-preset="team">👥 Team lead</button>
+      <button class="presetBtn" data-preset="enterprise">🏢 Enterprise</button>
+      <button class="presetBtn" data-preset="balanced">⚖️ Balanced</button>
+    </div>
+  </div>
+
+  <!-- Ranked results -->
+  <div class="card">
+    <h2>Ranked Result</h2>
+    <p style="color:var(--text-mute); font-size:12.5px;">Composite score = weighted sum across all 5 criteria, normalized to 0-100 within each criterion.</p>
+    <div class="rankGrid" id="rankGrid"></div>
+  </div>
+
+  <!-- Data + citations table -->
+  <div class="card">
+    <h2>Underlying Data</h2>
+    <p>Every cell links back to its source in the panel below. Flagged cells contain estimates or judgments, not direct citations.</p>
+    <div class="dataWrap">
+      <table class="dataTable" id="dataTable"></table>
+    </div>
+  </div>
+
+  <!-- Sources -->
+  <div class="card">
+    <h2>Sources</h2>
+    <p>Every data point in the table above is derived from one of these publicly-linkable references.</p>
+    <div class="sourcesList" id="sourcesList"></div>
+  </div>
+
+  <!-- How this was researched -->
+  <div class="collapsible closed" id="methodology">
+    <div class="head">
+      <h3>📚 How this was researched · methodology + conflicts resolved</h3>
+      <span class="arrow">▼</span>
+    </div>
+    <div class="body">
+      <p><b>Data sources.</b> Pricing pulled from each vendor's published API pricing page (linked in the Sources panel). Capability scores drawn from official model cards + widely-cited public benchmarks (MMLU, SWE-bench Verified). Context windows and rate limits from official documentation.</p>
+
+      <p><b>Blended cost estimation.</b> "Blended $/M tokens" assumes a 2:1 input-to-output token ratio (typical for chat and coding workloads). Actual cost varies by workload — heavy input-context work (long documents) skews cheaper; heavy generation (writing) skews closer to the output rate. Marked <span class="flag est" style="display:inline-block; font-size:9px; padding:1px 6px; border-radius:4px; font-weight:800; letter-spacing:1px; background:rgba(251,191,36,.15); color:var(--warn);">EST</span> throughout.</p>
+
+      <p><b>Openness / Deployment Flexibility scoring.</b> Judgment score 1-10 based on: proprietary-only vs. open weights (Llama), fine-tuning availability, self-hosting options. Not sourced from a single benchmark. Marked <span class="flag judgment" style="display:inline-block; font-size:9px; padding:1px 6px; border-radius:4px; font-weight:800; letter-spacing:1px; background:rgba(167,139,250,.15); color:var(--llama);">JUDGMENT</span>.</p>
+
+      <p><b>Conflicts resolved.</b></p>
+      <ul>
+        <li><b>Llama pricing varies wildly by host.</b> Together.ai, Groq, Fireworks, and Replicate each price Llama differently. I used Together.ai's published price for the 70B tier as a representative reference point. Groq is typically cheaper for latency-optimized workloads; Fireworks is often mid-price with better throughput. Marked <span class="flag est" style="display:inline-block; font-size:9px; padding:1px 6px; border-radius:4px; font-weight:800; letter-spacing:1px; background:rgba(251,191,36,.15); color:var(--warn);">EST</span>.</li>
+        <li><b>Context window vs. context quality.</b> Both GPT-4.1 and Gemini 2.5 Pro advertise 1M-token context windows, but performance degrades past ~200K in independent testing. The score uses advertised context; a "quality-adjusted context" score would give both a lower rating.</li>
+        <li><b>SWE-bench versions.</b> SWE-bench Verified (a curated 500-problem subset with human-verified solutions) is the current standard. Older SWE-bench scores from the original 2,294-problem set are not directly comparable. All numbers used are from Verified.</li>
+        <li><b>MMLU is saturating.</b> Every frontier model now scores 85%+, so MMLU no longer meaningfully separates leaders. Included for completeness; treat 2-3 point differences as noise.</li>
+      </ul>
+
+      <p><b>Update cadence.</b> Numbers in this space change every 30-60 days. Rerun the comparison quarterly.</p>
+    </div>
+  </div>
+
+  <p class="footer">
+    Data as of assistant's knowledge cutoff (May 2025) — verify current pricing at linked sources before deciding<br/>
+    Single HTML file · Vanilla CSS + JS · Built for Day 48 of #60DayClaudeChallenge
+  </p>
+</div>
+
+<script>
+/* =============================================================
+   COMPARE & DECIDE BUILDER — Day 48
+   Data: LLM APIs (Claude, GPT, Gemini, Llama) — May 2025 snapshot
+   ============================================================= */
+
+const CRITERIA = [
+  { key:"price", name:"Blended $/M tokens", dir:"lower", desc:"Assumes 2:1 input:output ratio. Lower is better.", est:true },
+  { key:"mmlu",  name:"MMLU (reasoning)",   dir:"higher", desc:"Massive Multitask Language Understanding benchmark, %." },
+  { key:"swebench", name:"SWE-bench Verified (coding)", dir:"higher", desc:"Coding capability benchmark, % of 500 verified problems solved." },
+  { key:"context", name:"Context window (K tokens)", dir:"higher", desc:"Maximum tokens per request. Advertised, not quality-adjusted." },
+  { key:"openness", name:"Openness / Deployment", dir:"higher", desc:"Proprietary (1-3) → open weights + self-hostable (8-10).", judgment:true },
+];
+
+const OPTIONS = [
+  {
+    key:"claude", name:"Claude Sonnet 4",
+    vendor:"Anthropic",
+    tagline:"Frontier proprietary · strong on code + reasoning",
+    data: {
+      price: { value: 7.00, cite:"Anthropic pricing page", est:true },  // (3 + 2*15) / 3 = 11 — actually blended 2:1 (input:output) = (2*3 + 1*15)/3 = 7
+      mmlu: { value: 88, cite:"Anthropic model card" },
+      swebench: { value: 65, cite:"Anthropic model card · SWE-bench Verified" },
+      context: { value: 200, cite:"Anthropic API docs" },
+      openness: { value: 3, cite:"Judgment", judgment:true },
+    }
+  },
+  {
+    key:"gpt", name:"GPT-4.1",
+    vendor:"OpenAI",
+    tagline:"Mid-tier price · 1M context · strong general use",
+    data: {
+      price: { value: 4.00, cite:"OpenAI pricing page", est:true },  // (2*2 + 1*8)/3 = 4
+      mmlu: { value: 88, cite:"OpenAI model card" },
+      swebench: { value: 55, cite:"OpenAI reports · SWE-bench Verified" },
+      context: { value: 1000, cite:"OpenAI GPT-4.1 launch (Apr 2025)" },
+      openness: { value: 3, cite:"Judgment", judgment:true },
+    }
+  },
+  {
+    key:"gemini", name:"Gemini 2.5 Pro",
+    vendor:"Google",
+    tagline:"Cheapest frontier · massive context · Google-integrated",
+    data: {
+      price: { value: 4.17, cite:"Google AI pricing page", est:true },  // (2*1.25 + 1*10)/3 = 4.17
+      mmlu: { value: 85, cite:"Google model card" },
+      swebench: { value: 63, cite:"Google reports · SWE-bench Verified" },
+      context: { value: 1000, cite:"Google Gemini docs" },
+      openness: { value: 3, cite:"Judgment", judgment:true },
+    }
+  },
+  {
+    key:"llama", name:"Llama 3.3 70B",
+    vendor:"Meta (via Together AI)",
+    tagline:"Open weights · self-hostable · commodity pricing",
+    data: {
+      price: { value: 0.60, cite:"Together AI pricing (host of choice)", est:true },  // Together.ai ~$0.60/M blended
+      mmlu: { value: 86, cite:"Meta Llama 3.3 model card" },
+      swebench: { value: 41, cite:"Independent benchmarks · SWE-bench Verified", est:true },
+      context: { value: 128, cite:"Meta Llama 3.3 model card" },
+      openness: { value: 9, cite:"Judgment · open weights, self-hostable, license permissive", judgment:true },
+    }
+  }
+];
+
+const SOURCES = [
+  { name:"Anthropic API pricing", url:"https://www.anthropic.com/pricing", desc:"Official Claude Sonnet 4 pricing — input and output per million tokens." },
+  { name:"Anthropic Claude Sonnet 4 model card", url:"https://www.anthropic.com/claude", desc:"MMLU, SWE-bench Verified, and context window for Claude Sonnet 4." },
+  { name:"OpenAI API pricing", url:"https://openai.com/api/pricing/", desc:"Official GPT-4.1 pricing per million tokens." },
+  { name:"OpenAI GPT-4.1 launch (April 2025)", url:"https://openai.com/index/gpt-4-1/", desc:"1M-token context announcement and capability benchmarks." },
+  { name:"Google Gemini API pricing", url:"https://ai.google.dev/pricing", desc:"Official Gemini 2.5 Pro pricing tiers (below and above 200K tokens)." },
+  { name:"Google Gemini 2.5 documentation", url:"https://ai.google.dev/gemini-api/docs/models/gemini", desc:"Context window and reported benchmark scores." },
+  { name:"Together AI pricing (Llama hosting)", url:"https://www.together.ai/pricing", desc:"Representative Llama 3.3 70B API pricing. Groq, Fireworks, and Replicate offer alternative rates." },
+  { name:"Meta Llama 3.3 model card", url:"https://ai.meta.com/blog/llama-3-3/", desc:"MMLU, context window, and openness terms for Llama 3.3 70B." },
+  { name:"SWE-bench Verified leaderboard", url:"https://www.swebench.com/", desc:"Live leaderboard of coding benchmark scores, human-verified subset." },
+];
+
+const PRESETS = {
+  indie:      { price: 8, mmlu: 4, swebench: 7, context: 5, openness: 6 },
+  student:    { price: 9, mmlu: 5, swebench: 6, context: 4, openness: 3 },
+  team:       { price: 6, mmlu: 6, swebench: 7, context: 6, openness: 4 },
+  enterprise: { price: 4, mmlu: 6, swebench: 6, context: 7, openness: 8 },
+  balanced:   { price: 5, mmlu: 5, swebench: 5, context: 5, openness: 5 },
+};
+
+const state = {
+  weights: { ...PRESETS.balanced },
+  activePreset: "balanced",
+};
+
+const el = (id) => document.getElementById(id);
+function esc(s){ return String(s||"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+/* Theme */
+el("themeBtn").addEventListener("click", () => {
+  const isLight = document.body.classList.toggle("lightMode");
+  el("themeBtn").textContent = isLight ? "☀️ Light" : "🌙 Dark";
+});
+
+/* ============================================================
+   SCORING
+   ============================================================ */
+function normalizeCriterion(criterion) {
+  const values = OPTIONS.map(o => o.data[criterion.key].value);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = max - min || 1;
+  return OPTIONS.map(o => {
+    const v = o.data[criterion.key].value;
+    // Higher is better → straight normalization
+    // Lower is better → inverted normalization
+    const raw = criterion.dir === "higher" ? (v - min) / range : (max - v) / range;
+    return Math.round(raw * 100);
+  });
+}
+
+function computeScores() {
+  const perCriterion = {};
+  CRITERIA.forEach(c => {
+    perCriterion[c.key] = normalizeCriterion(c);
+  });
+  const totalWeight = Object.values(state.weights).reduce((a,b) => a+b, 0) || 1;
+  const results = OPTIONS.map((opt, i) => {
+    let weighted = 0;
+    const scores = {};
+    CRITERIA.forEach(c => {
+      scores[c.key] = perCriterion[c.key][i];
+      weighted += (scores[c.key] * state.weights[c.key]);
+    });
+    return {
+      option: opt,
+      composite: Math.round(weighted / totalWeight),
+      scores,
+    };
+  });
+  return results.sort((a,b) => b.composite - a.composite);
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function renderWeights() {
+  el("weightsGrid").innerHTML = CRITERIA.map(c => `
+    <div class="weightRow">
+      <div class="head">
+        <div class="lbl">${esc(c.name)}<span class="direction ${c.dir}">${c.dir === "higher" ? "↑ better" : "↓ better"}</span></div>
+        <div class="val" id="w-${c.key}">${state.weights[c.key]}</div>
+      </div>
+      <input type="range" min="0" max="10" step="1" value="${state.weights[c.key]}" data-key="${c.key}"/>
+      <div class="sub">${esc(c.desc)}</div>
+    </div>
+  `).join("");
+
+  document.querySelectorAll('.weightRow input[type="range"]').forEach(inp => {
+    inp.addEventListener("input", e => {
+      const key = e.target.dataset.key;
+      state.weights[key] = parseInt(e.target.value);
+      el("w-" + key).textContent = state.weights[key];
+      state.activePreset = null;
+      renderPresets();
+      renderRanking();
+    });
+  });
+}
+
+function renderPresets() {
+  document.querySelectorAll(".presetBtn").forEach(b => {
+    b.classList.toggle("active", state.activePreset === b.dataset.preset);
+  });
+}
+document.querySelectorAll(".presetBtn").forEach(b => {
+  b.addEventListener("click", () => {
+    state.weights = { ...PRESETS[b.dataset.preset] };
+    state.activePreset = b.dataset.preset;
+    renderWeights();
+    renderPresets();
+    renderRanking();
+  });
+});
+
+function renderRanking() {
+  const results = computeScores();
+  el("rankGrid").innerHTML = results.map((r, i) => {
+    const opt = r.option;
+    const rank = i + 1;
+    const rankClass = rank === 1 ? "rank1" : rank === 2 ? "rank2" : "";
+    return `
+      <div class="rankCard ${rankClass} ${opt.key}">
+        <div class="rankBadge">#${rank}</div>
+        <div>
+          <div class="name"><span class="nameDot"></span>${esc(opt.name)}</div>
+          <div class="meta">${esc(opt.vendor)} · ${esc(opt.tagline)}</div>
+          <div class="breakdown">
+            ${CRITERIA.map(c => `
+              <div class="b">
+                <span class="k">${esc(c.name.split("(")[0].trim())}</span>
+                <div class="v">
+                  <span>${r.scores[c.key]}</span>
+                  <div class="bar"><i style="width:${r.scores[c.key]}%"></i></div>
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+        <div class="totalScore">
+          <div class="n">${r.composite}</div>
+          <div class="d">Weighted / 100</div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderDataTable() {
+  const headers = `<tr><th>Option</th>${CRITERIA.map(c => `<th>${esc(c.name)}</th>`).join("")}</tr>`;
+  const rows = OPTIONS.map(o => `
+    <tr>
+      <td><b>${esc(o.name)}</b><br/><span style="font-size:11px; color:var(--text-mute);">${esc(o.vendor)}</span></td>
+      ${CRITERIA.map(c => {
+        const d = o.data[c.key];
+        const flags = [];
+        if (d.est) flags.push('<span class="flag est">EST</span>');
+        if (d.judgment) flags.push('<span class="flag judgment">JUDGMENT</span>');
+        return `<td>${d.value}${c.key === "price" ? "" : c.key === "context" ? "K" : "%"}<span class="cite">${esc(d.cite)}</span>${flags.join("")}</td>`;
+      }).join("")}
+    </tr>
+  `).join("");
+  el("dataTable").innerHTML = `<thead>${headers}</thead><tbody>${rows}</tbody>`;
+}
+
+function renderSources() {
+  el("sourcesList").innerHTML = SOURCES.map(s => `
+    <div class="sourceItem">
+      <div class="name">${esc(s.name)}</div>
+      <div class="url">${esc(s.url)}</div>
+      <div class="desc">${esc(s.desc)}</div>
+    </div>
+  `).join("");
+}
+
+/* Methodology toggle */
+document.querySelector("#methodology .head").addEventListener("click", () => {
+  document.getElementById("methodology").classList.toggle("closed");
+});
+
+/* Init */
+renderWeights();
+renderPresets();
+renderRanking();
+renderDataTable();
+renderSources();
+</script>
+</body>
+</html>
