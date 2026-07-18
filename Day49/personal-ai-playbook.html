@@ -1,0 +1,2076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Personal AI Playbook — Reusable prompt systems, not stored prompts</title>
+<style>
+:root {
+  --bg: #0b0d13;
+  --bg-elev: #12151e;
+  --bg-elev2: #171b26;
+  --border: #242938;
+  --border-strong: #323847;
+  --text: #eef1f6;
+  --text-muted: #8b92a3;
+  --text-dim: #5f6675;
+  --accent: #7c3aed;
+  --accent-2: #22d3ee;
+  --success: #10b981;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+  --shadow: 0 8px 24px rgba(0,0,0,0.4);
+  --radius: 8px;
+  --radius-lg: 12px;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --font-serif: Georgia, 'Times New Roman', serif;
+}
+[data-theme="light"] {
+  --bg: #fafbfc;
+  --bg-elev: #ffffff;
+  --bg-elev2: #f4f6fa;
+  --border: #e5e7ee;
+  --border-strong: #cbd0dc;
+  --text: #1a1d26;
+  --text-muted: #5a6172;
+  --text-dim: #8e95a5;
+  --shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+  font-size: inherit;
+}
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  color: var(--text);
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+textarea { resize: vertical; min-height: 60px; font-family: var(--font-mono); font-size: 13px; }
+
+/* Layout */
+.app {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+}
+.sidebar {
+  background: var(--bg-elev);
+  border-right: 1px solid var(--border);
+  padding: 18px 14px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px 18px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+.brand-logo {
+  width: 32px; height: 32px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-radius: 8px;
+  display: grid; place-items: center;
+  font-size: 16px;
+  font-weight: 900;
+  color: white;
+}
+.brand-name { font-weight: 700; font-size: 14px; letter-spacing: -0.2px; }
+.brand-sub { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+
+.nav-label {
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  padding: 12px 10px 6px;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 6px;
+  color: var(--text-muted);
+  transition: background 0.15s, color 0.15s;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+.nav-item:hover { background: var(--bg-elev2); color: var(--text); }
+.nav-item.active { background: var(--bg-elev2); color: var(--text); }
+.nav-item .badge {
+  margin-left: auto;
+  font-size: 10px;
+  background: var(--bg-elev2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--text-dim);
+}
+.nav-item.active .badge { background: rgba(124,58,237,0.2); color: #c4b5fd; }
+.nav-icon { width: 18px; text-align: center; }
+
+/* Main */
+.main {
+  padding: 0 32px 60px;
+  max-width: 1280px;
+}
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 0 14px;
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 20;
+  border-bottom: 1px solid var(--border);
+  margin: 0 -32px 24px;
+  padding: 14px 32px;
+}
+.search {
+  flex: 1;
+  position: relative;
+  max-width: 420px;
+}
+.search input {
+  width: 100%;
+  padding-left: 34px;
+  height: 36px;
+}
+.search::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px; height: 12px;
+  border: 1.5px solid var(--text-dim);
+  border-radius: 50%;
+}
+.search::after {
+  content: "";
+  position: absolute;
+  left: 22px;
+  top: 55%;
+  width: 6px;
+  height: 1.5px;
+  background: var(--text-dim);
+  transform: rotate(45deg);
+}
+.kbd {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 2px 5px;
+  background: var(--bg-elev2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--text-dim);
+  line-height: 1;
+}
+.topbar-actions { display: flex; gap: 8px; margin-left: auto; }
+.btn {
+  padding: 8px 14px;
+  border-radius: 6px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-weight: 500;
+  font-size: 13px;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:hover { border-color: var(--border-strong); background: var(--bg-elev2); }
+.btn.primary {
+  background: linear-gradient(135deg, var(--accent), #6d28d9);
+  border-color: transparent;
+  color: white;
+}
+.btn.primary:hover { filter: brightness(1.1); }
+.btn.small { padding: 5px 10px; font-size: 12px; }
+.btn.ghost { background: transparent; border-color: transparent; color: var(--text-muted); }
+.btn.ghost:hover { color: var(--text); background: var(--bg-elev); }
+.btn.danger { color: var(--danger); }
+.btn.icon { padding: 6px 8px; }
+
+/* Explainer */
+.explainer {
+  background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(34,211,238,0.05));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  margin-bottom: 24px;
+  position: relative;
+}
+.explainer h1 {
+  font-size: 20px;
+  margin: 0 0 6px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+.explainer p {
+  margin: 0 0 8px;
+  color: var(--text-muted);
+  max-width: 800px;
+}
+.explainer .three-cols {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 14px;
+}
+.explainer .three-cols div {
+  background: rgba(0,0,0,0.15);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 12px;
+}
+[data-theme="light"] .explainer .three-cols div { background: rgba(255,255,255,0.6); }
+.explainer .three-cols strong { display: block; margin-bottom: 3px; color: var(--text); }
+.explainer .three-cols span { color: var(--text-muted); }
+.explainer-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  color: var(--text-dim);
+  font-size: 20px;
+  line-height: 1;
+  padding: 4px 8px;
+}
+.explainer-close:hover { color: var(--text); }
+
+/* View titles */
+.view-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 4px;
+  letter-spacing: -0.3px;
+}
+.view-subtitle {
+  color: var(--text-muted);
+  margin: 0 0 24px;
+  font-size: 13px;
+}
+
+/* Workflow grid */
+.workflow-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px;
+}
+.workflow-card {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  transition: all 0.15s;
+  cursor: pointer;
+  position: relative;
+}
+.workflow-card:hover { border-color: var(--border-strong); transform: translateY(-1px); box-shadow: var(--shadow); }
+.workflow-card-cat {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--accent-2);
+  font-weight: 600;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.workflow-card h3 {
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+.workflow-card p {
+  margin: 0 0 12px;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+.workflow-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--text-dim);
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+.workflow-card-meta .fav {
+  margin-left: auto;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.workflow-card-meta .fav.active { color: var(--warn); }
+.workflow-card-meta .fav:hover { background: var(--bg-elev2); }
+.workflow-card-actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* Section title with count */
+.section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 24px 0 12px;
+}
+.section-head h2 {
+  font-size: 15px;
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+.section-head .count {
+  color: var(--text-dim);
+  font-size: 12px;
+  font-family: var(--font-mono);
+}
+
+/* Filter chips */
+.filter-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.chip {
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.chip:hover { border-color: var(--border-strong); color: var(--text); }
+.chip.active { background: var(--accent); border-color: var(--accent); color: white; }
+
+/* Prompt Builder / Loop Builder */
+.builder {
+  display: grid;
+  grid-template-columns: 1fr 460px;
+  gap: 20px;
+  align-items: start;
+}
+@media (max-width: 1100px) {
+  .builder { grid-template-columns: 1fr; }
+}
+.builder-left, .builder-right {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+.builder-right { position: sticky; top: 90px; max-height: calc(100vh - 110px); overflow: auto; }
+
+.block-picker {
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  background: var(--bg);
+  margin-bottom: 16px;
+}
+.block-picker-title {
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+.block-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+}
+.block-pick {
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg-elev);
+  text-align: left;
+  transition: all 0.15s;
+  cursor: pointer;
+}
+.block-pick:hover { border-color: var(--accent); background: rgba(124,58,237,0.06); }
+.block-pick-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+.block-pick-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+/* Assembled blocks */
+.block-assembled {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  padding: 14px 14px 12px;
+  margin-bottom: 12px;
+  position: relative;
+}
+.block-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.block-head .block-title {
+  font-weight: 600;
+  font-size: 13px;
+}
+.block-head .block-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 4px;
+}
+.block-actions .btn { padding: 3px 8px; font-size: 11px; }
+.block-desc {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  padding: 6px 8px;
+  background: var(--bg-elev2);
+  border-radius: 4px;
+  border-left: 2px solid var(--accent);
+}
+.block-desc strong { color: var(--text); }
+.block-content textarea { width: 100%; }
+.block-content select { width: 100%; margin-bottom: 8px; }
+
+/* Live preview */
+.preview-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.preview-head h3 {
+  font-size: 13px;
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+.preview-head .btn { margin-left: auto; }
+.preview-box {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  white-space: pre-wrap;
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 320px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.preview-meta {
+  display: flex;
+  gap: 12px;
+  padding: 8px 0 0;
+  border-top: 1px solid var(--border);
+  margin-top: 12px;
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+/* Modals */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+.modal-backdrop.open { display: flex; }
+.modal {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  max-width: 640px;
+  width: 100%;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow);
+}
+.modal-head {
+  padding: 20px 24px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.modal-head h2 { margin: 0; font-size: 17px; font-weight: 700; letter-spacing: -0.2px; }
+.modal-head .btn { margin-left: auto; }
+.modal-body { padding: 8px 24px 24px; }
+.modal-body p { color: var(--text-muted); margin: 0 0 12px; }
+.modal-body label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 4px; margin-top: 12px; font-weight: 500; }
+.modal-body input, .modal-body select, .modal-body textarea { width: 100%; }
+.modal-actions {
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* Onboarding */
+.onboard {
+  max-width: 620px;
+  padding: 8px 0;
+}
+.onboard-step { display: none; }
+.onboard-step.active { display: block; }
+.onboard-step h3 { margin: 0 0 8px; font-size: 22px; letter-spacing: -0.4px; }
+.onboard-step p { color: var(--text-muted); font-size: 14px; line-height: 1.6; }
+.onboard-illus {
+  background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(34,211,238,0.06));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin: 14px 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: pre-wrap;
+  line-height: 1.7;
+}
+.onboard-illus span.tag {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 3px;
+  background: rgba(124,58,237,0.25);
+  color: #ddd6fe;
+  font-family: var(--font);
+  font-size: 11px;
+  font-weight: 600;
+  margin-right: 4px;
+}
+.onboard-dots {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin: 16px 0 4px;
+}
+.onboard-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: background 0.2s;
+}
+.onboard-dot.active { background: var(--accent); }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--bg-elev2);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  transition: transform 0.25s;
+  z-index: 200;
+  box-shadow: var(--shadow);
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.success { border-color: var(--success); }
+.toast.error { border-color: var(--danger); }
+
+/* Empty state */
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}
+.empty h3 { color: var(--text); font-size: 16px; margin: 0 0 6px; }
+.empty p { margin: 0 0 16px; }
+
+/* Loop preview specific */
+.loop-badge {
+  display: inline-block;
+  background: rgba(245,158,11,0.15);
+  color: var(--warn);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  margin-left: 8px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar { position: relative; height: auto; }
+  .main { padding: 0 16px 40px; }
+  .topbar { margin: 0 -16px 20px; padding: 12px 16px; flex-wrap: wrap; }
+  .search { min-width: 100%; order: 3; }
+  .explainer .three-cols { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* Scrollbars */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">AI</div>
+      <div>
+        <div class="brand-name">Personal AI Playbook</div>
+        <div class="brand-sub">Reusable systems, not stored prompts</div>
+      </div>
+    </div>
+
+    <div class="nav-label">Views</div>
+    <button class="nav-item active" data-view="dashboard"><span class="nav-icon">📚</span> Dashboard <span class="badge" id="nav-count-all">0</span></button>
+    <button class="nav-item" data-view="builder"><span class="nav-icon">🧱</span> Prompt Builder</button>
+    <button class="nav-item" data-view="loop"><span class="nav-icon">🔄</span> Loop Builder</button>
+
+    <div class="nav-label">Filter dashboard</div>
+    <button class="nav-item" data-filter="favorites"><span class="nav-icon">⭐</span> Favorites <span class="badge" id="nav-count-fav">0</span></button>
+    <button class="nav-item" data-filter="building"><span class="nav-icon">🛠️</span> Building &amp; prompts <span class="badge" id="nav-count-building">0</span></button>
+    <button class="nav-item" data-filter="analysis"><span class="nav-icon">📊</span> Analysis &amp; decisions <span class="badge" id="nav-count-analysis">0</span></button>
+    <button class="nav-item" data-filter="job"><span class="nav-icon">💼</span> Job search &amp; career <span class="badge" id="nav-count-job">0</span></button>
+    <button class="nav-item" data-filter="content"><span class="nav-icon">✍️</span> Content &amp; thought <span class="badge" id="nav-count-content">0</span></button>
+
+    <div class="nav-label">Settings</div>
+    <button class="nav-item" id="btn-theme"><span class="nav-icon">🌓</span> Toggle theme</button>
+    <button class="nav-item" id="btn-export"><span class="nav-icon">📤</span> Export JSON</button>
+    <button class="nav-item" id="btn-import"><span class="nav-icon">📥</span> Import JSON</button>
+    <button class="nav-item" id="btn-reset"><span class="nav-icon">♻️</span> Reset to seeds</button>
+    <input type="file" id="import-input" accept="application/json" style="display:none">
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="search">
+        <input type="text" id="search-input" placeholder="Search workflows, blocks, presets…">
+      </div>
+      <span class="kbd">⌘K</span>
+      <div class="topbar-actions">
+        <button class="btn" id="btn-help">? What is this?</button>
+        <button class="btn primary" id="btn-new"><span>+</span> New workflow <span class="kbd" style="background:rgba(0,0,0,0.2);border-color:rgba(255,255,255,0.2);color:rgba(255,255,255,0.8)">⌘N</span></button>
+      </div>
+    </div>
+
+    <!-- DASHBOARD VIEW -->
+    <section id="view-dashboard" class="view">
+      <!-- Persistent explainer -->
+      <div class="explainer" id="explainer-banner">
+        <button class="explainer-close" id="explainer-dismiss" title="Dismiss (re-open via ? button in header)">×</button>
+        <h1>What this is</h1>
+        <p>A workshop for building <strong>reusable prompt systems</strong> — not a stash of prompts to copy. Assemble a prompt from labelled blocks (Role, Objective, Constraints, etc.), then optionally wrap it into a self-improving loop with stop conditions and safety rules. Save the result as a workflow. Reuse the parts across new workflows.</p>
+        <div class="three-cols">
+          <div><strong>📚 Dashboard</strong><span>Your saved workflows across four categories. Search, favorite, duplicate, edit.</span></div>
+          <div><strong>🧱 Prompt Builder</strong><span>Assemble prompts from nine labelled blocks with live preview and dropdown presets.</span></div>
+          <div><strong>🔄 Loop Builder</strong><span>Wrap any prompt into an autonomous loop with goal, evaluator, stop conditions, and safety rules.</span></div>
+        </div>
+      </div>
+
+      <h2 class="view-title">Your workflows</h2>
+      <p class="view-subtitle">Every saved workflow is a set of prompt blocks you can copy, edit, or use as a starting point for new ones. Filter by category on the left.</p>
+
+      <!-- Filter chips -->
+      <div class="filter-bar" id="filter-chips"></div>
+
+      <!-- Grid -->
+      <div id="workflow-grid" class="workflow-grid"></div>
+      <div id="empty-state" class="empty" style="display:none;">
+        <h3>No workflows match your search</h3>
+        <p>Try clearing the filter or search box, or create a new workflow.</p>
+        <button class="btn primary" onclick="openWorkflowEditor()">+ New workflow</button>
+      </div>
+    </section>
+
+    <!-- PROMPT BUILDER VIEW -->
+    <section id="view-builder" class="view" style="display:none;">
+      <h2 class="view-title">Prompt Builder</h2>
+      <p class="view-subtitle">Assemble a prompt from labelled blocks. Each block explains what it does and why it's there. Live preview updates on the right. Save when you're happy.</p>
+
+      <div class="builder">
+        <div class="builder-left">
+          <div class="block-picker">
+            <div class="block-picker-title">➕ Add a block</div>
+            <div class="block-picker-grid" id="block-picker-grid"></div>
+          </div>
+          <div id="assembled-blocks"></div>
+          <div style="margin-top:16px; display:flex; gap:8px;">
+            <button class="btn primary" id="btn-save-workflow">💾 Save as workflow</button>
+            <button class="btn" id="btn-clear-builder">Clear all blocks</button>
+            <button class="btn ghost" id="btn-load-example">Load example</button>
+          </div>
+        </div>
+        <div class="builder-right">
+          <div class="preview-head">
+            <h3>Live preview</h3>
+            <button class="btn small" id="btn-copy-preview">📋 Copy</button>
+          </div>
+          <div class="preview-box" id="builder-preview">
+            <span style="color:var(--text-dim)">Add blocks on the left to build your prompt. The rendered prompt will appear here in real time.</span>
+          </div>
+          <div class="preview-meta">
+            <span>Blocks: <strong id="preview-count">0</strong></span>
+            <span>Chars: <strong id="preview-chars">0</strong></span>
+            <span>Est. tokens: <strong id="preview-tokens">0</strong></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOOP BUILDER VIEW -->
+    <section id="view-loop" class="view" style="display:none;">
+      <h2 class="view-title">Loop Builder</h2>
+      <p class="view-subtitle">Turn any prompt into a self-improving loop. The model runs the base prompt, evaluates its own output, revises, and repeats — stopping when a threshold hits, output plateaus, or the iteration cap is reached.</p>
+
+      <div class="builder">
+        <div class="builder-left">
+          <label style="display:block; font-size:12px; color:var(--text-muted); margin-bottom:6px; font-weight:500;">Base prompt to wrap in a loop</label>
+          <textarea id="loop-base" placeholder="Paste your base prompt here (from the Prompt Builder or any other source)..." style="min-height:100px; margin-bottom:16px;"></textarea>
+
+          <div class="block-picker">
+            <div class="block-picker-title">➕ Add a loop block</div>
+            <div class="block-picker-grid" id="loop-picker-grid"></div>
+          </div>
+          <div id="loop-assembled"></div>
+          <div style="margin-top:16px; display:flex; gap:8px;">
+            <button class="btn primary" id="btn-save-loop">💾 Save loop as workflow</button>
+            <button class="btn" id="btn-clear-loop">Clear all blocks</button>
+            <button class="btn ghost" id="btn-loop-example">Load example</button>
+          </div>
+        </div>
+        <div class="builder-right">
+          <div class="preview-head">
+            <h3>Loop preview <span class="loop-badge">SELF-IMPROVING</span></h3>
+            <button class="btn small" id="btn-copy-loop">📋 Copy</button>
+          </div>
+          <div class="preview-box" id="loop-preview">
+            <span style="color:var(--text-dim)">Paste a base prompt and add loop blocks to wrap it into an autonomous loop.</span>
+          </div>
+          <div class="preview-meta">
+            <span>Loop blocks: <strong id="loop-count">0</strong></span>
+            <span>Chars: <strong id="loop-chars">0</strong></span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ONBOARDING MODAL -->
+<div class="modal-backdrop" id="onboard-modal">
+  <div class="modal onboard">
+    <div class="modal-head">
+      <h2>Welcome to your Personal AI Playbook</h2>
+    </div>
+    <div class="modal-body">
+      <div class="onboard-step active" data-step="0">
+        <h3>Reusable systems, not stored prompts</h3>
+        <p>Most people collect prompts. This playbook teaches the parts a good prompt is made of, so you can assemble thousands of variations from a small library of blocks. Everything you save lives on your machine (localStorage) — nothing leaves this file.</p>
+        <div class="onboard-illus">A prompt is not a spell. It's a stack of these parts:
+<span class="tag">ROLE</span> who the model should act as
+<span class="tag">OBJECTIVE</span> what you want
+<span class="tag">CONTEXT</span> what the model doesn't know
+<span class="tag">CONSTRAINTS</span> what's off-limits
+<span class="tag">REASONING</span> how it should think
+<span class="tag">FORMAT</span> the shape of the output
+<span class="tag">TONE</span> the voice
+<span class="tag">EXAMPLES</span> what "good" looks like
+<span class="tag">QUALITY</span> self-checks before finishing</div>
+      </div>
+      <div class="onboard-step" data-step="1">
+        <h3>The Prompt Builder</h3>
+        <p>Click a block to add it. Each block has a dropdown of preset options plus a free-text override. Every block explains what it does and why it's there — you never have to guess what "Reasoning strategy" means. Live preview updates as you assemble.</p>
+        <div class="onboard-illus">Example: "Rewrite my resume bullet"
+<span class="tag">ROLE</span> ATS-optimization recruiter
+<span class="tag">OBJECTIVE</span> rewrite the bullet for keyword match
+<span class="tag">CONTEXT</span> target JD pasted below
+<span class="tag">CONSTRAINTS</span> under 25 words, no buzzwords
+<span class="tag">FORMAT</span> single bullet, no preamble
+<span class="tag">QUALITY</span> flag any invented achievements
+
+→ Save. Reuse the same 6 blocks for every bullet.</div>
+      </div>
+      <div class="onboard-step" data-step="2">
+        <h3>The Loop Builder</h3>
+        <p>Any prompt can become a self-improving loop. Paste your base prompt, define a goal, an evaluator, and stop conditions. The output is a single prompt that instructs the model to run itself in a loop until it hits a quality threshold, plateaus, or reaches a hard iteration cap.</p>
+        <div class="onboard-illus">Wrap a resume-bullet prompt into a loop:
+<span class="tag">GOAL</span> maximize quality score 1-100
+<span class="tag">EVAL</span> clarity + specificity + JD match
+<span class="tag">IMPROVE</span> patch only the weakest point
+<span class="tag">STOP</span> score ≥ 90 OR no gain 2× OR cap 6
+<span class="tag">SAFETY</span> abort if bullet invents a metric
+
+→ Model iterates itself. You paste the winner.</div>
+      </div>
+      <div class="onboard-step" data-step="3">
+        <h3>Seeded workflows are the tutorial</h3>
+        <p>The Dashboard ships with 12 real workflows across four categories. Open any one to see how it's built out of blocks. Duplicate, tweak, save as your own. Reuse blocks across new workflows. The tool teaches by example — the empty state is a filled one.</p>
+        <div class="onboard-illus">Try these first:
+• LinkedIn Day-N post drafter
+• Resume bullet tailorer
+• Decision framework runner
+• Single-file HTML app spec drafter
+• Prompt roast (self-critique loop)</div>
+      </div>
+      <div class="onboard-dots">
+        <div class="onboard-dot active" data-dot="0"></div>
+        <div class="onboard-dot" data-dot="1"></div>
+        <div class="onboard-dot" data-dot="2"></div>
+        <div class="onboard-dot" data-dot="3"></div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn ghost" id="onboard-skip">Skip tour</button>
+      <button class="btn" id="onboard-prev" style="display:none;">← Back</button>
+      <button class="btn primary" id="onboard-next">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- WORKFLOW EDITOR MODAL -->
+<div class="modal-backdrop" id="workflow-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="workflow-modal-title">New workflow</h2>
+      <button class="btn ghost" onclick="closeModal('workflow-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <label>Workflow name</label>
+      <input type="text" id="wf-name" placeholder="e.g. Resume bullet tailorer">
+      <label>Short description (what it does, in plain language)</label>
+      <textarea id="wf-desc" rows="2" placeholder="e.g. Rewrites a resume bullet against a target JD, preserving impact metrics."></textarea>
+      <label>Category</label>
+      <select id="wf-cat">
+        <option value="building">🛠️ Building &amp; prompt engineering</option>
+        <option value="analysis">📊 Analysis &amp; decisions</option>
+        <option value="job">💼 Job search &amp; career</option>
+        <option value="content">✍️ Content &amp; thought leadership</option>
+      </select>
+      <p style="margin-top:14px; font-size:12px; color:var(--text-dim);">Once saved, you'll be taken to the Prompt Builder to assemble the blocks. If you're editing an existing workflow, this preserves the blocks you already have.</p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeModal('workflow-modal')">Cancel</button>
+      <button class="btn primary" id="wf-save">Save + open in Builder</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* =====================================================================
+   BLOCK LIBRARIES
+   Every block has: id, name, icon, explanation (shown in-UI both in picker
+   AND on the assembled block), template (how it renders in the preview),
+   and preset options (dropdown; free-text override always available).
+   ===================================================================== */
+
+const BLOCK_LIBRARY = [
+  {
+    id: 'role',
+    name: 'Role',
+    icon: '👤',
+    explanation: '<strong>Who</strong> the model should act as. Anchors expertise level, vocabulary, and default assumptions. First line of most strong prompts.',
+    template: 'ROLE\nYou are a {value}.',
+    presets: [
+      'senior data analyst with 10+ years of experience',
+      'ATS-optimization recruiter reviewing resumes',
+      'principal front-end engineer writing production single-file HTML',
+      'blunt startup advisor who says the quiet part out loud',
+      'copywriter who edits like David Ogilvy',
+      'PhD-level academic peer reviewer',
+      'friendly professor explaining to a curious 15-year-old',
+      'MSBA career coach specializing in analyst roles',
+    ],
+  },
+  {
+    id: 'objective',
+    name: 'Objective',
+    icon: '🎯',
+    explanation: '<strong>What</strong> you want, in one sentence. The single answer to "what am I actually asking for?" Prompts fail more often from unclear objectives than from anything else.',
+    template: 'OBJECTIVE\nYour objective is to {value}.',
+    presets: [
+      'rewrite the following text to be more concise and specific',
+      'analyze the input and identify the top 3 issues, ranked by severity',
+      'produce a step-by-step plan I can execute today',
+      'draft a first version I can iterate on',
+      'critique the following work harshly and specifically — no polite hedging',
+      'translate this into plain English for a non-expert reader',
+      'summarize this into 5 bullet points, each under 15 words',
+    ],
+  },
+  {
+    id: 'context',
+    name: 'Context',
+    icon: '📋',
+    explanation: '<strong>Background</strong> the model needs to be useful. What you know that the model does not — audience, prior attempts, current state, real names of things.',
+    template: 'CONTEXT\n{value}',
+    presets: [
+      'The audience is [describe audience — role, expertise level, what they care about]',
+      'This is part of a larger project: [describe project + current state]',
+      'Previous attempts failed because [describe the failure mode]',
+      'The constraints I care about most are [describe]',
+      'I am [role] working on [thing] and my main blocker is [thing]',
+    ],
+  },
+  {
+    id: 'constraints',
+    name: 'Constraints',
+    icon: '🚧',
+    explanation: '<strong>Hard rules</strong> the model must obey. What must not appear in the output — word limits, format restrictions, banned words, forbidden claims. Negative instructions are underrated.',
+    template: 'CONSTRAINTS\n{value}',
+    presets: [
+      '- Do not use bullet points or numbered lists\n- Keep total output under 200 words\n- No em-dashes, no "leverage", no "delve"',
+      '- Never invent facts; if unsure, say "unknown"\n- Single paragraph, no headers\n- First person',
+      '- No preamble like "Here is..." — start directly with the deliverable\n- Max 3 sentences',
+      '- Do not include any AI-disclosure caveats\n- Do not soften the critique',
+    ],
+  },
+  {
+    id: 'reasoning',
+    name: 'Reasoning strategy',
+    icon: '🧠',
+    explanation: '<strong>How</strong> the model should think before answering. Step-by-step decomposition, first-principles, working backwards, considering alternatives. Meaningfully improves quality on multi-step problems.',
+    template: 'REASONING\n{value}',
+    presets: [
+      'Think step-by-step before writing the final answer. Show reasoning briefly, then the answer.',
+      'Work backwards from the ideal outcome. What would have to be true for that to happen?',
+      'Consider 3 distinct alternatives, name the tradeoffs of each, then pick one.',
+      'First principles: name the underlying assumptions, then reason from there.',
+      'Steelman the opposing view before defending your answer.',
+      'Explicitly identify what you do not know before answering.',
+    ],
+  },
+  {
+    id: 'format',
+    name: 'Output format',
+    icon: '📐',
+    explanation: '<strong>The shape</strong> of the response. Markdown vs. JSON vs. plain text. Headers, table structure, ordering. Specifying format eliminates a class of "I asked for X and got Y" failures.',
+    template: 'OUTPUT FORMAT\n{value}',
+    presets: [
+      'Markdown with H2 headers for each section',
+      'A single paragraph, no headers or lists',
+      'A JSON object with keys: {describe the schema}',
+      'A numbered list (1. 2. 3.) — one item per line',
+      'A table with columns: {describe columns}',
+      'A LinkedIn post under 3000 characters',
+      'Three variants labelled A, B, C',
+    ],
+  },
+  {
+    id: 'tone',
+    name: 'Tone',
+    icon: '🎨',
+    explanation: '<strong>The voice</strong> of the output. Formal, casual, blunt, warm, technical, editorial. Tone is easier to specify with reference than with adjectives — pair with an Example block for best results.',
+    template: 'TONE\n{value}',
+    presets: [
+      'Direct — no filler, no corporate-speak',
+      'Warm and encouraging, without being cloying',
+      'Academic and precise',
+      'Casual, conversational, first-person',
+      'Blunt — say the quiet part out loud',
+      'Editorial — like a New Yorker essay',
+      'Technical but readable by a non-specialist',
+    ],
+  },
+  {
+    id: 'examples',
+    name: 'Examples',
+    icon: '💡',
+    explanation: '<strong>Few-shot</strong> examples of what "good" looks like. Best-in-class technique for shaping style, format, and depth. One vivid example often beats a paragraph of rule-writing.',
+    template: 'EXAMPLES\n{value}',
+    presets: [
+      'Example 1:\nInput: [paste example input]\nIdeal output: [paste ideal output]\n\nExample 2:\nInput: [paste]\nIdeal output: [paste]',
+      'Style reference (match this voice):\n[paste 2-3 paragraphs of text in the tone you want]',
+      'Counter-example (DO NOT sound like this):\n[paste something in the wrong voice]',
+    ],
+  },
+  {
+    id: 'quality',
+    name: 'Quality checks',
+    icon: '✅',
+    explanation: '<strong>Self-checks</strong> the model should run before finishing. Catches common failure modes — vague claims, invented facts, generic language, unnecessary caveats. Adding this block reliably improves outputs.',
+    template: 'QUALITY CHECKS (run before returning)\n{value}',
+    presets: [
+      '- Any factual claim I cannot support? Remove it.\n- Anything vague? Make it specific.\n- Does every sentence earn its place? Cut any that do not.',
+      '- Any "as an AI" caveats or safety hedges? Remove them.\n- Any word a domain expert would wince at? Replace it.\n- Am I answering the actual question or a similar-looking one?',
+      '- Have I invented any metrics or achievements? Flag them.\n- Have I over-claimed expertise?\n- Would this pass a 30-second read from a busy hiring manager?',
+    ],
+  },
+];
+
+const LOOP_LIBRARY = [
+  {
+    id: 'loop_goal',
+    name: 'Loop goal',
+    icon: '🎯',
+    explanation: '<strong>What the loop optimizes for.</strong> The measurable outcome each iteration should improve. Without a goal, the loop cannot know if it is making progress.',
+    template: 'LOOP GOAL\n{value}',
+    presets: [
+      'Maximize a self-evaluated quality score on a 1-100 scale',
+      'Reach a specific target: [word count ≤ N / sentiment ≥ X / structural test passes]',
+      'Converge on a stable output (last two iterations identical or near-identical)',
+    ],
+  },
+  {
+    id: 'loop_eval',
+    name: 'Evaluation criteria',
+    icon: '📊',
+    explanation: '<strong>How each iteration is scored.</strong> Must be measurable. Either the model self-scores against a rubric, or an automated check runs on the output.',
+    template: 'EVALUATION CRITERIA\n{value}',
+    presets: [
+      'Self-rated 1-100 score based on: clarity, specificity, factual correctness. State the score explicitly as SCORE: N.',
+      'Rubric with these dimensions (each 1-10):\n- Clarity of argument\n- Specificity of examples\n- Absence of filler\n- Match to requested tone',
+      'Automated check: output must satisfy [regex / word-count range / structural test]. Score = pass/fail.',
+    ],
+  },
+  {
+    id: 'loop_improve',
+    name: 'Improvement strategy',
+    icon: '🔧',
+    explanation: '<strong>How to revise between iterations.</strong> Different from Reasoning strategy — this is about how to improve on the previous attempt, not how to reason about the problem.',
+    template: 'IMPROVEMENT STRATEGY (between iterations)\n{value}',
+    presets: [
+      'Read the previous output and its score. Identify the 2 weakest points from the rubric. Rewrite only those.',
+      'Full rewrite from scratch, informed by the critique.',
+      'Targeted patch: change only what the evaluator explicitly flagged. Leave everything else untouched.',
+      'Add one new specific example each iteration; do not remove earlier work.',
+    ],
+  },
+  {
+    id: 'loop_stop',
+    name: 'Stop conditions',
+    icon: '🛑',
+    explanation: '<strong>When to end the loop.</strong> Must include a hard iteration cap so the loop cannot run forever. Best practice: use all three (threshold, plateau, cap) simultaneously.',
+    template: 'STOP CONDITIONS (any triggers exit)\n{value}',
+    presets: [
+      '- Score ≥ 90 (quality threshold reached)\n- Score does not improve for 2 consecutive iterations (plateau)\n- Iteration count ≥ 6 (hard budget cap)',
+      '- Score ≥ 85 OR 5 iterations, whichever comes first',
+      '- Output identical to previous iteration (converged) OR 4 iterations',
+    ],
+  },
+  {
+    id: 'loop_safety',
+    name: 'Safety rules',
+    icon: '🛡️',
+    explanation: '<strong>Hard aborts</strong> regardless of score. Catches runaway loops, drift from original task, or violation of constraints. Safety rules override every other condition.',
+    template: 'SAFETY RULES (any triggers immediate abort)\n{value}',
+    presets: [
+      '- If any output contains personally identifying information not present in the input, abort.\n- If any output violates the ORIGINAL constraints in the base prompt, abort.\n- If any output exceeds 800 words, abort.',
+      '- If the model attempts to call an external tool or run code, abort.\n- If any output contains "as an AI" or refuses the task, abort and return the best previous attempt.',
+      '- If iteration produces empty output or output identical to the base prompt echoed back, abort.',
+    ],
+  },
+];
+
+/* =====================================================================
+   SEED WORKFLOWS
+   12 real workflows drawn from the actual daily use of a blended
+   (analyst + student + job seeker + builder) profile.
+   Each is stored as a set of block instances (blockId + value).
+   ===================================================================== */
+
+const SEED_WORKFLOWS = [
+  {
+    id: 'seed_html_spec',
+    name: 'Single-file HTML app spec drafter',
+    description: 'Turns a rough app idea into a complete spec Claude can implement in one pass. Output covers goal, user, sections, interactions, edge cases.',
+    category: 'building',
+    kind: 'prompt',
+    blocks: [
+      { id: 'role', value: 'principal front-end engineer writing production single-file HTML' },
+      { id: 'objective', value: 'convert my rough app idea into a complete build spec Claude can implement in one pass' },
+      { id: 'context', value: 'I ship single-file HTML apps with no frameworks and no CDN. The output of this prompt goes straight into a new chat with Claude Sonnet 4.5. The rough idea is:\n\n[PASTE ROUGH IDEA HERE]' },
+      { id: 'format', value: 'Markdown spec with these H2 sections: Goal, Primary user, App sections, Interactions, Data model, Edge cases, Non-goals, Success criteria' },
+      { id: 'constraints', value: '- No frameworks, no CDN, single HTML file\n- Do not write any code — spec only\n- Name any ambiguities as open questions at the top' },
+      { id: 'quality', value: '- Have I named the primary user and their moment of use?\n- Are edge cases specific (e.g., "empty state on cold open") not generic?\n- Would a strong engineer be able to build this in one pass?' },
+    ],
+  },
+  {
+    id: 'seed_prompt_roast',
+    name: 'Prompt roast + rewrite',
+    description: 'Paste a prompt you wrote. Get structural critique + rewritten version + reusable blocks extracted.',
+    category: 'building',
+    kind: 'prompt',
+    blocks: [
+      { id: 'role', value: 'blunt prompt engineer who has seen 10,000 bad prompts' },
+      { id: 'objective', value: 'roast the following prompt structurally, then rewrite it into a clean block-based version' },
+      { id: 'context', value: 'The prompt to roast:\n\n[PASTE PROMPT HERE]' },
+      { id: 'reasoning', value: 'First identify what parts (role / objective / context / constraints / format / tone / examples / quality checks) are present, missing, or vague. Then rewrite.' },
+      { id: 'format', value: 'Section 1: STRUCTURAL AUDIT — table with columns Block, Present?, Quality (1-10), Note.\nSection 2: TOP 3 PROBLEMS — bulleted, specific.\nSection 3: REWRITTEN PROMPT — labelled by block.' },
+      { id: 'constraints', value: '- No hedging like "consider adding..." — say what to change.\n- Do not invent context I did not provide.' },
+    ],
+  },
+  {
+    id: 'seed_sql_explain',
+    name: 'SQL query explainer + optimizer',
+    description: 'Paste a SQL query. Get plain-English explanation + optimization suggestions ranked by impact.',
+    category: 'analysis',
+    kind: 'prompt',
+    blocks: [
+      { id: 'role', value: 'senior analytics engineer who reviews SQL for a 500M-row warehouse' },
+      { id: 'objective', value: 'explain what this query does in plain English, then suggest optimizations ranked by expected impact' },
+      { id: 'context', value: 'The query:\n\n```sql\n[PASTE SQL HERE]\n```\n\nDialect: [Postgres / MySQL / BigQuery / Snowflake]' },
+      { id: 'format', value: 'Section 1: What this query does (1 paragraph, plain English)\nSection 2: Optimization opportunities — ranked table with columns Change, Expected impact (H/M/L), Effort, Why\nSection 3: Rewritten query with comments' },
+      { id: 'constraints', value: '- Do not invent index names or table structures I did not describe.\n- If a query cannot be optimized, say so directly.' },
+    ],
+  },
+  {
+    id: 'seed_decision_framework',
+    name: 'Decision framework runner',
+    description: 'Name a decision. The prompt runs the Reversibility × Impact × Time × Confidence framework and outputs a verdict.',
+    category: 'analysis',
+    kind: 'prompt',
+    blocks: [
+      { id: 'role', value: 'blunt startup advisor who has seen 500 founder decisions' },
+      { id: 'objective', value: 'analyze the following decision through the Reversibility × Impact × Time-to-signal × Confidence framework and return a verdict' },
+      { id: 'context', value: 'The decision:\n\n[DESCRIBE THE DECISION IN 3-5 SENTENCES]\n\nWhat I already know: [what you know]\nWhat I do not know: [gaps]\nDeadline: [when]' },
+      { id: 'reasoning', value: 'Score each of the four dimensions 1-10 with a one-line justification. Then produce the verdict: PROCEED / PROCEED WITH TEST / WAIT / KILL. Verdict must be constrained by reversibility — never say KILL for a highly reversible decision.' },
+      { id: 'format', value: 'Section 1: Scores table (Dimension | Score | Justification)\nSection 2: Verdict (one word) + 3-sentence rationale\nSection 3: The single next action, executable in the next 24 hours' },
+      { id: 'quality', value: '- Is the verdict consistent with the reversibility score?\n- Is the next action concrete (a specific thing you can do in 24 hours) not aspirational?' },
+    ],
+  },
+  {
+    id: 'seed_resume_bullet',
+    name: 'Resume bullet tailorer',
+    description: 'Paste your current bullet + a target JD. Get 3 rewritten variants matched to JD keywords, with impact metrics preserved.',
+    category: 'job',
+    kind: 'prompt',
+    blocks: [
+      { id: 'role', value: 'ATS-optimization recruiter reviewing analyst-role resumes' },
+      { id: 'objective', value: 'rewrite the following resume bullet in three variants that maximize keyword match to the target JD while preserving quantified impact' },
+      { id: 'context', value: 'Current bullet:\n[PASTE BULLET]\n\nTarget JD (relevant excerpts):\n[PASTE JD]\n\nMy actual work behind the bullet (do not include in output, use for accuracy check):\n[PASTE REAL DESCRIPTION]' },
+      { id: 'format', value: 'Three variants labelled A, B, C.\nEach: 1 line, ≤ 25 words, starts with a strong verb, contains at least one metric.\nBelow each: the specific JD keywords hit.' },
+      { id: 'constraints', value: '- Do not invent metrics or achievements not in my actual work.\n- No corporate-speak: no "leverage", no "synergy", no "spearhead".\n- Present tense if current role, past tense if prior role.' },
+      { id: 'quality', value: '- Does every variant match at least 3 JD keywords?\n- Is the metric in the bullet defensible from my actual work?\n- Would a hiring manager read the bullet and understand the impact in 3 seconds?' },
+    ],
+  },
+  {
+    id: 'seed_cover_letter',
+    name: 'Cover letter drafter (3-paragraph)',
+    description: 'JD + resume snippet → tight 3-paragraph cover letter. No throat-clearing openings.',
+    category: 'job',
+    kind: 'prompt',
+    blocks: [
+      { id: 'role', value: 'career coach who has written 2,000 cover letters that got interviews' },
+      { id: 'objective', value: 'draft a 3-paragraph cover letter for the following role' },
+      { id: 'context', value: 'Target JD:\n[PASTE JD]\n\nMy resume snippet (most relevant experience):\n[PASTE]\n\nSpecific reason I want this role (not the generic "I love your mission" — the real reason):\n[REASON]' },
+      { id: 'format', value: 'Paragraph 1: The hook. Why this specific role now. Do NOT open with "I am writing to apply for..."\nParagraph 2: The proof. The most relevant thing I have done, with a metric.\nParagraph 3: The ask. Confident, specific, includes availability.' },
+      { id: 'tone', value: 'Direct, confident, first-person, no filler. Cut every sentence that does not earn its place.' },
+      { id: 'constraints', value: '- Total under 280 words.\n- No "I am uniquely qualified" or similar cliches.\n- No em-dashes, no "delve".' },
+    ],
+  },
+  {
+    id: 'seed_star_story',
+    name: 'Interview STAR-story builder',
+    description: 'Raw story + target role competency → structured STAR story with strong metric and reflection.',
+    category: 'job',
+    kind: 'prompt',
+    blocks: [
+      { id: 'role', value: 'interview coach who has drilled 500 candidates into MBB / FAANG offers' },
+      { id: 'objective', value: 'restructure the following raw story into a tight STAR-format answer for a behavioural interview' },
+      { id: 'context', value: 'Target competency the story should demonstrate: [ownership / conflict resolution / analytical rigor / etc.]\n\nRaw story (stream of consciousness):\n[PASTE]' },
+      { id: 'format', value: 'S: Situation — 2 sentences max, sets the stakes.\nT: Task — 1 sentence, what you were asked to do.\nA: Action — 3-4 specific things YOU did (not "we").\nR: Result — 1-2 sentences, quantified.\nReflection: 1 sentence, what you would do differently.' },
+      { id: 'constraints', value: '- Answer must be ≤ 90 seconds when read aloud (about 200 words).\n- Do not invent numbers I did not give you.\n- First person singular throughout the Action section.' },
+    ],
+  },
+  {
+    id: 'seed_linkedin_dm',
+    name: 'LinkedIn networking DM',
+    description: 'Target person + role you want → warm, specific 3-line message. No corporate DM template.',
+    category: 'job',
+    kind: 'prompt',
+    blocks: [
+      { id: 'role', value: 'networking coach who writes messages that actually get replies' },
+      { id: 'objective', value: 'draft a warm, specific 3-line LinkedIn DM to the target person' },
+      { id: 'context', value: 'Target person: [name, current role, one thing about them from their profile]\nMy role / context: [who you are in one line]\nWhat you actually want from them: [informational call / referral / advice — say the truth]' },
+      { id: 'format', value: 'Exactly 3 lines. Line 1: a specific reason you\'re reaching out (something from their profile). Line 2: who you are in one line. Line 3: the ask, small and specific.' },
+      { id: 'constraints', value: '- Under 400 characters.\n- No "Hope you\'re doing well."\n- No "I saw your impressive profile."\n- No emojis unless the target uses them.\n- No "Can I pick your brain."' },
+    ],
+  },
+  {
+    id: 'seed_linkedin_post',
+    name: 'LinkedIn Day-N build post drafter',
+    description: 'What you built + one insight → reflective one-paragraph LinkedIn post under 3000 chars. Job-search-coded, no self-critical framings.',
+    category: 'content',
+    kind: 'prompt',
+    blocks: [
+      { id: 'role', value: 'copywriter who ghostwrites for technical founders on LinkedIn' },
+      { id: 'objective', value: 'draft a LinkedIn post about today\'s build for the #60DayClaudeChallenge' },
+      { id: 'context', value: 'Day number: [N]\nBuild name: [name]\nWhat it does: [1-2 sentences]\nThe one insight worth sharing (not the build — the insight): [the real point]\nLive tool URL: [URL]' },
+      { id: 'format', value: 'Opening hook: 1-2 sentence reframe or provocation.\nMiddle: reflective paragraph on the build + the insight.\nClose: "Day N of 60. Built with Claude. Single HTML file."\nTags: @Anil Bajpai @ABTalksOnAI @Anthropic\nHashtags: #60DayClaudeChallenge + 2-3 topical.' },
+      { id: 'tone', value: 'Direct, first-person, no corporate-speak. Voice matches a build-in-public account run by a person, not a brand.' },
+      { id: 'constraints', value: '- Total under 3000 characters.\n- No em-dashes unless intentional.\n- Do not open with "Today I built" or similar throat-clearing.\n- Do not self-critique or hedge ("I am not sure if...").\n- Do not use bullet points.' },
+      { id: 'quality', value: '- Does the opening hook stand alone without the rest of the post?\n- Is the insight specific (a real observation) or generic?\n- Under 3000 chars including tags?' },
+    ],
+  },
+  {
+    id: 'seed_writeup',
+    name: 'Build-in-public writeup',
+    description: 'Project + tech + insight → structured markdown writeup for docs / repo README / newsletter.',
+    category: 'content',
+    kind: 'prompt',
+    blocks: [
+      { id: 'role', value: 'technical writer who edits for Substack-tier build-in-public accounts' },
+      { id: 'objective', value: 'produce a structured writeup of the following project suitable for a repo README or dev blog post' },
+      { id: 'context', value: 'Project: [name]\nWhat it does: [1-2 sentences]\nTech stack: [list]\nThe interesting engineering decision (not the feature list — the decision): [describe]\nWhat surprised you while building it: [describe]' },
+      { id: 'format', value: '## What I built\n## The one interesting design choice\n## Trade-offs I actively rejected\n## Tech notes (bulleted, terse)\n## What this exercise demonstrates\n## Narrative continuity (how it connects to prior work)' },
+      { id: 'tone', value: 'Direct, first-person, technical but readable by a non-specialist. No hype.' },
+    ],
+  },
+  {
+    id: 'seed_teardown',
+    name: 'Product teardown analysis',
+    description: 'URL or product description → structured critique with what works, what doesn\'t, and what you\'d ship differently.',
+    category: 'content',
+    kind: 'prompt',
+    blocks: [
+      { id: 'role', value: 'senior product designer who has shipped at 3 unicorns' },
+      { id: 'objective', value: 'produce a structured teardown of the following product' },
+      { id: 'context', value: 'Product: [name + URL if available]\nWhat it claims to do: [one sentence]\nWho it is for: [target user]\nWhat you observed: [describe the experience]' },
+      { id: 'format', value: '## First 30 seconds — what a cold user takes away\n## What works — specific strong choices, ranked\n## What breaks — specific failure points, ranked by severity\n## What I would ship differently — 3 concrete changes, each in one paragraph\n## The bigger point this teardown makes about the category' },
+      { id: 'tone', value: 'Editorial, specific, not sycophantic. Would work as a Fast Company column.' },
+      { id: 'constraints', value: '- No generic UX advice ("improve accessibility") — every recommendation must reference something you observed.\n- No verdict of "10/10 flawless".' },
+    ],
+  },
+  {
+    id: 'seed_bullet_loop',
+    name: 'Resume bullet — self-improving loop',
+    description: 'Wraps the bullet tailorer in a loop that self-evaluates and revises until quality ≥ 90 or 5 iterations.',
+    category: 'job',
+    kind: 'loop',
+    base: 'You will rewrite this resume bullet for a target JD.\n\nCurrent bullet: [PASTE BULLET]\nTarget JD: [PASTE JD]\nMy real work behind the bullet (for accuracy — do not include in output): [PASTE]\n\nReturn a single-line rewritten bullet, ≤ 25 words, starting with a strong verb, containing at least one defensible metric.',
+    blocks: [
+      { id: 'loop_goal', value: 'Maximize a self-rated quality score on a 1-100 scale' },
+      { id: 'loop_eval', value: 'Score based on:\n- Keyword match to JD (0-30)\n- Metric strength & defensibility (0-25)\n- Verb strength & specificity (0-20)\n- Absence of buzzwords/hedging (0-15)\n- 30-second readability (0-10)\nState the score explicitly as SCORE: N/100 with a breakdown.' },
+      { id: 'loop_improve', value: 'Read your previous bullet + score breakdown. Identify the 2 lowest-scoring dimensions. Patch only those. Do not rewrite from scratch unless the score is below 60.' },
+      { id: 'loop_stop', value: '- Score ≥ 90 (quality threshold reached)\n- Score does not improve for 2 consecutive iterations (plateau)\n- Iteration count ≥ 5 (hard cap)' },
+      { id: 'loop_safety', value: '- If the bullet invents any metric not present in my "real work" input, abort.\n- If output exceeds 30 words, abort.\n- Never remove the metric that WAS in the original.' },
+    ],
+  },
+];
+
+/* =====================================================================
+   STATE + STORAGE
+   ===================================================================== */
+
+const STATE = {
+  workflows: [],
+  favorites: new Set(),
+  darkMode: true,
+  onboardingDone: false,
+  explainerDismissed: false,
+  activeView: 'dashboard',
+  activeFilter: 'all',
+  searchQuery: '',
+  builderBlocks: [],
+  loopBase: '',
+  loopBlocks: [],
+  editingWorkflowId: null,
+};
+
+const STORAGE_KEY = 'personal_ai_playbook_v1';
+
+function saveState() {
+  const persist = {
+    workflows: STATE.workflows,
+    favorites: Array.from(STATE.favorites),
+    darkMode: STATE.darkMode,
+    onboardingDone: STATE.onboardingDone,
+    explainerDismissed: STATE.explainerDismissed,
+  };
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(persist)); } catch(e){}
+}
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      STATE.workflows = parsed.workflows || [];
+      STATE.favorites = new Set(parsed.favorites || []);
+      STATE.darkMode = parsed.darkMode !== undefined ? parsed.darkMode : true;
+      STATE.onboardingDone = !!parsed.onboardingDone;
+      STATE.explainerDismissed = !!parsed.explainerDismissed;
+    } else {
+      // First run: seed workflows
+      STATE.workflows = JSON.parse(JSON.stringify(SEED_WORKFLOWS));
+    }
+  } catch(e) {
+    STATE.workflows = JSON.parse(JSON.stringify(SEED_WORKFLOWS));
+  }
+}
+
+/* =====================================================================
+   RENDERING
+   ===================================================================== */
+
+function $(sel) { return document.querySelector(sel); }
+function $$(sel) { return Array.from(document.querySelectorAll(sel)); }
+
+const CATEGORIES = {
+  building: { name: '🛠️ Building & prompt engineering', color: 'var(--accent)' },
+  analysis: { name: '📊 Analysis & decisions', color: 'var(--accent-2)' },
+  job: { name: '💼 Job search & career', color: 'var(--success)' },
+  content: { name: '✍️ Content & thought leadership', color: 'var(--warn)' },
+};
+
+function renderDashboard() {
+  const grid = $('#workflow-grid');
+  grid.innerHTML = '';
+
+  let filtered = STATE.workflows.slice();
+  if (STATE.activeFilter === 'favorites') {
+    filtered = filtered.filter(w => STATE.favorites.has(w.id));
+  } else if (STATE.activeFilter !== 'all') {
+    filtered = filtered.filter(w => w.category === STATE.activeFilter);
+  }
+  if (STATE.searchQuery) {
+    const q = STATE.searchQuery.toLowerCase();
+    filtered = filtered.filter(w =>
+      w.name.toLowerCase().includes(q) ||
+      w.description.toLowerCase().includes(q) ||
+      (w.blocks || []).some(b => (b.value || '').toLowerCase().includes(q))
+    );
+  }
+
+  if (filtered.length === 0) {
+    $('#empty-state').style.display = 'block';
+    $('#workflow-grid').style.display = 'none';
+  } else {
+    $('#empty-state').style.display = 'none';
+    $('#workflow-grid').style.display = 'grid';
+  }
+
+  filtered.forEach(wf => {
+    const card = document.createElement('div');
+    card.className = 'workflow-card';
+    const cat = CATEGORIES[wf.category] || { name: 'Uncategorized' };
+    const isFav = STATE.favorites.has(wf.id);
+    const kindBadge = wf.kind === 'loop' ? '<span class="loop-badge" style="margin-left:6px;">LOOP</span>' : '';
+    card.innerHTML = `
+      <div class="workflow-card-cat">${cat.name} ${kindBadge}</div>
+      <h3>${escapeHTML(wf.name)}</h3>
+      <p>${escapeHTML(wf.description)}</p>
+      <div class="workflow-card-meta">
+        <span>${(wf.blocks || []).length} blocks</span>
+        <div class="workflow-card-actions">
+          <button class="btn small" data-action="open" data-id="${wf.id}">Open</button>
+          <button class="btn small ghost" data-action="dup" data-id="${wf.id}" title="Duplicate">📄</button>
+          <button class="btn small ghost" data-action="del" data-id="${wf.id}" title="Delete">🗑</button>
+        </div>
+        <span class="fav ${isFav ? 'active' : ''}" data-action="fav" data-id="${wf.id}" title="Favorite">${isFav ? '★' : '☆'}</span>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+
+  // Update nav counts
+  const cnt = (fn) => STATE.workflows.filter(fn).length;
+  $('#nav-count-all').textContent = STATE.workflows.length;
+  $('#nav-count-fav').textContent = STATE.favorites.size;
+  $('#nav-count-building').textContent = cnt(w => w.category === 'building');
+  $('#nav-count-analysis').textContent = cnt(w => w.category === 'analysis');
+  $('#nav-count-job').textContent = cnt(w => w.category === 'job');
+  $('#nav-count-content').textContent = cnt(w => w.category === 'content');
+}
+
+function renderFilterChips() {
+  const chips = $('#filter-chips');
+  chips.innerHTML = '';
+  const filters = [
+    { id: 'all', label: 'All' },
+    { id: 'favorites', label: '⭐ Favorites' },
+    { id: 'building', label: '🛠️ Building & prompts' },
+    { id: 'analysis', label: '📊 Analysis' },
+    { id: 'job', label: '💼 Job search' },
+    { id: 'content', label: '✍️ Content' },
+  ];
+  filters.forEach(f => {
+    const c = document.createElement('button');
+    c.className = 'chip' + (STATE.activeFilter === f.id ? ' active' : '');
+    c.textContent = f.label;
+    c.onclick = () => { STATE.activeFilter = f.id; renderFilterChips(); renderDashboard(); };
+    chips.appendChild(c);
+  });
+}
+
+function escapeHTML(s) {
+  return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+}
+
+/* =====================================================================
+   PROMPT BUILDER
+   ===================================================================== */
+
+function renderBlockPicker() {
+  const grid = $('#block-picker-grid');
+  grid.innerHTML = '';
+  BLOCK_LIBRARY.forEach(b => {
+    const el = document.createElement('button');
+    el.className = 'block-pick';
+    el.innerHTML = `
+      <div class="block-pick-head">${b.icon} ${b.name}</div>
+      <div class="block-pick-desc">${b.explanation.replace(/<[^>]+>/g, '')}</div>
+    `;
+    el.onclick = () => addBlockToBuilder(b.id);
+    grid.appendChild(el);
+  });
+}
+
+function addBlockToBuilder(blockId) {
+  const b = BLOCK_LIBRARY.find(x => x.id === blockId);
+  if (!b) return;
+  STATE.builderBlocks.push({ id: blockId, value: b.presets[0] });
+  renderAssembled();
+  updatePreview();
+}
+
+function renderAssembled() {
+  const container = $('#assembled-blocks');
+  container.innerHTML = '';
+  STATE.builderBlocks.forEach((inst, idx) => {
+    const b = BLOCK_LIBRARY.find(x => x.id === inst.id);
+    if (!b) return;
+    const div = document.createElement('div');
+    div.className = 'block-assembled';
+    const options = b.presets.map((p, i) => `<option value="${escapeHTML(p)}" ${inst.value === p ? 'selected' : ''}>${escapeHTML(p.length > 80 ? p.slice(0, 80) + '…' : p)}</option>`).join('');
+    div.innerHTML = `
+      <div class="block-head">
+        <span>${b.icon}</span>
+        <div class="block-title">${b.name}</div>
+        <div class="block-actions">
+          ${idx > 0 ? `<button class="btn" data-move="up" data-idx="${idx}" title="Move up">↑</button>` : ''}
+          ${idx < STATE.builderBlocks.length - 1 ? `<button class="btn" data-move="down" data-idx="${idx}" title="Move down">↓</button>` : ''}
+          <button class="btn danger" data-remove="${idx}" title="Remove">✕</button>
+        </div>
+      </div>
+      <div class="block-desc">${b.explanation}</div>
+      <div class="block-content">
+        <select data-block-select="${idx}">
+          ${options}
+          <option value="__custom__">— Custom (write your own) —</option>
+        </select>
+        <textarea data-block-value="${idx}" placeholder="Edit the block content here. Presets are starting points — customize freely.">${escapeHTML(inst.value)}</textarea>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+
+  // Wire events
+  $$('#assembled-blocks [data-block-select]').forEach(el => {
+    el.onchange = (e) => {
+      const idx = +el.dataset.blockSelect;
+      const v = e.target.value;
+      if (v !== '__custom__') {
+        STATE.builderBlocks[idx].value = v;
+        renderAssembled();
+        updatePreview();
+      }
+    };
+  });
+  $$('#assembled-blocks [data-block-value]').forEach(el => {
+    el.oninput = (e) => {
+      const idx = +el.dataset.blockValue;
+      STATE.builderBlocks[idx].value = e.target.value;
+      updatePreview();
+    };
+  });
+  $$('#assembled-blocks [data-remove]').forEach(el => {
+    el.onclick = () => {
+      STATE.builderBlocks.splice(+el.dataset.remove, 1);
+      renderAssembled();
+      updatePreview();
+    };
+  });
+  $$('#assembled-blocks [data-move]').forEach(el => {
+    el.onclick = () => {
+      const idx = +el.dataset.idx;
+      const dir = el.dataset.move === 'up' ? -1 : 1;
+      const arr = STATE.builderBlocks;
+      [arr[idx], arr[idx+dir]] = [arr[idx+dir], arr[idx]];
+      renderAssembled();
+      updatePreview();
+    };
+  });
+}
+
+function buildPreviewText(blocks, library) {
+  if (blocks.length === 0) return null;
+  return blocks.map(inst => {
+    const b = library.find(x => x.id === inst.id);
+    if (!b) return '';
+    return b.template.replace('{value}', inst.value);
+  }).join('\n\n');
+}
+
+function updatePreview() {
+  const text = buildPreviewText(STATE.builderBlocks, BLOCK_LIBRARY);
+  const box = $('#builder-preview');
+  if (!text) {
+    box.innerHTML = '<span style="color:var(--text-dim)">Add blocks on the left to build your prompt. The rendered prompt will appear here in real time.</span>';
+    $('#preview-count').textContent = '0';
+    $('#preview-chars').textContent = '0';
+    $('#preview-tokens').textContent = '0';
+    return;
+  }
+  box.textContent = text;
+  $('#preview-count').textContent = STATE.builderBlocks.length;
+  $('#preview-chars').textContent = text.length;
+  $('#preview-tokens').textContent = Math.round(text.length / 4);
+}
+
+/* =====================================================================
+   LOOP BUILDER
+   ===================================================================== */
+
+function renderLoopPicker() {
+  const grid = $('#loop-picker-grid');
+  grid.innerHTML = '';
+  LOOP_LIBRARY.forEach(b => {
+    const el = document.createElement('button');
+    el.className = 'block-pick';
+    el.innerHTML = `
+      <div class="block-pick-head">${b.icon} ${b.name}</div>
+      <div class="block-pick-desc">${b.explanation.replace(/<[^>]+>/g, '')}</div>
+    `;
+    el.onclick = () => addLoopBlock(b.id);
+    grid.appendChild(el);
+  });
+}
+
+function addLoopBlock(id) {
+  const b = LOOP_LIBRARY.find(x => x.id === id);
+  if (!b) return;
+  STATE.loopBlocks.push({ id, value: b.presets[0] });
+  renderLoopAssembled();
+  updateLoopPreview();
+}
+
+function renderLoopAssembled() {
+  const container = $('#loop-assembled');
+  container.innerHTML = '';
+  STATE.loopBlocks.forEach((inst, idx) => {
+    const b = LOOP_LIBRARY.find(x => x.id === inst.id);
+    if (!b) return;
+    const div = document.createElement('div');
+    div.className = 'block-assembled';
+    const options = b.presets.map(p => `<option value="${escapeHTML(p)}" ${inst.value === p ? 'selected' : ''}>${escapeHTML(p.length > 80 ? p.slice(0,80) + '…' : p)}</option>`).join('');
+    div.innerHTML = `
+      <div class="block-head">
+        <span>${b.icon}</span>
+        <div class="block-title">${b.name}</div>
+        <div class="block-actions">
+          ${idx > 0 ? `<button class="btn" data-loop-move="up" data-idx="${idx}">↑</button>` : ''}
+          ${idx < STATE.loopBlocks.length - 1 ? `<button class="btn" data-loop-move="down" data-idx="${idx}">↓</button>` : ''}
+          <button class="btn danger" data-loop-remove="${idx}">✕</button>
+        </div>
+      </div>
+      <div class="block-desc">${b.explanation}</div>
+      <div class="block-content">
+        <select data-loop-select="${idx}">
+          ${options}
+          <option value="__custom__">— Custom —</option>
+        </select>
+        <textarea data-loop-value="${idx}">${escapeHTML(inst.value)}</textarea>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+
+  $$('#loop-assembled [data-loop-select]').forEach(el => {
+    el.onchange = (e) => {
+      const v = e.target.value;
+      if (v !== '__custom__') {
+        STATE.loopBlocks[+el.dataset.loopSelect].value = v;
+        renderLoopAssembled();
+        updateLoopPreview();
+      }
+    };
+  });
+  $$('#loop-assembled [data-loop-value]').forEach(el => {
+    el.oninput = (e) => {
+      STATE.loopBlocks[+el.dataset.loopValue].value = e.target.value;
+      updateLoopPreview();
+    };
+  });
+  $$('#loop-assembled [data-loop-remove]').forEach(el => {
+    el.onclick = () => { STATE.loopBlocks.splice(+el.dataset.loopRemove, 1); renderLoopAssembled(); updateLoopPreview(); };
+  });
+  $$('#loop-assembled [data-loop-move]').forEach(el => {
+    el.onclick = () => {
+      const idx = +el.dataset.idx;
+      const dir = el.dataset.loopMove === 'up' ? -1 : 1;
+      const arr = STATE.loopBlocks;
+      [arr[idx], arr[idx+dir]] = [arr[idx+dir], arr[idx]];
+      renderLoopAssembled();
+      updateLoopPreview();
+    };
+  });
+}
+
+function updateLoopPreview() {
+  const base = STATE.loopBase.trim();
+  const loopParts = buildPreviewText(STATE.loopBlocks, LOOP_LIBRARY);
+  const box = $('#loop-preview');
+  if (!base && !loopParts) {
+    box.innerHTML = '<span style="color:var(--text-dim)">Paste a base prompt and add loop blocks to wrap it into an autonomous loop.</span>';
+    $('#loop-count').textContent = '0';
+    $('#loop-chars').textContent = '0';
+    return;
+  }
+  const text = `# AUTONOMOUS LOOP WRAPPER
+You will run the following BASE PROMPT in an iterative loop. On each iteration, produce output, self-evaluate against the criteria, and revise. Continue until any stop condition triggers.
+
+## BASE PROMPT (the task to iterate on)
+${base || '[paste base prompt above]'}
+
+## LOOP CONFIGURATION
+${loopParts || '[no loop blocks added yet]'}
+
+## PROTOCOL
+For each iteration:
+1. Output your best attempt at the base prompt.
+2. On its own line, write SCORE: N/100 followed by a short breakdown.
+3. Check the STOP CONDITIONS. If any triggers, output FINAL: [your best output so far] and stop.
+4. Otherwise, apply the IMPROVEMENT STRATEGY and continue.
+Always respect the SAFETY RULES — they override every other condition.`;
+  box.textContent = text;
+  $('#loop-count').textContent = STATE.loopBlocks.length;
+  $('#loop-chars').textContent = text.length;
+}
+
+/* =====================================================================
+   WORKFLOW CRUD
+   ===================================================================== */
+
+function openWorkflowEditor(existing) {
+  STATE.editingWorkflowId = existing ? existing.id : null;
+  $('#workflow-modal-title').textContent = existing ? `Edit: ${existing.name}` : 'New workflow';
+  $('#wf-name').value = existing ? existing.name : '';
+  $('#wf-desc').value = existing ? existing.description : '';
+  $('#wf-cat').value = existing ? existing.category : 'building';
+  openModal('workflow-modal');
+}
+
+function saveWorkflowFromEditor() {
+  const name = $('#wf-name').value.trim();
+  const desc = $('#wf-desc').value.trim();
+  const cat = $('#wf-cat').value;
+  if (!name) { toast('Give the workflow a name.', 'error'); return; }
+  if (STATE.editingWorkflowId) {
+    const wf = STATE.workflows.find(w => w.id === STATE.editingWorkflowId);
+    if (wf) { wf.name = name; wf.description = desc; wf.category = cat; }
+    STATE.builderBlocks = wf ? JSON.parse(JSON.stringify(wf.blocks || [])) : [];
+  } else {
+    const id = 'wf_' + Date.now();
+    const wf = { id, name, description: desc, category: cat, kind: 'prompt', blocks: [] };
+    STATE.workflows.unshift(wf);
+    STATE.editingWorkflowId = id;
+    STATE.builderBlocks = [];
+  }
+  saveState();
+  closeModal('workflow-modal');
+  switchView('builder');
+  renderAssembled();
+  updatePreview();
+  toast('Workflow saved. Add blocks in the Builder.', 'success');
+}
+
+function saveBuilderAsWorkflow() {
+  if (STATE.builderBlocks.length === 0) { toast('Add at least one block first.', 'error'); return; }
+  if (STATE.editingWorkflowId) {
+    const wf = STATE.workflows.find(w => w.id === STATE.editingWorkflowId);
+    if (wf) { wf.blocks = JSON.parse(JSON.stringify(STATE.builderBlocks)); wf.kind = 'prompt'; }
+    saveState();
+    renderDashboard();
+    toast('Workflow updated.', 'success');
+  } else {
+    // No workflow context — prompt for name
+    STATE.editingWorkflowId = null;
+    openWorkflowEditor(null);
+    // Save name via modal, then persist blocks after
+    const originalSave = $('#wf-save').onclick;
+    $('#wf-save').onclick = () => {
+      const name = $('#wf-name').value.trim();
+      const desc = $('#wf-desc').value.trim();
+      const cat = $('#wf-cat').value;
+      if (!name) { toast('Give the workflow a name.', 'error'); return; }
+      const id = 'wf_' + Date.now();
+      STATE.workflows.unshift({ id, name, description: desc, category: cat, kind: 'prompt', blocks: JSON.parse(JSON.stringify(STATE.builderBlocks)) });
+      STATE.editingWorkflowId = id;
+      saveState();
+      closeModal('workflow-modal');
+      renderDashboard();
+      toast('Workflow saved.', 'success');
+      $('#wf-save').onclick = originalSave;
+    };
+  }
+}
+
+function saveLoopAsWorkflow() {
+  if (STATE.loopBlocks.length === 0 || !STATE.loopBase.trim()) { toast('Add a base prompt and at least one loop block.', 'error'); return; }
+  const name = prompt('Name for this loop workflow:');
+  if (!name) return;
+  const cat = prompt('Category (building / analysis / job / content):', 'building');
+  const id = 'wf_' + Date.now();
+  STATE.workflows.unshift({
+    id, name, description: 'Self-improving loop workflow.',
+    category: ['building','analysis','job','content'].includes(cat) ? cat : 'building',
+    kind: 'loop',
+    base: STATE.loopBase,
+    blocks: JSON.parse(JSON.stringify(STATE.loopBlocks)),
+  });
+  saveState();
+  renderDashboard();
+  toast('Loop saved as workflow.', 'success');
+}
+
+function openWorkflow(id) {
+  const wf = STATE.workflows.find(w => w.id === id);
+  if (!wf) return;
+  if (wf.kind === 'loop') {
+    STATE.loopBase = wf.base || '';
+    STATE.loopBlocks = JSON.parse(JSON.stringify(wf.blocks || []));
+    $('#loop-base').value = STATE.loopBase;
+    switchView('loop');
+    renderLoopAssembled();
+    updateLoopPreview();
+  } else {
+    STATE.editingWorkflowId = id;
+    STATE.builderBlocks = JSON.parse(JSON.stringify(wf.blocks || []));
+    switchView('builder');
+    renderAssembled();
+    updatePreview();
+  }
+}
+
+function duplicateWorkflow(id) {
+  const wf = STATE.workflows.find(w => w.id === id);
+  if (!wf) return;
+  const copy = JSON.parse(JSON.stringify(wf));
+  copy.id = 'wf_' + Date.now();
+  copy.name = wf.name + ' (copy)';
+  STATE.workflows.unshift(copy);
+  saveState();
+  renderDashboard();
+  toast('Duplicated.', 'success');
+}
+
+function deleteWorkflow(id) {
+  if (!confirm('Delete this workflow? Cannot undo.')) return;
+  STATE.workflows = STATE.workflows.filter(w => w.id !== id);
+  STATE.favorites.delete(id);
+  saveState();
+  renderDashboard();
+  toast('Deleted.', 'success');
+}
+
+function toggleFavorite(id) {
+  if (STATE.favorites.has(id)) STATE.favorites.delete(id);
+  else STATE.favorites.add(id);
+  saveState();
+  renderDashboard();
+}
+
+/* =====================================================================
+   VIEW SWITCHING
+   ===================================================================== */
+
+function switchView(name) {
+  STATE.activeView = name;
+  $$('.view').forEach(v => v.style.display = 'none');
+  $('#view-' + name).style.display = '';
+  $$('.nav-item[data-view]').forEach(n => n.classList.toggle('active', n.dataset.view === name));
+}
+
+/* =====================================================================
+   MODALS + TOAST
+   ===================================================================== */
+
+function openModal(id) { $('#' + id).classList.add('open'); }
+function closeModal(id) { $('#' + id).classList.remove('open'); }
+
+let toastTimer;
+function toast(msg, kind) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + (kind || '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+/* =====================================================================
+   ONBOARDING
+   ===================================================================== */
+
+let onboardStep = 0;
+function showOnboardStep(i) {
+  onboardStep = i;
+  $$('.onboard-step').forEach((el, idx) => el.classList.toggle('active', idx === i));
+  $$('.onboard-dot').forEach((el, idx) => el.classList.toggle('active', idx === i));
+  $('#onboard-prev').style.display = i === 0 ? 'none' : '';
+  $('#onboard-next').textContent = i === 3 ? "Let's go →" : 'Next →';
+}
+
+function openOnboarding() { openModal('onboard-modal'); showOnboardStep(0); }
+function closeOnboarding() {
+  closeModal('onboard-modal');
+  STATE.onboardingDone = true;
+  saveState();
+}
+
+/* =====================================================================
+   THEME + IMPORT/EXPORT
+   ===================================================================== */
+
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', STATE.darkMode ? 'dark' : 'light');
+}
+
+function exportJSON() {
+  const data = JSON.stringify({ workflows: STATE.workflows, favorites: Array.from(STATE.favorites) }, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'personal-ai-playbook-export.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast('Exported.', 'success');
+}
+
+function importJSON(file) {
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const parsed = JSON.parse(e.target.result);
+      if (Array.isArray(parsed.workflows)) {
+        STATE.workflows = parsed.workflows;
+        STATE.favorites = new Set(parsed.favorites || []);
+        saveState();
+        renderDashboard();
+        toast('Imported.', 'success');
+      } else throw new Error('bad shape');
+    } catch (err) { toast('Invalid file.', 'error'); }
+  };
+  reader.readAsText(file);
+}
+
+function resetToSeeds() {
+  if (!confirm('Reset all workflows to the original seeds? Your custom workflows will be lost.')) return;
+  STATE.workflows = JSON.parse(JSON.stringify(SEED_WORKFLOWS));
+  STATE.favorites = new Set();
+  saveState();
+  renderDashboard();
+  toast('Reset to seeds.', 'success');
+}
+
+/* =====================================================================
+   EVENT WIRING
+   ===================================================================== */
+
+function wireEvents() {
+  // Nav
+  $$('.nav-item[data-view]').forEach(n => n.onclick = () => switchView(n.dataset.view));
+  $$('.nav-item[data-filter]').forEach(n => n.onclick = () => {
+    STATE.activeFilter = n.dataset.filter;
+    switchView('dashboard');
+    renderFilterChips();
+    renderDashboard();
+  });
+
+  // Topbar
+  $('#search-input').oninput = (e) => { STATE.searchQuery = e.target.value; renderDashboard(); };
+  $('#btn-help').onclick = openOnboarding;
+  $('#btn-new').onclick = () => openWorkflowEditor(null);
+  $('#btn-theme').onclick = () => { STATE.darkMode = !STATE.darkMode; saveState(); applyTheme(); };
+  $('#btn-export').onclick = exportJSON;
+  $('#btn-import').onclick = () => $('#import-input').click();
+  $('#import-input').onchange = (e) => { if (e.target.files[0]) importJSON(e.target.files[0]); };
+  $('#btn-reset').onclick = resetToSeeds;
+
+  // Explainer
+  $('#explainer-dismiss').onclick = () => {
+    $('#explainer-banner').style.display = 'none';
+    STATE.explainerDismissed = true;
+    saveState();
+  };
+
+  // Workflow card actions (event delegation)
+  $('#workflow-grid').onclick = (e) => {
+    const el = e.target.closest('[data-action]');
+    if (!el) return;
+    const id = el.dataset.id;
+    switch (el.dataset.action) {
+      case 'open': openWorkflow(id); break;
+      case 'dup': duplicateWorkflow(id); break;
+      case 'del': deleteWorkflow(id); break;
+      case 'fav': toggleFavorite(id); break;
+    }
+  };
+
+  // Onboarding
+  $('#onboard-next').onclick = () => {
+    if (onboardStep < 3) showOnboardStep(onboardStep + 1);
+    else closeOnboarding();
+  };
+  $('#onboard-prev').onclick = () => showOnboardStep(Math.max(0, onboardStep - 1));
+  $('#onboard-skip').onclick = closeOnboarding;
+  $$('.onboard-dot').forEach(d => d.onclick = () => showOnboardStep(+d.dataset.dot));
+
+  // Workflow modal
+  $('#wf-save').onclick = saveWorkflowFromEditor;
+
+  // Builder
+  $('#btn-save-workflow').onclick = saveBuilderAsWorkflow;
+  $('#btn-clear-builder').onclick = () => {
+    if (!STATE.builderBlocks.length || confirm('Clear all blocks?')) {
+      STATE.builderBlocks = [];
+      STATE.editingWorkflowId = null;
+      renderAssembled();
+      updatePreview();
+    }
+  };
+  $('#btn-copy-preview').onclick = () => {
+    const t = $('#builder-preview').textContent;
+    if (!t.trim() || t.startsWith('Add blocks')) return;
+    navigator.clipboard.writeText(t).then(() => toast('Copied prompt.', 'success'));
+  };
+  $('#btn-load-example').onclick = () => {
+    STATE.builderBlocks = JSON.parse(JSON.stringify(SEED_WORKFLOWS[0].blocks));
+    STATE.editingWorkflowId = null;
+    renderAssembled();
+    updatePreview();
+    toast('Loaded HTML spec drafter example.', 'success');
+  };
+
+  // Loop
+  $('#loop-base').oninput = (e) => { STATE.loopBase = e.target.value; updateLoopPreview(); };
+  $('#btn-save-loop').onclick = saveLoopAsWorkflow;
+  $('#btn-clear-loop').onclick = () => {
+    if (!STATE.loopBlocks.length || confirm('Clear all loop blocks?')) {
+      STATE.loopBlocks = [];
+      STATE.loopBase = '';
+      $('#loop-base').value = '';
+      renderLoopAssembled();
+      updateLoopPreview();
+    }
+  };
+  $('#btn-copy-loop').onclick = () => {
+    const t = $('#loop-preview').textContent;
+    if (!t.trim() || t.startsWith('Paste a base')) return;
+    navigator.clipboard.writeText(t).then(() => toast('Copied loop prompt.', 'success'));
+  };
+  $('#btn-loop-example').onclick = () => {
+    const example = SEED_WORKFLOWS.find(w => w.kind === 'loop');
+    if (!example) return;
+    STATE.loopBase = example.base;
+    STATE.loopBlocks = JSON.parse(JSON.stringify(example.blocks));
+    $('#loop-base').value = STATE.loopBase;
+    renderLoopAssembled();
+    updateLoopPreview();
+    toast('Loaded resume-bullet loop example.', 'success');
+  };
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', (e) => {
+    const mod = e.metaKey || e.ctrlKey;
+    if (mod && e.key === 'k') { e.preventDefault(); $('#search-input').focus(); }
+    if (mod && e.key === 'n') { e.preventDefault(); openWorkflowEditor(null); }
+    if (e.key === '?' && !['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) {
+      e.preventDefault(); openOnboarding();
+    }
+    if (e.key === 'Escape') {
+      $$('.modal-backdrop.open').forEach(m => m.classList.remove('open'));
+    }
+  });
+}
+
+/* =====================================================================
+   INIT
+   ===================================================================== */
+
+function init() {
+  loadState();
+  applyTheme();
+  renderBlockPicker();
+  renderLoopPicker();
+  renderFilterChips();
+  renderDashboard();
+  wireEvents();
+
+  if (STATE.explainerDismissed) $('#explainer-banner').style.display = 'none';
+  if (!STATE.onboardingDone) openOnboarding();
+}
+
+init();
+</script>
+</body>
+</html>
