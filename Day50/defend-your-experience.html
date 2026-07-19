@@ -1,0 +1,1686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Defend Your Experience — the interview simulator that grills every claim on your resume</title>
+<style>
+:root {
+  --bg: #0b0d13;
+  --bg-elev: #12151e;
+  --bg-elev2: #171b26;
+  --border: #242938;
+  --border-strong: #323847;
+  --text: #eef1f6;
+  --text-muted: #8b92a3;
+  --text-dim: #5f6675;
+  --accent: #7c3aed;
+  --accent-2: #22d3ee;
+  --success: #10b981;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+  --shadow: 0 8px 24px rgba(0,0,0,0.4);
+  --radius: 8px;
+  --radius-lg: 12px;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --font-serif: Georgia, 'Times New Roman', serif;
+}
+[data-theme="light"] {
+  --bg: #fafbfc;
+  --bg-elev: #ffffff;
+  --bg-elev2: #f4f6fa;
+  --border: #e5e7ee;
+  --border-strong: #cbd0dc;
+  --text: #1a1d26;
+  --text-muted: #5a6172;
+  --text-dim: #8e95a5;
+  --shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+  font-size: inherit;
+}
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  color: var(--text);
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color 0.15s;
+  width: 100%;
+}
+input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+textarea { resize: vertical; }
+
+/* Header */
+.header {
+  border-bottom: 1px solid var(--border);
+  padding: 14px 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: sticky;
+  top: 0;
+  background: var(--bg);
+  z-index: 10;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+.brand-logo {
+  width: 28px; height: 28px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  border-radius: 6px;
+  display: grid; place-items: center;
+  font-size: 13px;
+  font-weight: 900;
+  color: white;
+}
+.brand-sub { font-size: 11px; color: var(--text-dim); font-weight: 400; margin-left: 4px; }
+
+.progress-track {
+  flex: 1;
+  height: 6px;
+  background: var(--bg-elev2);
+  border-radius: 3px;
+  overflow: hidden;
+  max-width: 420px;
+  margin: 0 auto;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  transition: width 0.35s;
+  width: 0%;
+}
+.progress-text {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+}
+.header-actions { display: flex; gap: 8px; }
+.btn {
+  padding: 8px 14px;
+  border-radius: 6px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-weight: 500;
+  font-size: 13px;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn:hover { border-color: var(--border-strong); background: var(--bg-elev2); }
+.btn.primary {
+  background: linear-gradient(135deg, var(--accent), #6d28d9);
+  border-color: transparent;
+  color: white;
+}
+.btn.primary:hover { filter: brightness(1.1); }
+.btn.small { padding: 5px 10px; font-size: 12px; }
+.btn.ghost { background: transparent; border-color: transparent; color: var(--text-muted); }
+.btn.ghost:hover { color: var(--text); background: var(--bg-elev); }
+.btn.large { padding: 14px 24px; font-size: 15px; }
+
+/* Main */
+.main {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 40px 32px 80px;
+}
+
+/* States */
+.state { display: none; }
+.state.active { display: block; }
+
+/* Welcome state */
+.hero {
+  text-align: center;
+  margin-bottom: 40px;
+}
+.hero-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent-2);
+  letter-spacing: 3px;
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+.hero h1 {
+  font-family: var(--font-serif);
+  font-size: 56px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin: 0 0 12px;
+  line-height: 1.05;
+}
+.hero h1 em {
+  color: var(--accent);
+  font-style: italic;
+}
+.hero p {
+  font-size: 18px;
+  color: var(--text-muted);
+  max-width: 640px;
+  margin: 0 auto 24px;
+  line-height: 1.5;
+}
+
+/* Three-cols explainer */
+.explainer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 32px 0;
+}
+@media (max-width: 760px) { .explainer { grid-template-columns: 1fr; } }
+.explainer-card {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+.explainer-card .num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--accent-2);
+  letter-spacing: 3px;
+  font-weight: 700;
+  display: block;
+  margin-bottom: 8px;
+}
+.explainer-card h3 { margin: 0 0 8px; font-size: 15px; font-weight: 700; }
+.explainer-card p { margin: 0; font-size: 13px; color: var(--text-muted); }
+
+/* Drop zone */
+.drop-zone {
+  background: var(--bg-elev);
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  transition: all 0.2s;
+  margin-top: 32px;
+}
+.drop-zone.dragover {
+  border-color: var(--accent);
+  background: rgba(124,58,237,0.06);
+}
+.drop-zone-inner {
+  text-align: center;
+  color: var(--text-muted);
+  margin-bottom: 20px;
+}
+.drop-zone-inner h3 {
+  margin: 0 0 6px;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+}
+.drop-zone textarea {
+  min-height: 220px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  background: var(--bg);
+}
+.drop-actions {
+  margin-top: 14px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.drop-actions .btn { flex: 1; min-width: 180px; justify-content: center; }
+@media (max-width: 600px) { .drop-actions .btn { min-width: 100%; } }
+
+/* Sharpness selector */
+.sharpness {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 20px 0;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.sharpness-label {
+  font-size: 12px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  font-family: var(--font-mono);
+}
+.sharpness-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text-muted);
+  transition: all 0.12s;
+}
+.sharpness-btn.active {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+.sharpness-btn:hover { color: var(--text); border-color: var(--border-strong); }
+.sharpness-btn.active:hover { color: white; border-color: var(--accent); }
+
+/* Interview state */
+.interview-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 900px) { .interview-layout { grid-template-columns: 1fr; } }
+
+.claim-card {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.claim-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 3px;
+  margin-bottom: 8px;
+}
+.claim-quote {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  line-height: 1.4;
+  border-left: 3px solid var(--accent);
+  padding-left: 14px;
+  color: var(--text);
+  font-style: italic;
+}
+.question-card {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 16px;
+}
+.question-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.question-label .badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 2px 8px;
+  background: rgba(239,68,68,0.15);
+  color: var(--danger);
+  border-radius: 4px;
+  letter-spacing: 2px;
+  font-weight: 700;
+}
+.question-label .cat {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+}
+.question-text {
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--text);
+  font-weight: 500;
+}
+.answer-box textarea {
+  min-height: 140px;
+  font-family: var(--font);
+  font-size: 14px;
+}
+.answer-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  align-items: center;
+}
+.answer-actions .score-hint {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+}
+
+/* Sidebar: claims list */
+.claims-sidebar {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  position: sticky;
+  top: 84px;
+  max-height: calc(100vh - 110px);
+  overflow-y: auto;
+}
+.claims-sidebar h3 {
+  margin: 0 0 12px;
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+.claim-row {
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-bottom: 4px;
+  transition: background 0.12s;
+  border-left: 3px solid transparent;
+}
+.claim-row:hover { background: var(--bg-elev2); }
+.claim-row.active { background: var(--bg-elev2); border-left-color: var(--accent); }
+.claim-row-title {
+  font-size: 12px;
+  color: var(--text);
+  line-height: 1.35;
+  margin-bottom: 4px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.claim-row-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+}
+.claim-status-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--border-strong);
+}
+.claim-status-dot.pending { background: var(--warn); }
+.claim-status-dot.done { background: var(--success); }
+.claim-status-dot.weak { background: var(--danger); }
+
+/* Report state */
+.report-hero {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 32px;
+  align-items: center;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  margin-bottom: 24px;
+}
+@media (max-width: 700px) {
+  .report-hero { grid-template-columns: 1fr; text-align: center; }
+  .donut-wrap { margin: 0 auto; }
+}
+.donut-wrap {
+  width: 220px;
+  height: 220px;
+  position: relative;
+}
+.donut-value {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  flex-direction: column;
+  font-family: var(--font-serif);
+}
+.donut-value .n {
+  font-size: 62px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -1.5px;
+}
+.donut-value .l {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 3px;
+  margin-top: 6px;
+}
+.report-summary h2 {
+  margin: 0 0 8px;
+  font-family: var(--font-serif);
+  font-size: 30px;
+  letter-spacing: -0.5px;
+}
+.report-summary p { color: var(--text-muted); margin: 0 0 12px; }
+.report-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+.stat {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+}
+.stat-label {
+  font-size: 10px;
+  color: var(--text-dim);
+  letter-spacing: 2px;
+  font-family: var(--font-mono);
+  margin-bottom: 4px;
+}
+.stat-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Bucket sections */
+.bucket-section { margin-top: 24px; }
+.bucket-head {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.bucket-head h3 {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+.bucket-head .count {
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+.claim-detail {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 10px;
+}
+.claim-detail-head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+.claim-detail-quote {
+  flex: 1;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--text);
+}
+.claim-detail-score {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 700;
+  min-width: 68px;
+  text-align: right;
+}
+.claim-detail-bar {
+  height: 4px;
+  background: var(--bg-elev2);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+.claim-detail-bar-fill { height: 100%; border-radius: 2px; }
+.claim-detail-answers {
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+  margin-top: 6px;
+}
+.claim-detail-qa {
+  margin: 8px 0;
+  font-size: 13px;
+}
+.claim-detail-qa .q {
+  color: var(--danger);
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.claim-detail-qa .a {
+  color: var(--text-muted);
+  padding-left: 12px;
+  border-left: 2px solid var(--border);
+}
+.rewrite-suggestion {
+  margin-top: 10px;
+  padding: 10px 12px;
+  background: rgba(16,185,129,0.06);
+  border: 1px solid rgba(16,185,129,0.25);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text);
+}
+.rewrite-suggestion strong { color: var(--success); font-size: 10px; letter-spacing: 3px; display: block; margin-bottom: 4px; font-family: var(--font-mono); }
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--bg-elev2);
+  border: 1px solid var(--border-strong);
+  color: var(--text);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  transition: transform 0.25s;
+  z-index: 200;
+  box-shadow: var(--shadow);
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+.toast.success { border-color: var(--success); }
+.toast.error { border-color: var(--danger); }
+
+/* Modal */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+.modal-backdrop.open { display: flex; }
+.modal {
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  max-width: 640px;
+  width: 100%;
+  max-height: 88vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow);
+  padding: 24px 28px;
+}
+.modal h2 { margin: 0 0 8px; font-size: 20px; font-family: var(--font-serif); }
+.modal p { color: var(--text-muted); }
+
+.env-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.env-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--text-dim);
+}
+.env-badge.live .env-dot { background: var(--success); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+.spinner {
+  display: inline-block;
+  width: 12px; height: 12px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<!-- HEADER -->
+<header class="header">
+  <div class="brand">
+    <div class="brand-logo">D</div>
+    <div>Defend Your Experience <span class="brand-sub">a hostile interviewer that never gets tired</span></div>
+  </div>
+  <div class="progress-track" id="progress-track" style="display:none;">
+    <div class="progress-fill" id="progress-fill"></div>
+  </div>
+  <span class="progress-text" id="progress-text" style="display:none;">0 / 0</span>
+  <div class="header-actions">
+    <span class="env-badge" id="env-badge" title="AI backend status"><span class="env-dot"></span> <span id="env-label">offline</span></span>
+    <button class="btn small" id="btn-theme" title="Toggle theme">🌓</button>
+    <button class="btn small ghost" id="btn-help">?</button>
+    <button class="btn small ghost" id="btn-restart" style="display:none;">↺ Restart</button>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- STATE 1: INPUT -->
+  <section id="state-input" class="state active">
+    <div class="hero">
+      <span class="hero-tag">DAY 50 · #60DayClaudeChallenge</span>
+      <h1>Defend <em>every</em> claim<br>on your resume.</h1>
+      <p>Paste any experience — a resume, a project writeup, a bio, a research abstract. This tool extracts every specific claim and grills you on it, one question at a time, until you have to actually defend it out loud. Not a resume improver. An interview simulator that never gets bored.</p>
+    </div>
+
+    <div class="explainer">
+      <div class="explainer-card">
+        <span class="num">STEP 01</span>
+        <h3>Paste anything</h3>
+        <p>Resume, LinkedIn bio, project doc, research abstract, startup story. The tool doesn't care about format — it looks for specific claims.</p>
+      </div>
+      <div class="explainer-card">
+        <span class="num">STEP 02</span>
+        <h3>Get grilled</h3>
+        <p>For every metric, verb, and outcome, you'll get a sharp follow-up. "Reduced churn 22%" becomes "how did you measure churn? What was the baseline? Was it your work?"</p>
+      </div>
+      <div class="explainer-card">
+        <span class="num">STEP 03</span>
+        <h3>See your defense score</h3>
+        <p>Every answer is scored 0-100. You get a Defense Report showing which claims you've earned the right to say and which ones will collapse under real questioning.</p>
+      </div>
+    </div>
+
+    <div class="sharpness">
+      <span class="sharpness-label">SKEPTIC SHARPNESS</span>
+      <button class="sharpness-btn" data-sharp="friendly">Friendly coach</button>
+      <button class="sharpness-btn" data-sharp="balanced">Balanced interviewer</button>
+      <button class="sharpness-btn active" data-sharp="hostile">Hostile grill</button>
+    </div>
+
+    <div class="drop-zone" id="drop-zone">
+      <div class="drop-zone-inner">
+        <h3>Drop a .txt / .md file or paste your experience</h3>
+        <p style="margin:0;font-size:13px;">Everything stays local. Nothing is uploaded. No API key needed.</p>
+      </div>
+      <textarea id="experience-input" placeholder="Paste your resume, LinkedIn About section, project writeup, research abstract, or any content describing your experience…"></textarea>
+      <div class="drop-actions">
+        <button class="btn primary large" id="btn-start">▶  Start the interview</button>
+        <button class="btn large" id="btn-try-demo">Try demo (sample resume)</button>
+      </div>
+    </div>
+
+    <p style="text-align:center;margin-top:24px;font-size:12px;color:var(--text-dim);">
+      Runs entirely in your browser. If loaded inside Anthropic's Claude environment, it uses live model calls. Otherwise it falls back to a pattern-based skeptic that still asks sharp, personalized questions.
+    </p>
+  </section>
+
+  <!-- STATE 2: INTERVIEW -->
+  <section id="state-interview" class="state">
+    <div class="interview-layout">
+      <div>
+        <div class="claim-card">
+          <div class="claim-label">DEFENDING THIS CLAIM</div>
+          <div class="claim-quote" id="current-claim"></div>
+        </div>
+
+        <div class="question-card">
+          <div class="question-label">
+            <span class="badge" id="q-badge">CHALLENGE</span>
+            <span class="cat" id="q-cat">METRIC PROBE</span>
+            <span class="cat" id="q-num" style="margin-left:auto;"></span>
+          </div>
+          <div class="question-text" id="current-question"></div>
+        </div>
+
+        <div class="answer-box">
+          <textarea id="answer-input" placeholder="Answer out loud, then type your answer here. Specifics beat abstractions. Numbers beat adjectives."></textarea>
+          <div class="answer-actions">
+            <button class="btn primary" id="btn-submit-answer">Submit answer →</button>
+            <button class="btn ghost" id="btn-skip-question">Skip question</button>
+            <button class="btn ghost" id="btn-next-claim">Next claim →</button>
+            <span class="score-hint" id="score-hint">Type an answer to see your score</span>
+          </div>
+        </div>
+
+        <div style="margin-top:24px;display:flex;gap:8px;justify-content:flex-end;">
+          <button class="btn" id="btn-see-report">See Defense Report →</button>
+        </div>
+      </div>
+
+      <aside class="claims-sidebar">
+        <h3>CLAIMS QUEUE</h3>
+        <div id="claims-list"></div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- STATE 3: REPORT -->
+  <section id="state-report" class="state">
+    <div class="hero" style="margin-bottom:24px;">
+      <span class="hero-tag">DEFENSE REPORT</span>
+      <h1>Which claims <em>survive</em><br>a real interviewer.</h1>
+    </div>
+
+    <div class="report-hero">
+      <div class="donut-wrap" id="donut-wrap"></div>
+      <div class="report-summary">
+        <h2 id="report-verdict">Under construction</h2>
+        <p id="report-narrative"></p>
+        <div class="report-stats">
+          <div class="stat">
+            <div class="stat-label">CLAIMS DEFENDED</div>
+            <div class="stat-value" id="stat-defended">0 / 0</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">AVG. ANSWER SCORE</div>
+            <div class="stat-value" id="stat-avg">0</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">STRONG CLAIMS</div>
+            <div class="stat-value" id="stat-strong">0</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">WEAK CLAIMS</div>
+            <div class="stat-value" id="stat-weak">0</div>
+          </div>
+        </div>
+        <div style="margin-top:20px;display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn primary" id="btn-export-md">📄 Export Markdown report</button>
+          <button class="btn" id="btn-export-json">Export JSON</button>
+          <button class="btn ghost" id="btn-back-to-interview">← Keep drilling</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="bucket-section" id="bucket-weak"></div>
+    <div class="bucket-section" id="bucket-medium"></div>
+    <div class="bucket-section" id="bucket-strong"></div>
+  </section>
+</main>
+
+<!-- HELP MODAL -->
+<div class="modal-backdrop" id="help-modal">
+  <div class="modal">
+    <h2>What this tool does</h2>
+    <p>Most resume tools try to improve what's on the page. This one assumes the page is fine and asks whether you can actually defend it out loud.</p>
+    <p><strong>How it works:</strong> Paste any text describing your experience. The tool extracts every specific claim — every metric, every verb, every outcome. Then it grills you on each claim, one question at a time. The sharper the claim, the sharper the follow-up.</p>
+    <p><strong>Three sharpness levels:</strong> Friendly coach (warm probing), Balanced interviewer (fair grilling), Hostile grill (aggressive follow-ups — recommended for interview prep).</p>
+    <p><strong>Backend status:</strong> If loaded inside Anthropic's Claude artifact environment, the tool uses live model calls for questions and scoring. Otherwise, it uses a rules-based skeptic that still asks specific, personalized questions from a library of 40+ challenge templates.</p>
+    <p><strong>Your data:</strong> Everything stays in your browser. No uploads, no API key, no backend. Session history saves to localStorage.</p>
+    <div style="margin-top:16px;">
+      <button class="btn primary" onclick="document.getElementById('help-modal').classList.remove('open')">Got it</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =====================================================================
+   SAMPLE RESUME (universal, industry-neutral, fictional)
+   Every bullet has a defendable claim. Perfect for demo mode.
+   ===================================================================== */
+const SAMPLE_RESUME = `JORDAN CHEN
+Senior Data Analyst · San Francisco, CA
+
+EXPERIENCE
+
+Senior Data Analyst, Meridian Health · Jan 2023 – Present
+- Led migration of BI reporting layer from Tableau to Looker, cutting monthly licensing costs by 40% and reducing dashboard load time from 8s to 1.2s
+- Built forecasting model for hospital-bed utilization that improved staffing efficiency by 15% across 3 regional facilities
+- Mentored 4 junior analysts on SQL best practices and dbt fundamentals
+- Owned the analytics roadmap in partnership with the CFO
+
+Data Analyst, Northstar Retail · Aug 2020 – Dec 2022
+- Analyzed customer churn drivers using survival analysis; findings drove a 22% reduction in Q4 churn
+- Automated weekly executive dashboard, saving 6 hours/week of manual work
+- Built A/B testing framework in Python + Snowflake used by 12 teams
+
+EDUCATION
+M.S. Business Analytics, University of Illinois · 2020
+B.A. Economics, UC Berkeley · 2018
+
+SKILLS
+SQL, Python, dbt, Snowflake, Looker, Tableau, R, A/B testing, forecasting`;
+
+/* =====================================================================
+   CHALLENGE TEMPLATE LIBRARY
+   40+ templates across 8 categories. Each has a matcher and a set of
+   tokenized questions. {claim} is the whole line, {metric} is the extracted
+   number/percentage, {verb} is the leading verb.
+   ===================================================================== */
+const CHALLENGE_LIBRARY = {
+  metric: {
+    label: 'METRIC PROBE',
+    templates: [
+      "You wrote '{metric}'. What was the baseline you were measuring against? How did you actually calculate that number?",
+      "'{metric}' is a specific number. Walk me through the numerator and the denominator — where did each come from?",
+      "Six months later, is '{metric}' still true? If I called your former manager, would she use the same number?",
+      "'{metric}' — over what time window? Compared against what control?",
+      "How much of '{metric}' would still have happened if you'd done nothing? Give me the counterfactual.",
+      "'{metric}' is a very round number. What was the actual number, before you rounded for the resume?",
+    ],
+  },
+  ownership: {
+    label: 'OWNERSHIP PROBE',
+    templates: [
+      "You wrote 'led' or 'owned'. Who else was in the room, and what did they specifically do? I want names and roles.",
+      "Was this your idea, or were you executing on someone else's plan? Be honest — I'll ask them.",
+      "If you'd left the company mid-project, could someone else have delivered this? Who would you have handed it to?",
+      "In your performance review, what did your manager credit YOU for on this specifically? Not the team — you.",
+      "How much of this happened before you got there? What did the person before you do that made yours possible?",
+    ],
+  },
+  method: {
+    label: 'METHOD PROBE',
+    templates: [
+      "Walk me through week one. What did you do on Monday? Tuesday? What was the first thing you built?",
+      "What were the three approaches you actively considered and rejected? Tell me why each was wrong.",
+      "Where's the version of this that failed first? Every real project has a v1 that didn't work.",
+      "What tool would you use if you had to redo this in a language you don't know?",
+      "Who told you 'no, don't do it that way' at some point? What did they see that you missed?",
+    ],
+  },
+  impact: {
+    label: 'IMPACT PROBE',
+    templates: [
+      "What would have happened if you hadn't done this? Nothing? Give me the specific business consequence you avoided.",
+      "How is this measured today, twelve months later? Or was it a one-time win?",
+      "Name three people who benefited most from this. What did they say about it?",
+      "If this project was worth so much, why aren't you leading a bigger version of it right now?",
+      "What's the second-order effect that made the number look better than the work actually was?",
+    ],
+  },
+  scope: {
+    label: 'SCOPE PROBE',
+    templates: [
+      "Give me the scope. How many users, how many dollars, how many weeks? Real numbers.",
+      "You wrote '{verb}' — how many people were you actually leading? What was the budget?",
+      "This bullet takes eight words. In an interview, we'll spend three minutes on it. Are you ready for three minutes?",
+      "Is this the biggest thing you did in that role, or is it the safest thing to put on a resume?",
+    ],
+  },
+  vague: {
+    label: 'VAGUENESS PROBE',
+    templates: [
+      "'{vague_word}' — from what to what? Give me numbers or replace the word.",
+      "'{vague_word}' is a filler word. What was the specific decision that changed as a result?",
+      "'{vague_word}' — describe it to a skeptical friend using zero corporate vocabulary. What would you actually say?",
+      "'{vague_word}' — what did that concretely mean on a Tuesday morning?",
+    ],
+  },
+  failure: {
+    label: 'FAILURE PROBE',
+    templates: [
+      "What's the worst thing that happened during this project? Something you'd rather not tell me.",
+      "If this was so successful, what did you get wrong first? Walk me through the mistake.",
+      "Was there someone who predicted it wouldn't work and was right? What did they see that you missed?",
+      "What did you do here that you now regret? What would you undo?",
+    ],
+  },
+  timeline: {
+    label: 'TIMELINE PROBE',
+    templates: [
+      "How long did this actually take? Not the 'success story' version — the real timeline including the detours.",
+      "When did you first know this was going to work? What was the specific signal?",
+      "What killed the three previous attempts by other people to do this?",
+    ],
+  },
+};
+
+/* =====================================================================
+   VAGUE WORD LIST + REWRITE SUGGESTIONS
+   ===================================================================== */
+const VAGUE_WORDS = [
+  'optimized', 'improved', 'enhanced', 'leveraged', 'utilized', 'streamlined',
+  'spearheaded', 'facilitated', 'strategized', 'collaborated', 'cross-functional',
+  'stakeholder', 'synergy', 'best practices', 'thought leader', 'thought leadership',
+  'best-in-class', 'strategic', 'holistic', 'ideation', 'operationalized',
+];
+
+const REWRITE_HINTS = {
+  metric: "Add a baseline. 'From X to Y over Z weeks' beats a percentage on its own.",
+  ownership: "Distinguish YOU vs. the team. 'I designed X while the team executed Y' is stronger than 'we did Z'.",
+  method: "Name the specific technique or tool. 'Built X using survival analysis in R' beats 'built a model'.",
+  impact: "Connect to a business outcome the CFO would recognize. Dollars, users, or hours.",
+  scope: "Add the size. Number of users, teams, or dollars in play.",
+  vague: "Replace the vague verb with a concrete action. 'Reduced dashboard load from 8s to 1.2s' beats 'optimized dashboards'.",
+};
+
+/* =====================================================================
+   STATE
+   ===================================================================== */
+const STATE = {
+  sharpness: 'hostile',
+  darkMode: true,
+  claims: [],
+  currentClaimIdx: 0,
+  currentChallenges: [],
+  currentChallengeIdx: 0,
+  sessionHistory: [], // array of {claimIdx, question, answer, score, category}
+  isLiveClaude: false,
+};
+
+const STORAGE_KEY = 'defend_your_experience_v1';
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      sharpness: STATE.sharpness,
+      darkMode: STATE.darkMode,
+      lastSession: {
+        claims: STATE.claims,
+        sessionHistory: STATE.sessionHistory,
+        timestamp: Date.now(),
+      },
+    }));
+  } catch(e){}
+}
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      STATE.sharpness = parsed.sharpness || 'hostile';
+      STATE.darkMode = parsed.darkMode !== undefined ? parsed.darkMode : true;
+    }
+  } catch(e){}
+}
+
+/* =====================================================================
+   CLAIM EXTRACTION
+   ===================================================================== */
+function extractClaims(text) {
+  const lines = text.split(/\n/).map(l => l.trim()).filter(l => l.length > 8);
+  const claims = [];
+  const strongVerbs = /^(led|built|created|analyzed|automated|designed|implemented|launched|managed|owned|delivered|drove|shipped|reduced|improved|increased|scaled|developed|deployed|architected|engineered|founded|conducted|initiated|coordinated|directed|mentored|trained|produced|authored|migrated|integrated|optimized|reorganized|streamlined|enhanced|redesigned|restructured|transformed)\b/i;
+  const metricRe = /(\d+(?:\.\d+)?\s*%|\$\s*\d+(?:[.,]\d+)*(?:\s*(?:k|K|m|M|b|B|million|billion|thousand))?|\d+\s*(?:hours?|weeks?|months?|years?|days?|users?|customers?|teams?|people|employees|clients?|companies|regions?|projects?|deals?)|\d+\s*x\b|\d+(?:\.\d+)?\s*(?:s|ms|seconds?|minutes?)\b)/gi;
+  const bulletRe = /^\s*[-•*+·▸►]\s*/;
+
+  for (const line of lines) {
+    const cleaned = line.replace(bulletRe, '').trim();
+    if (cleaned.length < 12) continue;
+    // Skip section headers (all caps or short standalone words)
+    if (/^[A-Z\s]{4,40}$/.test(cleaned) && !metricRe.test(cleaned)) continue;
+    // Skip pure lists like "SQL, Python, R"
+    if (cleaned.split(/,/).length > 3 && cleaned.length < 80 && !strongVerbs.test(cleaned)) continue;
+    // Skip pure contact info
+    if (/^[a-z0-9._-]+@[a-z0-9.-]+/i.test(cleaned)) continue;
+    // Skip pure job title lines (contain · or |)
+    if (/^\S+.*[·|,–—-].*(present|20\d\d)/i.test(cleaned) && cleaned.length < 100 && !metricRe.test(cleaned)) continue;
+
+    metricRe.lastIndex = 0;
+    const metrics = [...cleaned.matchAll(metricRe)].map(m => m[0]);
+    const hasMetric = metrics.length > 0;
+    const hasStrongVerb = strongVerbs.test(cleaned);
+    const isBullet = bulletRe.test(line);
+    const wordCount = cleaned.split(/\s+/).length;
+
+    // Only extract lines that look like claims
+    if (!isBullet && !hasStrongVerb && !hasMetric) continue;
+    if (wordCount < 4) continue;
+
+    // Find vague words
+    const vagueHits = VAGUE_WORDS.filter(w => new RegExp('\\b' + w.replace(/\s+/g,'\\s+') + '\\b', 'i').test(cleaned));
+
+    // Initial strength score
+    let strength = 30;
+    if (hasMetric) strength += 25;
+    if (hasStrongVerb) strength += 15;
+    if (/because|due to|resulted in|led to|drove|caused/.test(cleaned.toLowerCase())) strength += 10;
+    if (wordCount >= 10 && wordCount <= 30) strength += 10;
+    if (vagueHits.length > 0) strength -= 15;
+    strength = Math.max(10, Math.min(95, strength));
+
+    claims.push({
+      id: 'c_' + claims.length,
+      text: cleaned,
+      metrics,
+      hasStrongVerb,
+      vagueHits,
+      wordCount,
+      initialStrength: strength,
+      status: 'pending', // pending | done | weak | strong
+      answers: [], // {q, a, score, category}
+    });
+  }
+
+  // Cap at 20 claims for interview length
+  return claims.slice(0, 20);
+}
+
+/* =====================================================================
+   CHALLENGE GENERATION (RULES-BASED FALLBACK)
+   Picks 1-2 challenges per claim based on what's in it.
+   ===================================================================== */
+function generateChallenges(claim) {
+  const categories = [];
+  const text = claim.text.toLowerCase();
+
+  // Priority ordering: strongest signal first
+  if (claim.vagueHits.length > 0) categories.push('vague');
+  if (claim.metrics.length > 0) categories.push('metric');
+  if (/\b(led|owned|managed|directed|coordinated|mentored)\b/.test(text)) categories.push('ownership');
+  if (/\b(built|created|designed|implemented|developed|automated|architected)\b/.test(text)) categories.push('method');
+  if (/(revenue|churn|conversion|retention|cost|savings|efficiency|productivity|hours|users|customers)/.test(text)) categories.push('impact');
+  if (claim.wordCount < 15) categories.push('scope');
+  // Always throw in one failure or timeline probe near the end for the hostile mode
+  if (STATE.sharpness === 'hostile') {
+    categories.push('failure');
+    categories.push('timeline');
+  } else if (STATE.sharpness === 'balanced') {
+    categories.push('failure');
+  }
+
+  // Deduplicate and take 2-4
+  const uniqCats = Array.from(new Set(categories));
+  const take = STATE.sharpness === 'hostile' ? 3 : (STATE.sharpness === 'balanced' ? 2 : 1);
+  const chosenCats = uniqCats.slice(0, take);
+
+  const challenges = [];
+  for (const cat of chosenCats) {
+    const pool = CHALLENGE_LIBRARY[cat];
+    if (!pool) continue;
+    const template = pool.templates[Math.floor(Math.random() * pool.templates.length)];
+    const question = personalizeTemplate(template, claim);
+    challenges.push({ category: cat, label: pool.label, question });
+  }
+  return challenges;
+}
+
+function personalizeTemplate(tpl, claim) {
+  let q = tpl;
+  if (claim.metrics.length > 0) {
+    q = q.replace(/{metric}/g, claim.metrics[0]);
+  } else {
+    q = q.replace(/{metric}/g, 'that specific number');
+  }
+  if (claim.vagueHits.length > 0) {
+    q = q.replace(/{vague_word}/g, claim.vagueHits[0]);
+  } else {
+    q = q.replace(/{vague_word}/g, 'that word');
+  }
+  const verbMatch = claim.text.match(/^(led|built|created|analyzed|automated|designed|implemented|launched|managed|owned|delivered|drove|shipped|reduced|improved|increased|scaled|developed|deployed|architected|mentored|migrated|integrated|optimized)/i);
+  q = q.replace(/{verb}/g, verbMatch ? verbMatch[0] : 'did what you say you did');
+  q = q.replace(/{claim}/g, claim.text);
+  return q;
+}
+
+/* =====================================================================
+   LIVE CLAUDE (when running in Anthropic artifact env)
+   ===================================================================== */
+async function askClaudeForChallenge(claim, existingAnswers) {
+  if (!STATE.isLiveClaude) return null;
+  const sharpnessInstruction = {
+    friendly: 'Be warm but specific. Name the gap without grilling.',
+    balanced: 'Simulate a fair, sharp hiring manager. Push on specifics.',
+    hostile: 'Simulate the toughest interviewer possible. Grill for specifics. Push on ownership, metric baselines, counterfactuals, and failure modes. Be aggressive but never rude.',
+  }[STATE.sharpness];
+  const prior = existingAnswers.map(a => `Q: ${a.q}\nA: ${a.a}`).join('\n\n');
+  const prompt = `You are a hostile-but-fair interview simulator. Your job is to challenge the following resume claim with ONE sharp, specific follow-up question. Do not summarize the claim. Do not compliment it. Just ask the question.
+
+Claim being defended:
+"${claim.text}"
+
+${prior ? 'Prior Q&A on this claim (do NOT repeat questions already asked):\n' + prior + '\n' : ''}
+
+Sharpness mode: ${sharpnessInstruction}
+
+Return ONLY the question, nothing else. Do not include preamble like "Here's my question:" — just the question itself, one to three sentences.`;
+  try {
+    const response = await window.claude.complete(prompt);
+    return response.trim();
+  } catch (e) {
+    console.warn('Claude call failed, falling back:', e);
+    return null;
+  }
+}
+
+async function askClaudeForScore(claim, question, answer) {
+  if (!STATE.isLiveClaude) return null;
+  const prompt = `Score this interview answer on a 0-100 scale for how well it defends the claim under hostile questioning.
+
+Original claim: "${claim.text}"
+Question asked: "${question}"
+Candidate's answer: "${answer}"
+
+Return ONLY a JSON object with two fields: {"score": N, "note": "one-sentence explanation"}. Score criteria: specificity (numbers, names, dates), ownership clarity (I vs we), causality reasoning, mention of alternatives or trade-offs, and answer completeness. Vague answers score below 40. Strong specific answers with numbers and causality score above 80.`;
+  try {
+    const response = await window.claude.complete(prompt);
+    // Best-effort JSON extraction
+    const match = response.match(/\{[\s\S]*\}/);
+    if (match) {
+      const parsed = JSON.parse(match[0]);
+      return { score: Math.max(0, Math.min(100, parsed.score || 50)), note: parsed.note || '' };
+    }
+  } catch (e) {
+    console.warn('Claude scoring failed, falling back:', e);
+  }
+  return null;
+}
+
+/* =====================================================================
+   RULES-BASED ANSWER SCORING (fallback)
+   ===================================================================== */
+function scoreAnswerRules(answer) {
+  if (!answer || answer.trim().length < 20) return { score: 15, note: 'Too short — a real interviewer would ask you to keep going.' };
+  const a = answer.trim();
+  const wc = a.split(/\s+/).length;
+  const hasNumbers = /\d/.test(a);
+  const hasProperNoun = /\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)?\b/.test(a);
+  const hasFirstPerson = /\b(I|my|myself|me)\b/.test(a);
+  const hasCausal = /\bbecause\b|\bso that\b|\bin order to\b|\bresulted in\b|\bled to\b|\bdrove\b|\btherefore\b/i.test(a);
+  const hasAlternatives = /\b(considered|alternative|instead of|rather than|rejected|weighed|trade-?off|tradeoff)\b/i.test(a);
+  const hasFailure = /\b(mistake|failed|wrong|regret|redo|hindsight|missed)\b/i.test(a);
+  const hasFillerWords = VAGUE_WORDS.some(w => new RegExp('\\b' + w.replace(/\s+/g,'\\s+') + '\\b', 'i').test(a));
+
+  let score = 20;
+  if (wc >= 30) score += 15;
+  if (wc >= 60) score += 10;
+  if (wc >= 120) score += 5;
+  if (hasNumbers) score += 15;
+  if (hasProperNoun) score += 10;
+  if (hasFirstPerson) score += 5;
+  if (hasCausal) score += 12;
+  if (hasAlternatives) score += 10;
+  if (hasFailure) score += 8;
+  if (hasFillerWords) score -= 12;
+  score = Math.max(5, Math.min(97, score));
+
+  let note = '';
+  if (score < 40) note = 'Weak — no numbers, no ownership signals, or too vague. A real interviewer would keep digging.';
+  else if (score < 65) note = 'Middling — you\'ve started defending but the answer needs more specifics or a clearer causal chain.';
+  else if (score < 82) note = 'Solid — specific enough to survive one follow-up. Still room for a sharper example.';
+  else note = 'Strong — this answer would land with any interviewer.';
+
+  return { score, note };
+}
+
+/* =====================================================================
+   RENDER: DASHBOARD / SIDEBAR
+   ===================================================================== */
+function $(s) { return document.querySelector(s); }
+function $$(s) { return Array.from(document.querySelectorAll(s)); }
+
+function renderProgress() {
+  const total = STATE.claims.length;
+  const done = STATE.claims.filter(c => c.status !== 'pending').length;
+  $('#progress-track').style.display = total ? 'block' : 'none';
+  $('#progress-text').style.display = total ? 'inline' : 'none';
+  $('#progress-fill').style.width = total ? Math.round((done / total) * 100) + '%' : '0%';
+  $('#progress-text').textContent = `${done} / ${total}`;
+}
+
+function renderClaimsSidebar() {
+  const list = $('#claims-list');
+  list.innerHTML = '';
+  STATE.claims.forEach((c, i) => {
+    const el = document.createElement('div');
+    el.className = 'claim-row' + (i === STATE.currentClaimIdx ? ' active' : '');
+    const shortText = c.text.length > 90 ? c.text.slice(0, 90) + '…' : c.text;
+    el.innerHTML = `
+      <div class="claim-row-title">${escapeHTML(shortText)}</div>
+      <div class="claim-row-meta">
+        <span class="claim-status-dot ${c.status}"></span>
+        <span>${c.answers.length} answered</span>
+      </div>
+    `;
+    el.onclick = () => { STATE.currentClaimIdx = i; STATE.currentChallengeIdx = 0; loadCurrentChallenge(); };
+    list.appendChild(el);
+  });
+}
+
+/* =====================================================================
+   INTERVIEW LOOP
+   ===================================================================== */
+async function loadCurrentChallenge() {
+  const claim = STATE.claims[STATE.currentClaimIdx];
+  if (!claim) return;
+
+  $('#current-claim').textContent = claim.text;
+
+  // Generate challenges if not already
+  if (!claim._challenges) {
+    claim._challenges = generateChallenges(claim);
+  }
+
+  // If we're past the challenges for this claim, mark done and move on
+  if (STATE.currentChallengeIdx >= claim._challenges.length) {
+    finishClaim(claim);
+    return;
+  }
+
+  let challenge = claim._challenges[STATE.currentChallengeIdx];
+
+  // Try live Claude for a fresher question (async)
+  if (STATE.isLiveClaude) {
+    $('#current-question').innerHTML = '<span class="spinner"></span> Generating question...';
+    const liveQ = await askClaudeForChallenge(claim, claim.answers);
+    if (liveQ) {
+      challenge = { category: challenge.category, label: 'LIVE PROBE', question: liveQ };
+    }
+  }
+
+  $('#q-badge').textContent = STATE.sharpness === 'hostile' ? 'CHALLENGE' : (STATE.sharpness === 'balanced' ? 'FOLLOW-UP' : 'PROMPT');
+  $('#q-cat').textContent = challenge.label || 'PROBE';
+  $('#q-num').textContent = `${STATE.currentChallengeIdx + 1} of ${claim._challenges.length}`;
+  $('#current-question').textContent = challenge.question;
+  $('#answer-input').value = '';
+  $('#score-hint').textContent = 'Type an answer to see your score';
+
+  renderClaimsSidebar();
+  renderProgress();
+}
+
+async function submitAnswer() {
+  const claim = STATE.claims[STATE.currentClaimIdx];
+  if (!claim || !claim._challenges) return;
+  const challenge = claim._challenges[STATE.currentChallengeIdx];
+  const answer = $('#answer-input').value.trim();
+  if (answer.length < 5) { toast('Give at least a short answer, or use Skip.', 'error'); return; }
+
+  // Score
+  let scored;
+  if (STATE.isLiveClaude) {
+    scored = await askClaudeForScore(claim, challenge.question, answer);
+  }
+  if (!scored) scored = scoreAnswerRules(answer);
+
+  claim.answers.push({
+    q: challenge.question,
+    a: answer,
+    score: scored.score,
+    note: scored.note,
+    category: challenge.category,
+  });
+  STATE.sessionHistory.push({ claimId: claim.id, ...claim.answers[claim.answers.length - 1] });
+  saveState();
+
+  toast(`Answered — score ${scored.score}. ${scored.note}`, scored.score >= 65 ? 'success' : 'error');
+
+  STATE.currentChallengeIdx++;
+  await loadCurrentChallenge();
+}
+
+function skipQuestion() {
+  const claim = STATE.claims[STATE.currentClaimIdx];
+  if (!claim || !claim._challenges) return;
+  claim.answers.push({
+    q: claim._challenges[STATE.currentChallengeIdx].question,
+    a: '(skipped)',
+    score: 0,
+    note: 'Skipped — a real interviewer would circle back and press harder.',
+    category: claim._challenges[STATE.currentChallengeIdx].category,
+  });
+  STATE.currentChallengeIdx++;
+  loadCurrentChallenge();
+}
+
+function nextClaim() {
+  const claim = STATE.claims[STATE.currentClaimIdx];
+  if (claim) finishClaim(claim);
+}
+
+function finishClaim(claim) {
+  // Determine status based on answers
+  const nonSkipped = claim.answers.filter(a => a.a !== '(skipped)');
+  if (nonSkipped.length === 0) {
+    claim.status = 'weak';
+  } else {
+    const avg = nonSkipped.reduce((s, a) => s + a.score, 0) / nonSkipped.length;
+    if (avg >= 65) claim.status = 'done';
+    else if (avg >= 40) claim.status = 'done';
+    else claim.status = 'weak';
+    claim.avgScore = avg;
+  }
+  saveState();
+
+  // Move to next pending claim
+  const nextIdx = STATE.claims.findIndex((c, i) => i > STATE.currentClaimIdx && c.status === 'pending');
+  if (nextIdx !== -1) {
+    STATE.currentClaimIdx = nextIdx;
+    STATE.currentChallengeIdx = 0;
+    loadCurrentChallenge();
+  } else {
+    // All done — go to report
+    showReport();
+  }
+}
+
+/* =====================================================================
+   REPORT
+   ===================================================================== */
+function showReport() {
+  switchState('report');
+  const all = STATE.claims;
+  const defended = all.filter(c => c.answers.length > 0);
+  const strong = defended.filter(c => (c.avgScore || 0) >= 70);
+  const medium = defended.filter(c => (c.avgScore || 0) >= 45 && (c.avgScore || 0) < 70);
+  const weak = defended.filter(c => (c.avgScore || 0) < 45);
+  const undefended = all.filter(c => c.answers.length === 0);
+
+  const totalScores = defended.flatMap(c => c.answers.filter(a => a.a !== '(skipped)').map(a => a.score));
+  const avg = totalScores.length ? Math.round(totalScores.reduce((a,b)=>a+b,0)/totalScores.length) : 0;
+
+  // Donut chart
+  renderDonut(avg);
+  $('#stat-defended').textContent = `${defended.length} / ${all.length}`;
+  $('#stat-avg').textContent = avg;
+  $('#stat-strong').textContent = strong.length;
+  $('#stat-weak').textContent = weak.length + undefended.length;
+
+  let verdict, narrative;
+  if (avg >= 75) {
+    verdict = 'Strong defense.';
+    narrative = 'Your answers land with specifics, ownership signals, and clean causality. You could walk into an interview tomorrow.';
+  } else if (avg >= 55) {
+    verdict = 'Middling defense.';
+    narrative = 'You survive the first question on most claims. A sharp interviewer would follow up on the weak spots below.';
+  } else if (avg >= 30) {
+    verdict = 'Your resume is stronger than your defense.';
+    narrative = 'Half your bullets would fold under one focused follow-up. Fix the weak claims below before your next interview.';
+  } else {
+    verdict = 'Rehearsal required.';
+    narrative = 'The claims are on paper but not yet in your head. Work through the weak claims below out loud.';
+  }
+  $('#report-verdict').textContent = verdict;
+  $('#report-narrative').textContent = narrative;
+
+  renderBucket('bucket-weak', 'Fix these first', weak.concat(undefended.map(u => ({...u, avgScore:0, isUndefended:true}))), 'weak');
+  renderBucket('bucket-medium', 'Sharpen these', medium, 'medium');
+  renderBucket('bucket-strong', 'Ship these as-is', strong, 'strong');
+}
+
+function renderDonut(avg) {
+  const wrap = $('#donut-wrap');
+  const size = 220, stroke = 22;
+  const r = (size - stroke) / 2;
+  const c = 2 * Math.PI * r;
+  const offset = c * (1 - avg / 100);
+  const color = avg >= 75 ? 'var(--success)' : avg >= 55 ? 'var(--warn)' : 'var(--danger)';
+  wrap.innerHTML = `
+    <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+      <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="var(--bg-elev2)" stroke-width="${stroke}" />
+      <circle cx="${size/2}" cy="${size/2}" r="${r}" fill="none" stroke="${color}" stroke-width="${stroke}"
+        stroke-dasharray="${c}" stroke-dashoffset="${offset}"
+        transform="rotate(-90 ${size/2} ${size/2})" stroke-linecap="round" style="transition: stroke-dashoffset 1s;" />
+    </svg>
+    <div class="donut-value">
+      <div>
+        <div class="n">${avg}</div>
+        <div class="l">DEFENSE SCORE / 100</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderBucket(id, title, claims, bucket) {
+  const el = $('#' + id);
+  if (claims.length === 0) { el.innerHTML = ''; return; }
+  const color = bucket === 'strong' ? 'var(--success)' : bucket === 'medium' ? 'var(--warn)' : 'var(--danger)';
+  const html = [`
+    <div class="bucket-head">
+      <h3>${title}</h3>
+      <span class="count">${claims.length} ${claims.length === 1 ? 'claim' : 'claims'}</span>
+    </div>
+  `];
+  for (const c of claims) {
+    const score = Math.round(c.avgScore || 0);
+    const barW = c.isUndefended ? 0 : score;
+    // rewrite suggestion
+    let rewriteText = '';
+    if (bucket === 'weak' || bucket === 'medium') {
+      const worstCategory = c.answers.length ? c.answers.slice().sort((a,b)=>a.score-b.score)[0].category : (c.vagueHits.length ? 'vague' : (c.metrics.length === 0 ? 'metric' : 'method'));
+      rewriteText = REWRITE_HINTS[worstCategory] || REWRITE_HINTS.method;
+    }
+    html.push(`
+      <div class="claim-detail">
+        <div class="claim-detail-head">
+          <div class="claim-detail-quote">"${escapeHTML(c.text)}"</div>
+          <div class="claim-detail-score" style="color:${color};">${c.isUndefended ? '—' : score}</div>
+        </div>
+        <div class="claim-detail-bar"><div class="claim-detail-bar-fill" style="width:${barW}%;background:${color};"></div></div>
+        ${c.answers.length ? `
+          <div class="claim-detail-answers">
+            ${c.answers.map(a => `
+              <div class="claim-detail-qa">
+                <div class="q">Q: ${escapeHTML(a.q)}</div>
+                <div class="a">${escapeHTML(a.a)} <span style="color:var(--text-dim);font-family:var(--font-mono);font-size:10px;">— score ${a.score}</span></div>
+              </div>
+            `).join('')}
+          </div>
+        ` : `<div style="color:var(--text-dim);font-size:12px;font-style:italic;">Not defended yet. A real interviewer will find this one.</div>`}
+        ${rewriteText ? `<div class="rewrite-suggestion"><strong>REWRITE HINT</strong>${rewriteText}</div>` : ''}
+      </div>
+    `);
+  }
+  el.innerHTML = html.join('');
+}
+
+function exportMarkdown() {
+  const all = STATE.claims;
+  const defended = all.filter(c => c.answers.length > 0);
+  const totalScores = defended.flatMap(c => c.answers.filter(a => a.a !== '(skipped)').map(a => a.score));
+  const avg = totalScores.length ? Math.round(totalScores.reduce((a,b)=>a+b,0)/totalScores.length) : 0;
+  const md = [
+    `# Defense Report`,
+    `_Generated by Defend Your Experience — Day 50 of #60DayClaudeChallenge_`,
+    ``,
+    `**Overall Defense Score:** ${avg} / 100`,
+    `**Claims defended:** ${defended.length} of ${all.length}`,
+    `**Sharpness:** ${STATE.sharpness}`,
+    ``,
+    `---`,
+    ``,
+    `## Claim breakdown`,
+    ``,
+  ];
+  for (const c of all) {
+    md.push(`### ${c.text}`);
+    md.push(`**Score:** ${c.answers.length ? Math.round(c.avgScore || 0) : '—'} / 100`);
+    if (c.answers.length) {
+      md.push('');
+      for (const a of c.answers) {
+        md.push(`- **Q:** ${a.q}`);
+        md.push(`  - **A:** ${a.a}`);
+        md.push(`  - _Score ${a.score} — ${a.note}_`);
+      }
+    } else {
+      md.push('_Not defended._');
+    }
+    md.push('');
+  }
+  downloadFile(md.join('\n'), 'defense-report.md', 'text/markdown');
+}
+
+function exportJSON() {
+  const data = { claims: STATE.claims, sessionHistory: STATE.sessionHistory, sharpness: STATE.sharpness, timestamp: new Date().toISOString() };
+  downloadFile(JSON.stringify(data, null, 2), 'defense-report.json', 'application/json');
+}
+
+function downloadFile(content, name, type) {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  toast(`Exported ${name}`, 'success');
+}
+
+/* =====================================================================
+   UI HELPERS
+   ===================================================================== */
+function switchState(name) {
+  $$('.state').forEach(s => s.classList.remove('active'));
+  $('#state-' + name).classList.add('active');
+  $('#btn-restart').style.display = name === 'input' ? 'none' : '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+let toastTimer;
+function toast(msg, kind) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + (kind || '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3400);
+}
+
+function escapeHTML(s) {
+  return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
+}
+
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', STATE.darkMode ? 'dark' : 'light');
+}
+
+/* =====================================================================
+   INIT / EVENTS
+   ===================================================================== */
+function detectClaude() {
+  STATE.isLiveClaude = typeof window.claude !== 'undefined' && typeof window.claude.complete === 'function';
+  const badge = $('#env-badge');
+  const label = $('#env-label');
+  if (STATE.isLiveClaude) {
+    badge.classList.add('live');
+    label.textContent = 'live claude';
+    badge.title = 'Live Claude Messages API — running inside Anthropic artifact environment';
+  } else {
+    badge.classList.remove('live');
+    label.textContent = 'pattern skeptic';
+    badge.title = 'Not inside Anthropic artifact environment — using rules-based challenge library';
+  }
+}
+
+function wireEvents() {
+  // Sharpness
+  $$('.sharpness-btn').forEach(b => b.onclick = () => {
+    STATE.sharpness = b.dataset.sharp;
+    $$('.sharpness-btn').forEach(x => x.classList.toggle('active', x === b));
+    saveState();
+  });
+
+  // Start
+  $('#btn-start').onclick = () => {
+    const text = $('#experience-input').value.trim();
+    if (text.length < 40) { toast('Paste at least a few sentences of experience.', 'error'); return; }
+    startInterview(text);
+  };
+  $('#btn-try-demo').onclick = () => {
+    $('#experience-input').value = SAMPLE_RESUME;
+    startInterview(SAMPLE_RESUME);
+  };
+
+  // Drop zone
+  const dz = $('#drop-zone');
+  ['dragover', 'dragenter'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('dragover'); }));
+  ['dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('dragover'); }));
+  dz.addEventListener('drop', async (e) => {
+    const file = e.dataTransfer.files[0];
+    if (!file) return;
+    const text = await file.text();
+    $('#experience-input').value = text;
+  });
+
+  // Interview
+  $('#btn-submit-answer').onclick = submitAnswer;
+  $('#btn-skip-question').onclick = skipQuestion;
+  $('#btn-next-claim').onclick = nextClaim;
+  $('#btn-see-report').onclick = showReport;
+  $('#answer-input').addEventListener('input', (e) => {
+    const scored = scoreAnswerRules(e.target.value);
+    $('#score-hint').textContent = `Pattern score: ${scored.score} — ${scored.note}`;
+  });
+
+  // Report
+  $('#btn-export-md').onclick = exportMarkdown;
+  $('#btn-export-json').onclick = exportJSON;
+  $('#btn-back-to-interview').onclick = () => switchState('interview');
+
+  // Restart
+  $('#btn-restart').onclick = () => {
+    if (!confirm('Restart? Your current session will be cleared.')) return;
+    STATE.claims = [];
+    STATE.sessionHistory = [];
+    STATE.currentClaimIdx = 0;
+    STATE.currentChallengeIdx = 0;
+    saveState();
+    switchState('input');
+  };
+
+  // Header
+  $('#btn-help').onclick = () => $('#help-modal').classList.add('open');
+  $('#btn-theme').onclick = () => { STATE.darkMode = !STATE.darkMode; saveState(); applyTheme(); };
+
+  // Keyboard
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') $$('.modal-backdrop.open').forEach(m => m.classList.remove('open'));
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && $('#state-interview').classList.contains('active')) {
+      e.preventDefault();
+      submitAnswer();
+    }
+  });
+
+  // Close modal on backdrop click
+  $$('.modal-backdrop').forEach(m => m.addEventListener('click', (e) => { if (e.target === m) m.classList.remove('open'); }));
+}
+
+function startInterview(text) {
+  const claims = extractClaims(text);
+  if (claims.length === 0) {
+    toast('No specific claims detected. Try pasting bullets or sentences with metrics / action verbs.', 'error');
+    return;
+  }
+  STATE.claims = claims;
+  STATE.currentClaimIdx = 0;
+  STATE.currentChallengeIdx = 0;
+  STATE.sessionHistory = [];
+  saveState();
+  switchState('interview');
+  loadCurrentChallenge();
+}
+
+function init() {
+  loadState();
+  applyTheme();
+  detectClaude();
+  wireEvents();
+  // Apply saved sharpness
+  $$('.sharpness-btn').forEach(x => x.classList.toggle('active', x.dataset.sharp === STATE.sharpness));
+}
+init();
+</script>
+</body>
+</html>
